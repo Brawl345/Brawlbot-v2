@@ -18,8 +18,8 @@ end
 
 function gSearch:googlethat(query, config)
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
-  local apikey = config.google_api_key
-  local cseid = config.google_cse_key
+  local apikey = cred_data.google_apikey
+  local cseid = cred_data.google_cse_id
   local number = 5 -- Set number of results 
 
   local api        = BASE_URL.."/?key="..apikey.."&cx="..cseid.."&gl=de&num="..number.."&safe=medium&fields=searchInformation%28formattedSearchTime,formattedTotalResults%29,items%28title,link,displayLink%29&"
