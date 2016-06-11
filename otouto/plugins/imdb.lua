@@ -4,15 +4,15 @@ local HTTP = require('socket.http')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
+local bindings = require('otouto.bindings')
 
 imdb.command = 'imdb <query>'
 
 function imdb:init(config)
 	imdb.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('imdb', true).table
-	imdb.doc = [[```
-]]..config.cmd_pat..[[imdb <query>
-Returns an IMDb entry.
-```]]
+	imdb.doc = [[*
+]]..config.cmd_pat..[[imdb* _<Film>_
+Sucht _Film_ bei IMDB]]
 end
 
 function imdb:action(msg, config)
@@ -42,12 +42,17 @@ function imdb:action(msg, config)
 		return
 	end
 
-	local output = '*' .. jdat.Title .. ' ('.. jdat.Year ..')*\n'
-	output = output .. jdat.imdbRating ..'/10 | '.. jdat.Runtime ..' | '.. jdat.Genre ..'\n'
+	local output = '*' .. jdat.Title .. ' ('.. jdat.Year ..')* von '..jdat.Director..'\n'
+	output = output .. string.gsub(jdat.imdbRating, '%.', ',') ..'/10 | '.. jdat.Runtime ..' | '.. jdat.Genre ..'\n'
 	output = output .. '_' .. jdat.Plot .. '_\n'
-	output = output .. '[Read more.](http://imdb.com/title/' .. jdat.imdbID .. ')'
+	output = output .. '[IMDB-Seite besuchen](http://imdb.com/title/' .. jdat.imdbID .. ')'
 
 	utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	
+	if jdat.Poster ~= "N/A" then
+	  local file = download_to_file(jdat.Poster)
+      bindings.sendPhoto(self, {chat_id = msg.chat.id}, {photo = file} )
+	end
 
 end
 

@@ -3,9 +3,9 @@ return {
 	-- Your authorization token from the botfather.
 	bot_api_key = '',
 	-- Your Telegram ID.
-	admin = 00000000,
+	admin = 1337,
 	-- Two-letter language code.
-	lang = 'en',
+	lang = 'de',
 	-- The channel, group, or user to send error reports to.
 	-- If this is not set, errors will be printed to the console.
 	log_chat = nil,
@@ -14,42 +14,22 @@ return {
 	cli_port = 4567,
 	-- The block of text returned by /start.
 	about_text = [[
-I am otouto, the plugin-wielding, multipurpose Telegram bot.
+Dies ist die BETA-Version von Brawlbot v2.
 
-Send /help to get started.
+Sende /hilfe, um zu starten
 	]],
 	-- The symbol that starts a command. Usually noted as '/' in documentation.
 	cmd_pat = '/',
 
-	-- https://datamarket.azure.com/dataset/bing/search
-	bing_api_key = '',
-	-- http://console.developers.google.com
-	google_api_key = '',
-	-- https://cse.google.com/cse
-	google_cse_key = '',
-	-- http://openweathermap.org/appid
-	owm_api_key = '',
-	-- http://last.fm/api
-	lastfm_api_key = '',
-	-- http://api.biblia.com
-	biblia_api_key = '',
-	-- http://thecatapi.com/docs.html
-	thecatapi_key = '',
-	-- http://api.nasa.gov
-	nasa_api_key = '',
-	-- http://tech.yandex.com/keys/get
-	yandex_key = '',
-	-- http://developer.simsimi.com/signUp
-	simsimi_key = '',
-	simsimi_trial = true,
-
 	errors = { -- Generic error messages used in various plugins.
-		connection = 'Connection error.',
-		results = 'No results found.',
-		argument = 'Invalid argument.',
-		syntax = 'Invalid syntax.',
-		chatter_connection = 'I don\'t feel like talking right now.',
-		chatter_response = 'I don\'t know what to say to that.'
+		connection = 'Verbindungsfehler.',
+		quotaexceeded = 'API-Quota aufgebraucht.',
+		results = 'Keine Ergebnisse gefunden.',
+		sudo = 'Du bist kein Superuser. Dieser Vorfall wird gemeldet!',
+		argument = 'Invalides Argument.',
+		syntax = 'Invalide Syntax.',
+		chatter_connection = 'Ich möchte gerade nicht reden',
+		chatter_response = 'Ich weiß nicht, was ich darauf antworten soll.'
 	},
 
 	plugins = { -- To enable a plugin, add its name to the list.
@@ -60,6 +40,9 @@ Send /help to get started.
 		'whoami',
 		'nick',
 		'echo',
+		'imgblacklist',
+		'gImages',
+		'gSearch',
 		'gMaps',
 		'wikipedia',
 		'hackernews',
@@ -67,7 +50,6 @@ Send /help to get started.
 		'calc',
 		'urbandictionary',
 		'time',
-		'eightball',
 		'dice',
 		'reddit',
 		'xkcd',
@@ -75,8 +57,14 @@ Send /help to get started.
 		'commit',
 		'pun',
 		'currency',
-		'cats',
 		'shout',
+		'set',
+		'get',
+		'patterns',
+		'9gag',
+		'shell',
+		'adfly',
+		'twitter',
 		-- Put new plugins above this line.
 		'help',
 		'greetings'

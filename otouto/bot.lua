@@ -3,13 +3,16 @@ local bot = {}
 -- Requires are moved to init to allow for reloads.
 local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
+local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '3.9'
+bot.version = '2'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
 	bindings = require('otouto.bindings')
 	utilities = require('otouto.utilities')
+	redis = (loadfile "./otouto/redis.lua")()
+	cred_data = load_cred()
 
 	assert(
 		config.bot_api_key and config.bot_api_key ~= '',
@@ -125,6 +128,57 @@ function bot:run(config)
 	-- Save the database before exiting.
 	utilities.save_data(self.info.username..'.db', self.database)
 	print('Halted.')
+end
+
+function load_cred()
+  if redis:exists("telegram:credentials") == false then
+  -- If credentials hash doesnt exists
+    print ("Created new credentials hash: telegram:credentials")
+    create_cred()
+  end
+  return redis:hgetall("telegram:credentials")
+end
+
+-- create credentials hash with redis
+function create_cred()
+  cred = {
+  bitly_access_token = "",
+  cloudinary_apikey = "",
+  cloudinary_api_secret = "",
+  cloudinary_public_id = "",
+  derpibooru_apikey = "",
+  fb_access_token = "",
+  flickr_apikey = "",
+  ftp_site = "",
+  ftp_username = "",
+  ftp_password = "",
+  gender_apikey = "",
+  golem_apikey = "",
+  google_apikey = "",
+  google_cse_id = "",
+  gitlab_private_token = "",
+  gitlab_project_id = "",
+  instagram_access_token = "",
+  lyricsnmusic_apikey = "",
+  mal_username = "",
+  mal_pw = "",
+  neutrino_userid = "",
+  neutrino_apikey = "",
+  owm_apikey = "",
+  page2images_restkey = "",
+  soundcloud_client_id = "",
+  tw_consumer_key = "",
+  tw_consumer_secret = "",
+  tw_access_token = "",
+  tw_access_token_secret = "",
+  x_mashape_key = "",
+  yandex_translate_apikey = "",
+  yandex_rich_content_apikey = "",
+  yourls_site_url = "",
+  yourls_signature_token = ""
+  }
+  redis:hmset("telegram:credentials", cred)
+  print ('saved credentials into reds hash telegram:credentials')
 end
 
 return bot

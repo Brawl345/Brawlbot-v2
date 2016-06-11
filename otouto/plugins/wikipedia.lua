@@ -5,20 +5,18 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-wikipedia.command = 'wikipedia <query>'
+wikipedia.command = 'wiki <Begriff>'
 
 function wikipedia:init(config)
 	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true):t('w', true).table
-	wikipedia.doc = [[```
-]]..config.cmd_pat..[[wikipedia <query>
-Returns an article from Wikipedia.
-Aliases: ]]..config.cmd_pat..[[w, ]]..config.cmd_pat..[[wiki
-```]]
+	wikipedia.doc = [[*
+]]..config.cmd_pat..[[wiki* _<Begriff>_: Gibt Wikipedia-Artikel aus
+Aliase: ]]..config.cmd_pat..[[w, ]]..config.cmd_pat..[[wikipedia]]
 end
 
 local get_title = function(search)
 	for _,v in ipairs(search) do
-		if not v.snippet:match('may refer to:') then
+		if not v.snippet:match('steht für') then
 			return v.title
 		end
 	end
@@ -46,7 +44,7 @@ function wikipedia:action(msg, config)
 	local jstr, res, jdat
 
 	-- All pretty standard from here.
-	local search_url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
+	local search_url = 'https://de.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
 
 	jstr, res = HTTPS.request(search_url .. URL.escape(input))
 	if res ~= 200 then
@@ -66,7 +64,7 @@ function wikipedia:action(msg, config)
 		return
 	end
 
-	local res_url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+	local res_url = 'https://de.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
 
 	jstr, res = HTTPS.request(res_url .. URL.escape(title))
 	if res ~= 200 then
@@ -97,7 +95,7 @@ function wikipedia:action(msg, config)
 	-- first part of the text is the title, and if so, we embolden that.
 	-- Otherwise, we prepend the text with a bold title. Then we append a "Read
 	-- More" link.
-	local url = 'https://en.wikipedia.org/wiki/' .. URL.escape(title)
+	local url = 'https://de.wikipedia.org/wiki/' .. URL.escape(title)
 	title = title:gsub('%(.+%)', '')
 	local output
 	if string.match(text:sub(1, title:len()), title) then
@@ -105,7 +103,7 @@ function wikipedia:action(msg, config)
 	else
 		output = '*' .. title:gsub('%(.+%)', '') .. '*\n' .. text:gsub('%[.+%]','')
 	end
-	output = output .. '\n[Read more.](' .. url:gsub('%)', '\\)') .. ')'
+	output = output .. '\n[Wikipedia - '..title..'](' .. url:gsub('%)', '\\)') .. ')'
 
 	utilities.send_message(self, msg.chat.id, output, true, nil, true)
 
