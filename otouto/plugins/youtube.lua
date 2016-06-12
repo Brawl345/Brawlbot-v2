@@ -1,62 +1,165 @@
- -- Thanks to @TiagoDanin for writing the original plugin.
-
 local youtube = {}
 
-local HTTPS = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
+local https = require('ssl.https')
+local JSON = require('dkjson')
+local bindings = require('otouto.bindings')
 
 function youtube:init(config)
-	if not config.google_api_key then
-		print('Missing config value: google_api_key.')
+	if not cred_data.google_apikey then
+		print('Missing config value: google_apikey.')
 		print('youtube.lua will not be enabled.')
 		return
 	end
-
-	youtube.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('youtube', true):t('yt', true).table
-	youtube.doc = [[```
-]]..config.cmd_pat..[[youtube <query>
-Returns the top result from YouTube.
-Alias: ]]..config.cmd_pat..[[yt
-```]]
+	
+	youtube.triggers = {
+		'youtu.be/([A-Za-z0-9-_-]+)',
+		'youtube.com/watch%?v=([A-Za-z0-9-_-]+)'
+	}
+	youtube.doc = [[*YouTube-Link*: Postet Infos zu Video]]
 end
 
-youtube.command = 'youtube <query>'
+local apikey = cred_data.google_apikey
 
-function youtube:action(msg, config)
+local BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
-	local input = utilities.input(msg.text)
-	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, youtube.doc, true, msg.message_id, true)
-			return
-		end
+function table.contains(table, element)
+  for _, value in pairs(table) do
+    if value == element then
+      return true
+    end
+  end
+  return false
+end
+
+local makeOurDate = function(dateString)
+  local pattern = "(%d+)%-(%d+)%-(%d+)T"
+  local year, month, day = dateString:match(pattern)
+  return day..'.'..month..'.'..year
+end
+
+function get_yt_data (yt_code)
+  local apikey = cred_data.google_apikey
+  local url = BASE_URL..'/videos?part=snippet,statistics,contentDetails&key='..apikey..'&id='..yt_code..'&fields=items(snippet(publishedAt,channelTitle,localized(title,description),thumbnails),statistics(viewCount,likeCount,dislikeCount,commentCount),contentDetails(duration,regionRestriction(blocked)))'
+  local res,code  = https.request(url)
+  if code ~= 200 then return "HTTP-FEHLER" end
+  local data = JSON.decode(res).items[1]
+  return data
+end
+
+local function convertISO8601Time(duration)
+	local a = {}
+
+	for part in string.gmatch(duration, "%d+") do
+	   table.insert(a, part)
 	end
 
-	local url = 'https://www.googleapis.com/youtube/v3/search?key=' .. config.google_api_key .. '&type=video&part=snippet&maxResults=4&q=' .. URL.escape(input)
-
-	local jstr, res = HTTPS.request(url)
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
+	if duration:find('M') and not (duration:find('H') or duration:find('S')) then
+		a = {0, a[1], 0}
 	end
 
-	local jdat = JSON.decode(jstr)
-	if jdat.pageInfo.totalResults == 0 then
-		utilities.send_reply(self, msg, config.errors.results)
-		return
+	if duration:find('H') and not duration:find('M') then
+		a = {a[1], 0, a[2]}
 	end
 
-	local vid_url = 'https://www.youtube.com/watch?v=' .. jdat.items[1].id.videoId
-	local vid_title = jdat.items[1].snippet.title
-	vid_title = vid_title:gsub('%(.+%)',''):gsub('%[.+%]','')
-	local output = '[' .. vid_title .. '](' .. vid_url .. ')'
+	if duration:find('H') and not (duration:find('M') or duration:find('S')) then
+		a = {a[1], 0, 0}
+	end
 
-	utilities.send_message(self, msg.chat.id, output, false, nil, true)
+	duration = 0
 
+	if #a == 3 then
+		duration = duration + tonumber(a[1]) * 3600
+		duration = duration + tonumber(a[2]) * 60
+		duration = duration + tonumber(a[3])
+	end
+
+	if #a == 2 then
+		duration = duration + tonumber(a[1]) * 60
+		duration = duration + tonumber(a[2])
+	end
+
+	if #a == 1 then
+		duration = duration + tonumber(a[1])
+	end
+
+	return duration
+end
+
+function send_youtube_data(data, msg, self, link, sendpic)
+  local title = data.snippet.localized.title
+  -- local description = data.snippet.localized.description
+  local uploader = data.snippet.channelTitle
+  local upload_date = makeOurDate(data.snippet.publishedAt)
+  local viewCount = comma_value(data.statistics.viewCount)
+  if data.statistics.likeCount then
+    likeCount = ', '..comma_value(data.statistics.likeCount)..' Likes und '
+	dislikeCount = comma_value(data.statistics.dislikeCount)..' Dislikes'
+  else
+    likeCount = ''
+	dislikeCount = ''
+  end
+
+  if data.statistics.commentCount then
+    commentCount = ', '..comma_value(data.statistics.commentCount)..' Kommentare'
+  else
+    commentCount = ''
+  end
+
+  local totalseconds = convertISO8601Time(data.contentDetails.duration)
+  local duration = makeHumanTime(totalseconds)
+  if data.contentDetails.regionRestriction then
+    blocked = data.contentDetails.regionRestriction.blocked
+    blocked = table.contains(blocked, "DE")
+  else
+    blocked = false
+  end
+  
+  text = '*'..title..'*\n_('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..likeCount..dislikeCount..commentCount..')_\n'
+  if link then
+    text = link..'\n'..text
+  end
+  
+  if blocked then
+    text = text..'\n*ACHTUNG, Video ist in Deutschland gesperrt!*'
+  end
+  
+  if sendpic then
+    if data.snippet.thumbnails.maxres then
+      image_url = data.snippet.thumbnails.maxres.url
+	elseif data.snippet.thumbnails.high then
+	  image_url = data.snippet.thumbnails.high.url
+	elseif data.snippet.thumbnails.medium then
+	  image_url = data.snippet.thumbnails.medium.url
+	elseif data.snippet.thumbnails.standard then
+	  image_url = data.snippet.thumbnails.standard.url
+	else
+	  image_url = data.snippet.thumbnails.default.url
+	end
+	-- need to change text, because Telegram captions can only be 200 characters long and don't support Markdown
+	local text = link..'\n'..title..'\n('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..')'
+	if blocked then
+      text = text..'\nACHTUNG, In Deutschland gesperrt!'
+    end
+    local file = download_to_file(image_url)
+    bindings.sendPhoto(self, {chat_id = msg.chat.id, reply_to_message_id = msg.message_id, caption = text }, {photo = file} )
+    os.remove(file)
+    print("Deleted: "..file)
+  else
+    utilities.send_reply(self, msg, text, true)
+  end
+end
+
+function youtube:action(msg)
+  if not msg.text:match('youtu.be/([A-Za-z0-9-_-]+)') and not msg.text:match('youtube.com/watch%?v=([A-Za-z0-9-_-]+)') then
+    return
+  end
+  local yt_code = msg.text:match('youtu.be/([A-Za-z0-9-_-]+)')
+  if not yt_code then yt_code = msg.text:match('youtube.com/watch%?v=([A-Za-z0-9-_-]+)') end
+  
+  local data = get_yt_data(yt_code)
+  send_youtube_data(data, msg, self)
+  return
 end
 
 return youtube

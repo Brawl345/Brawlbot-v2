@@ -136,7 +136,7 @@ function rss:subscribe(id, url)
    local uhash = get_base_redis(id)
 
    if redis:sismember(uhash, baseurl) then
-      return "Du hast "..url.." bereits abonniert."
+      return "Du hast `"..url.."` bereits abonniert."
    end
 
    local parsed, err = get_rss(url, protocol)

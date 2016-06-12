@@ -137,7 +137,6 @@ function twitter:action(msg)
   
   -- send the parts 
   local text = unescape(text)
-  print(header .. "\n" .. text.."\n"..footer)
   utilities.send_reply(self, msg, header .. "\n" .. text.."\n"..footer)
   for k, v in pairs(images) do
     local file = download_to_file(v)
