@@ -140,15 +140,11 @@ function twitter:action(msg)
   utilities.send_reply(self, msg, header .. "\n" .. text.."\n"..footer)
   for k, v in pairs(images) do
     local file = download_to_file(v)
-    bindings.sendPhoto(self, {chat_id = msg.chat.id}, {photo = file} )
-	os.remove(file)
-    print("Deleted: "..file)
+	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
   end
   for k, v in pairs(videos) do
     local file = download_to_file(v)
-	bindings.sendVideo(self, {chat_id = msg.chat.id}, {video = file} )
-	os.remove(file)
-    print("Deleted: "..file)
+	utilities.send_video(self, msg.chat.id, file, nil, msg.message_id)
   end
 end
 

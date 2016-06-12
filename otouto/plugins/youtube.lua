@@ -142,9 +142,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
       text = text..'\nACHTUNG, In Deutschland gesperrt!'
     end
     local file = download_to_file(image_url)
-    bindings.sendPhoto(self, {chat_id = msg.chat.id, reply_to_message_id = msg.message_id, caption = text }, {photo = file} )
-    os.remove(file)
-    print("Deleted: "..file)
+	utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
   else
     utilities.send_reply(self, msg, text, true)
   end

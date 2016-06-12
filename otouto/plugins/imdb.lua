@@ -51,7 +51,7 @@ function imdb:action(msg, config)
 	
 	if jdat.Poster ~= "N/A" then
 	  local file = download_to_file(jdat.Poster)
-      bindings.sendPhoto(self, {chat_id = msg.chat.id}, {photo = file} )
+	  utilities.send_photo(self, msg.chat.id, file)
 	end
 
 end

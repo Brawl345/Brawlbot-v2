@@ -34,6 +34,107 @@ function utilities:send_reply(old_msg, text, use_markdown)
 		parse_mode = use_markdown and 'Markdown' or nil
 	} )
 end
+
+-- NOTE: Telegram currently only allows file uploads up to 50 MB
+-- https://core.telegram.org/bots/api#sendphoto
+function utilities:send_photo(chat_id, file, text, reply_to_message_id)
+	local output = bindings.request(self, 'sendPhoto', {
+		chat_id = chat_id,
+		caption = text or nil,
+		reply_to_message_id = reply_to_message_id
+	}, {photo = file} )
+	os.remove(file)
+	print("Deleted: "..file)
+	return output
+end
+
+-- https://core.telegram.org/bots/api#sendaudio
+function utilities:send_audio(chat_id, file, text, reply_to_message_id, duration, performer, title)
+	local output = bindings.request(self, 'sendAudio', {
+		chat_id = chat_id,
+		caption = text or nil,
+		duration = duration or nil,
+		performer = performer or nil,
+		title = title or nil,
+		reply_to_message_id = reply_to_message_id
+	}, {audio = file} )
+	os.remove(file)
+	print("Deleted: "..file)
+	return output
+end
+
+-- https://core.telegram.org/bots/api#senddocument
+function utilities:send_document(chat_id, file, text, reply_to_message_id)
+	local output = bindings.request(self, 'sendDocument', {
+		chat_id = chat_id,
+		caption = text or nil,
+		reply_to_message_id = reply_to_message_id
+	}, {document = file} )
+	os.remove(file)
+	print("Deleted: "..file)
+	return output
+end
+
+-- https://core.telegram.org/bots/api#sendvideo
+function utilities:send_video(chat_id, file, text, reply_to_message_id, duration, width, height)
+	local output = bindings.request(self, 'sendVideo', {
+		chat_id = chat_id,
+		caption = text or nil,
+		duration = duration or nil,
+		width = width or nil,
+		height = height or nil,
+		reply_to_message_id = reply_to_message_id
+	}, {video = file} )
+	os.remove(file)
+	print("Deleted: "..file)
+	return output
+end
+
+-- NOTE: Voice messages are .ogg files encoded with OPUS
+-- https://core.telegram.org/bots/api#sendvoice
+function utilities:send_voice(chat_id, file, text, reply_to_message_id, duration)
+	local output = bindings.request(self, 'sendVoice', {
+		chat_id = chat_id,
+		duration = duration or nil,
+		reply_to_message_id = reply_to_message_id
+	}, {voice = file} )
+	os.remove(file)
+	print("Deleted: "..file)
+	return output
+end
+
+-- https://core.telegram.org/bots/api#sendlocation
+function utilities:send_location(chat_id, latitude, longitude, reply_to_message_id)
+	return bindings.request(self, 'sendLocation', {
+		chat_id = chat_id,
+		latitude = latitude,
+		longitude = longitude,
+		reply_to_message_id = reply_to_message_id
+	} )
+end
+
+-- NOTE: Venue is different from location: it shows information, such as the street adress or
+-- title of the location with it.
+-- https://core.telegram.org/bots/api#sendvenue
+function utilities:send_venue(chat_id, latitude, longitude, reply_to_message_id, title, address)
+	return bindings.request(self, 'sendVenue', {
+		chat_id = chat_id,
+		latitude = latitude,
+		longitude = longitude,
+		title = title,
+		address = address,
+		reply_to_message_id = reply_to_message_id
+	} )
+end
+
+-- https://core.telegram.org/bots/api#sendchataction
+function utilities:send_typing(chat_id, action)
+	return bindings.request(self, 'sendChatAction', {
+		chat_id = chat_id,
+		action = action
+	} )
+end
+
  -- get the indexed word in a string
 function utilities.get_word(s, i)
 	s = s or ''

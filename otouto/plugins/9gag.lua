@@ -26,6 +26,7 @@ function ninegag:get_9GAG()
 end
 
 function ninegag:action(msg, config)
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local url, title = ninegag:get_9GAG()
   if not url then
 	utilities.send_reply(self, msg, config.errors.connection)
@@ -33,9 +34,7 @@ function ninegag:action(msg, config)
   end
 
   local file = download_to_file(url)
-  bindings.sendPhoto(self, {chat_id = msg.chat.id, caption = title}, {photo = file} )
-  os.remove(file)
-  print("Deleted: "..file)
+  utilities.send_photo(self, msg.chat.id, file, title)
 end
 
 return ninegag

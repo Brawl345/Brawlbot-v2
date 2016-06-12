@@ -47,6 +47,7 @@ function gImages:action(msg, config)
 	return
   end
 
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local apikey = cred_data.google_apikey
   local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
@@ -68,9 +69,7 @@ function gImages:action(msg, config)
   local img_url = jdat.items[i].link
   
   local file = download_to_file(img_url)
-  bindings.sendPhoto(self, {chat_id = msg.chat.id, caption = img_url}, {photo = file} )
-  os.remove(file)
-  print("Deleted: "..file)
+  utilities.send_photo(self, msg.chat.id, file, img_url)
 end
 
 return gImages
