@@ -17,7 +17,8 @@ function yt_search:init(config)
 	end
 	
 	yt_search.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('yt', true):t('youtube', true).table
-	yt_search.doc = [[*]]..config.cmd_pat..[[yt* _<Suchbegriff>_: Sucht nach einem YouTube-Video]]
+	yt_search.doc = [[*
+]]..config.cmd_pat..[[yt* _<Suchbegriff>_: Sucht nach einem YouTube-Video]]
 end
 
 local BASE_URL = 'https://www.googleapis.com/youtube/v3'
