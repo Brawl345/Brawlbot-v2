@@ -1,4 +1,4 @@
-# otouto
+# Brawlbot v2
 The plugin-wielding, multipurpose Telegram bot.
 
 [Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
