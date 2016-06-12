@@ -48,6 +48,11 @@ function imgblacklist:remove_blacklist(word)
 end
 
 function imgblacklist:action(msg)
+  if msg.from.id ~= config.admin then
+    utilities.send_reply(self, msg, config.errors.sudo)
+	return
+  end
+  
   local input = utilities.input(msg.text)
   local input = string.lower(input)
   _blacklist = redis:smembers("telegram:img_blacklist")
