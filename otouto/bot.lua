@@ -5,7 +5,7 @@ local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '2'
+bot.version = '2.0'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -73,10 +73,17 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 		for _,w in pairs(v.triggers) do
 			if string.match(msg.text_lower, w) then
 				local success, result = pcall(function()
-					return v.action(self, msg, config)
+				 -- trying to port matches to otouto
+				      for k, pattern in pairs(v.triggers) do
+					    matches = match_pattern(pattern, msg.text)
+						if matches then
+						  break;
+						end
+					  end
+					return v.action(self, msg, config, matches)
 				end)
 				if not success then
-					utilities.send_reply(self, msg, 'Sorry, an unexpected error occurred.')
+					utilities.send_reply(self, msg, 'Ein unbekannter Fehler ist aufgetreten, bitte  [melde diesen Bug](https://github.com/Brawl345/Brawlbot-v2/issues).', true)
 					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 					return
 				end
