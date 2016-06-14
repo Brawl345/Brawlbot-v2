@@ -211,6 +211,14 @@ local lc_list = {
 	['!'] = 'ǃ'
 }
 
+function get_name(msg)
+   local name = msg.from.first_name
+   if name == nil then
+      name = msg.from.id
+   end
+   return name
+end
+
 -- http://www.lua.org/manual/5.2/manual.html#pdf-io.popen
 function run_command(str)
   local cmd = io.popen(str)
