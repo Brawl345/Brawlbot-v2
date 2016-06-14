@@ -8,6 +8,8 @@ local ltn12 = require('ltn12')
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
+local http = require('socket.http')
+local https = require('ssl.https')
 local serpent = require("serpent")
 local bindings = require('otouto.bindings')
 local redis = (loadfile "./otouto/redis.lua")()
@@ -210,6 +212,17 @@ local lc_list = {
 	['y'] = 'у',
 	['!'] = 'ǃ'
 }
+
+-- Retruns true if the string is empty
+function string:isempty()
+  return self == nil or self == ''
+end
+
+-- Retruns true if the string is blank
+function string:isblank()
+  self = self:trim()
+  return self:isempty()
+end
 
 function get_name(msg)
    local name = msg.from.first_name
@@ -580,6 +593,50 @@ function match_pattern(pattern, text)
 	end
   end
   -- nil
+end
+
+function post_petition(url, arguments, headers)
+   local url, h = string.gsub(url, "http://", "")
+   local url, hs = string.gsub(url, "https://", "")
+   local post_prot = "http"
+   if hs == 1 then
+      post_prot = "https"
+   end
+   local response_body = {}
+   local request_constructor = {
+      url = post_prot..'://'..url,
+      method = "POST",
+      sink = ltn12.sink.table(response_body),
+      headers = headers or {},
+      redirect = false
+   }
+
+   local source = arguments
+   if type(arguments) == "table" then
+      local source = helpers.url_encode_arguments(arguments)
+   end
+   
+   if not headers then
+     request_constructor.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF8"
+     request_constructor.headers["X-Accept"] = "application/json"
+	 request_constructor.headers["Accept"] = "application/json"
+   end
+   request_constructor.headers["Content-Length"] = tostring(#source)
+   request_constructor.source = ltn12.source.string(source)
+   
+   if post_prot == "http" then
+     ok, response_code, response_headers, response_status_line = http.request(request_constructor)
+   else
+     ok, response_code, response_headers, response_status_line = https.request(request_constructor)
+   end
+
+   if not ok then
+      return nil
+   end
+
+   response_body = JSON.decode(table.concat(response_body))
+
+   return response_body, response_headers
 end
 
 function get_redis_hash(msg, var)
