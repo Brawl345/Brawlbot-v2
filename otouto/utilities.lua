@@ -349,9 +349,9 @@ end
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
 function utilities.get_coords(input, config)
 
-	local url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
+	local url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
-	local jstr, res = HTTP.request(url)
+	local jstr, res = HTTPS.request(url)
 	if res ~= 200 then
 		return config.errors.connection
 	end
@@ -673,6 +673,16 @@ end
 
 function string.ends(str, fin)
   return fin=='' or string.sub(str,-string.len(fin)) == fin
+end
+
+function get_location(user_id)
+  local hash = 'user:'..user_id
+  local set_location = redis:hget(hash, 'location')
+  if set_location == 'false' or set_location == nil then
+    return false
+  else
+    return set_location
+  end
 end
 
 function cache_data(plugin, query, data, timeout, typ)

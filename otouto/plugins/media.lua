@@ -28,6 +28,7 @@ function media:action(msg)
   local ext = matches[2]
   local receiver = msg.chat.id
 
+  utilities.send_typing(self, receiver, 'upload_document')
   local file = download_to_file(url)
   local mime_type = mimetype.get_content_type_no_sub(ext)
 
