@@ -98,7 +98,7 @@ function creds_manager:action(msg, config, matches)
   end
 
   if msg.chat.type ~= 'private' then
-    utilities.send_reply(self, msg, 'Dieses Plugin solltest du nur [privat](http://telegram.me/' .. self.info.username .. '?start=creds) nutzen!', true)
+    utilities.send_reply(self, msg, 'Dieses Plugin solltest du nur [privat](http://telegram.me/' .. self.info.username .. '?start=creds) verwenden!', true)
     return
   end
   
