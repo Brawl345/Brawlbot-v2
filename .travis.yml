@@ -1,6 +1,7 @@
 language: erlang
 
 before_install:
+  - CURDIR=$(pwd)
   - sudo apt-get update -qq
   - sudo apt-get install -qq libreadline-dev libconfig-dev libssl-dev lua5.2 liblua5.2-dev libevent-dev make unzip git libjansson-dev
   - THIS_DIR=$(cd $(dirname $0); pwd)
@@ -26,8 +27,9 @@ before_install:
   - ./.luarocks/bin/luarocks install serpent
   - ./.luarocks/bin/luarocks install sha1
   - ./.luarocks/bin/luarocks install lpeg
-  - cd $THIS_DIR
+  - cd $CURDIR
   - ls
+  - pwd
   
 
 script: 
