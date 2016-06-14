@@ -26,6 +26,8 @@ before_install:
   - ./.luarocks/bin/luarocks install serpent
   - ./.luarocks/bin/luarocks install sha1
   - ./.luarocks/bin/luarocks install lpeg
+  - cd $THIS_DIR
+  - ls
   
 
 script: 
