@@ -60,7 +60,7 @@ end
 function creds_manager:add_creds(var, key)
   print('Saving credential for '..var..' to redis hash '..hash)
   redis:hset(hash, var, key)
-  reload_creds()
+  creds_manager:reload_creds()
   return 'Gespeichert!'
 end
 
@@ -68,7 +68,7 @@ function creds_manager:del_creds(var)
   if redis:hexists(hash, var) == true then
     print('Deleting credential for '..var..' from redis hash '..hash)
     redis:hdel(hash, var)
-	reload_creds()
+	creds_manager:reload_creds()
     return 'Key von "'..var..'" erfolgreich gelöscht!'
   else
     return 'Du hast keine Logininformationen für diese Variable eingespeichert.'
@@ -80,7 +80,7 @@ function creds_manager:rename_creds(var, newvar)
     local key = redis:hget(hash, var)
 	if redis:hsetnx(hash, newvar, key) == true then
 	  redis:hdel(hash, var)
-	  reload_creds()
+	  creds_manager:reload_creds()
 	  return '"'..var..'" erfolgreich zu "'..newvar..'" umbenannt.'
 	else
 	  return "Variable konnte nicht umbenannt werden: Zielvariable existiert bereits."

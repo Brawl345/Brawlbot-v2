@@ -8,10 +8,10 @@ local utilities = require('otouto.utilities')
 wikipedia.command = 'wiki <Begriff>'
 
 function wikipedia:init(config)
-	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true):t('w', true).table
+	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true).table
 	wikipedia.doc = [[*
 ]]..config.cmd_pat..[[wiki* _<Begriff>_: Gibt Wikipedia-Artikel aus
-Aliase: ]]..config.cmd_pat..[[w, ]]..config.cmd_pat..[[wikipedia]]
+Alias: ]]..config.cmd_pat..[[wikipedia]]
 end
 
 local get_title = function(search)

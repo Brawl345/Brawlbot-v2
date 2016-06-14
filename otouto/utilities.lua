@@ -240,6 +240,12 @@ function run_command(str)
   return result
 end
 
+function convert_timestamp(timestamp, format)
+  local converted_date = run_command('date -d @'..timestamp..' +"'..format..'"')
+  local converted_date = string.gsub(converted_date, '%\n', '')
+  return converted_date
+end
+
 function string.starts(String, Start)
    return Start == string.sub(String,1,string.len(Start))
 end
@@ -657,6 +663,14 @@ function tablelength(T)
   local count = 0
   for _ in pairs(T) do count = count + 1 end
   return count
+end
+
+function round(num, idp)
+  if idp and idp>0 then
+    local mult = 10^idp
+    return math.floor(num * mult + 0.5) / mult
+  end
+  return math.floor(num + 0.5)
 end
 
 function comma_value(amount)
