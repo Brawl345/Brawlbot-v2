@@ -21,7 +21,6 @@ Sende /hilfe, um zu starten
 	-- The symbol that starts a command. Usually noted as '/' in documentation.
 	cmd_pat = '/',
 
-<<<<<<< HEAD:config.lua.example
 	errors = { -- Generic error messages used in various plugins.
 	    generic = 'An unexpected error occurred.',
 		connection = 'Verbindungsfehler.',
