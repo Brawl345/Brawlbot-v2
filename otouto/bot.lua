@@ -69,21 +69,28 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 		msg.text_lower = msg.text:lower()
 	end
 
-	for _,v in ipairs(self.plugins) do
-		for _,w in pairs(v.triggers) do
-			if string.match(msg.text_lower, w) then
+	for _, plugin in ipairs(self.plugins) do
+		for _, trigger in pairs(plugin.triggers) do
+			if string.match(msg.text_lower, trigger) then
 				local success, result = pcall(function()
 				 -- trying to port matches to otouto
-				      for k, pattern in pairs(v.triggers) do
+				      for k, pattern in pairs(plugin.triggers) do
 					    matches = match_pattern(pattern, msg.text)
 						if matches then
 						  break;
 						end
 					  end
-					return v.action(self, msg, config, matches)
+					return plugin.action(self, msg, config, matches)
 				end)
 				if not success then
-					utilities.send_reply(self, msg, 'Ein unbekannter Fehler ist aufgetreten, bitte  [melde diesen Bug](https://github.com/Brawl345/Brawlbot-v2/issues).', true)
+					-- If the plugin has an error message, send it. If it does
+					-- not, use the generic one specified in config. If it's set
+					-- to false, do nothing.
+					if plugin.error then
+						utilities.send_reply(self, msg, plugin.error)
+					elseif plugin.error == nil then
+						utilities.send_reply(self, msg, config.errors.generic, true)
+					end
 					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 					return
 				end
