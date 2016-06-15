@@ -150,7 +150,7 @@ end
 function pre_process_msg(self, msg)
   for number,plugin in ipairs(self.plugins) do
     if plugin.pre_process and msg then
-	  print('Preprocess #'..number)
+	 -- print('Preprocess #'..number) -- remove comment to restore old behaviour
 	  plugin:pre_process(msg, self)
     end
   end
