@@ -7,7 +7,7 @@ local redis = (loadfile "./otouto/redis.lua")()
 
 app_store.triggers = {
 	"itunes.apple.com/(.*)/app/(.*)/id(%d+)",
-	"^!itunes (%d+)$",
+	"^/itunes (%d+)$",
 	"itunes.apple.com/app/id(%d+)"
 }
 	
