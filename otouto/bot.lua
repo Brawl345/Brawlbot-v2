@@ -63,12 +63,14 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 
 	msg = utilities.enrich_message(msg)
+	
 
 	if msg.text:match('^'..config.cmd_pat..'start .+') then
 		msg.text = config.cmd_pat .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
 	end
 
+	pre_process_msg(self, msg)
 	for _, plugin in ipairs(self.plugins) do
 		for _, trigger in pairs(plugin.triggers) do
 			if string.match(msg.text_lower, trigger) then
@@ -142,6 +144,16 @@ function bot:run(config)
 	-- Save the database before exiting.
 	utilities.save_data(self.info.username..'.db', self.database)
 	print('Halted.')
+end
+
+-- Apply plugin.pre_process function
+function pre_process_msg(self, msg)
+  for number,plugin in ipairs(self.plugins) do
+    if plugin.pre_process and msg then
+	  print('Preprocess #'..number)
+	  plugin:pre_process(msg, self)
+    end
+  end
 end
 
 function load_cred()

@@ -68,7 +68,11 @@ function gImages:action(msg, config)
   local img_url = jdat.items[i].link
   
   local file = download_to_file(img_url)
-  utilities.send_photo(self, msg.chat.id, file, img_url)
+  if string.ends(img_url, ".gif") then
+    utilities.send_document(self, msg.chat.id, file, img_url)
+  else
+    utilities.send_photo(self, msg.chat.id, file, img_url)
+  end
 end
 
 return gImages
