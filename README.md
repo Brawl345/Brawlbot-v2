@@ -1,4 +1,6 @@
 # Brawlbot v2
+[![Build Status](https://travis-ci.org/Brawl345/Brawlbot-v2.svg?branch=master)](https://travis-ci.org/Brawl345/Brawlbot-v2)
+
 The plugin-wielding, multipurpose Telegram bot.
 
 [Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
