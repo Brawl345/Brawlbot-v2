@@ -51,7 +51,8 @@ function bot:init(config) -- The function run when the bot is started or reloade
 end
 
 function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
-
+	-- remove comment to enable debugging
+	-- vardump(msg)
 	-- Cache user info for those involved.
 	utilities.create_user_entry(self, msg.from)
 	if msg.forward_from and msg.forward_from.id ~= msg.from.id then
