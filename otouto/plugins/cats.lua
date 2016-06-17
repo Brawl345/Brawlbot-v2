@@ -4,35 +4,34 @@ local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 
 function cats:init(config)
-	if not config.thecatapi_key then
-		print('Missing config value: thecatapi_key.')
+	if not cred_data.cat_apikey then
+		print('Missing config value: cat_apikey.')
 		print('cats.lua will be enabled, but there are more features with a key.')
 	end
 
-	cats.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('cat').table
+	cats.triggers = {
+      "^/cat$",
+	  "^/cat (gif)$"
+	}
+	
+	cats.doc = [[*
+]]..config.cmd_pat..[[cat*: Postet eine zufällige Katze
+*]]..config.cmd_pat..[[cat* _gif_: Postet eine zufällige, animierte Katze]]
 end
 
 cats.command = 'cat'
-cats.doc = '`Returns a cat!`'
+local apikey = cred_data.cat_apikey or "" -- apply for one here: http://thecatapi.com/api-key-registration.html
 
 function cats:action(msg, config)
-
-	local url = 'http://thecatapi.com/api/images/get?format=html&type=jpg'
-	if config.thecatapi_key then
-		url = url .. '&api_key=' .. config.thecatapi_key
-	end
-
-	local str, res = HTTP.request(url)
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
-	end
-
-	str = str:match('<img src="(.-)">')
-	local output = '[Cat!]('..str..')'
-
-	utilities.send_message(self, msg.chat.id, output, false, nil, true)
-
+  if matches[1] == 'gif' then
+    local url = 'http://thecatapi.com/api/images/get?type=gif&apikey='..apikey
+	local file = download_to_file(url)
+    utilities.send_document(self, msg.chat.id, file, nil, msg.message_id)
+  else
+    local url = 'http://thecatapi.com/api/images/get?type=jpg,png&apikey='..apikey
+	local file = download_to_file(url)
+    utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  end
 end
 
 return cats
