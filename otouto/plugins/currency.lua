@@ -3,59 +3,62 @@ local currency = {}
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-currency.command = 'cash [amount] <from> to <to>'
+currency.command = 'cash [Menge] <von> in <zu>'
 
 function currency:init(config)
-	currency.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('cash', true).table
-	currency.doc = [[```
-]]..config.cmd_pat..[[cash [amount] <from> to <to>
-Example: ]]..config.cmd_pat..[[cash 5 USD to EUR
-Returns exchange rates for various currencies.
-Source: Google Finance.
-```]]
+	currency.triggers = {
+      "^/cash ([A-Za-z]+)$",
+      "^/cash ([A-Za-z]+) ([A-Za-z]+)$",
+	  "^/cash (%d+[%d%.,]*) ([A-Za-z]+) ([A-Za-z]+)$",
+  	"^(/eur)$"
+	}
+	currency.doc = [[*
+]]..config.cmd_pat..[[cash* _[Menge]_ _<von>_ _<zu>_
+Beispiel: _]]..config.cmd_pat..[[cash 5 USD EUR_]]
 end
 
 function currency:action(msg, config)
+  if not matches[2] then
+    from = string.upper(matches[1])
+	to = 'EUR'
+	amount = 1
+  elseif matches[3] then
+    from = string.upper(matches[2])
+	to = string.upper(matches[3])
+	amount = matches[1]
+  else
+    from = string.upper(matches[1])
+	to = string.upper(matches[2])
+	amount = 1
+  end
+  
+  local amount = string.gsub(amount, ",", ".")
+  amount = tonumber(amount)
+  local result = 1
+  local BASE_URL = 'https://www.google.com/finance/converter'
+  if from == to then
+    utilities.send_reply(self, msg, 'Jaja, sehr witzig...')
+	return
+  end
+  
+  local url = BASE_URL..'?from='..from..'&to='..to..'&a='..amount
+  local str, res = HTTPS.request(url)
+  if res ~= 200 then
+    utilities.send_reply(self, msg, config.errors.connection)
+    return
+  end
+  
+  local str = str:match('<span class=bld>(.*) %u+</span>')
+  if not str then
+	utilities.send_reply(self, msg, 'Keine gültige Währung - sieh dir die Währungsliste bei [Google Finanzen](https://www.google.com/finance/converter) an.', true)
+	return
+  end
+  local result = string.format('%.2f', str)
+  local result = string.gsub(result, "%.", ",")
 
-	local input = msg.text:upper()
-	if not input:match('%a%a%a TO %a%a%a') then
-		utilities.send_message(self, msg.chat.id, currency.doc, true, msg.message_id, true)
-		return
-	end
-
-	local from = input:match('(%a%a%a) TO')
-	local to = input:match('TO (%a%a%a)')
-	local amount = utilities.get_word(input, 2)
-	amount = tonumber(amount) or 1
-	local result = 1
-
-	local url = 'https://www.google.com/finance/converter'
-
-	if from ~= to then
-
-		url = url .. '?from=' .. from .. '&to=' .. to .. '&a=' .. amount
-		local str, res = HTTPS.request(url)
-		if res ~= 200 then
-			utilities.send_reply(self, msg, config.errors.connection)
-			return
-		end
-
-		str = str:match('<span class=bld>(.*) %u+</span>')
-		if not str then
-			utilities.send_reply(self, msg, config.errors.results)
-			return
-		end
-
-		result = string.format('%.2f', str)
-
-	end
-
-	local output = amount .. ' ' .. from .. ' = ' .. result .. ' ' .. to .. '\n\n'
-	output = output .. os.date('!%F %T UTC') .. '\nSource: Google Finance`'
-	output = '```\n' .. output .. '\n```'
-
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
-
+  local amount = tostring(string.gsub(amount, "%.", ","))
+  local output = amount..' '..from..' = *'..result..' '..to..'*'
+  utilities.send_reply(self, msg, output, true)
 end
 
 return currency
