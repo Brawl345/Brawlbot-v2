@@ -104,7 +104,7 @@ function media_download:pre_process(msg, self)
   
   -- Save file_id to redis to prevent downloading the same file over and over when forwarding
   redis:sadd('telegram:file_id', file_id)
-  return
+  return msg
 end
 
 function media_download:action(msg)

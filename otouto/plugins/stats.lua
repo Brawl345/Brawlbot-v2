@@ -103,7 +103,7 @@ function stats:pre_process(msg, self)
   -- Total user msgs
   local hash = 'msgs:'..msg.from.id..':'..msg.chat.id
   redis:incr(hash)
-  return
+  return msg
 end
 
 function stats:action(msg, config, matches)

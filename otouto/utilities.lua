@@ -586,8 +586,7 @@ utilities.char = {
 	arabic = '[\216-\219][\128-\191]',
 	rtl_override = '‮',
 	rtl_mark = '‏',
-	em_dash = '—',
-	utf_8 = '([%z\1-\127\194-\244][\128-\191]*)',
+	em_dash = '—'
 }
 
 -- Returns a table with matches or nil
@@ -600,6 +599,15 @@ function match_pattern(pattern, text)
 	end
   end
   -- nil
+end
+
+function is_sudo(msg, config)
+  local var = false
+  -- Check if user id is sudoer
+  if config.admin == msg.from.id then
+    var = true
+  end
+  return var
 end
 
 function post_petition(url, arguments, headers)

@@ -101,7 +101,7 @@ function afk:pre_process(msg, self)
 	end
   end
   
-  return
+  return msg
 end
 
 function afk:action(msg)

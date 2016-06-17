@@ -71,7 +71,11 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 		msg.text_lower = msg.text:lower()
 	end
 
-	pre_process_msg(self, msg)
+	-- gsub out user name if multiple bots are in the same group
+	msg.text = string.gsub(msg.text, '@'..config.bot_user_name, "")
+	msg.text_lower = string.gsub(msg.text, '@'..string.lower(config.bot_user_name), "")
+
+	msg = pre_process_msg(self, msg, config)
 	for _, plugin in ipairs(self.plugins) do
 		for _, trigger in pairs(plugin.triggers) do
 			if string.match(msg.text_lower, trigger) then
@@ -148,13 +152,14 @@ function bot:run(config)
 end
 
 -- Apply plugin.pre_process function
-function pre_process_msg(self, msg)
+function pre_process_msg(self, msg, config)
   for number,plugin in ipairs(self.plugins) do
     if plugin.pre_process and msg then
 	 -- print('Preprocess #'..number) -- remove comment to restore old behaviour
-	  plugin:pre_process(msg, self)
+	  new_msg = plugin:pre_process(msg, self, config)
     end
   end
+  return new_msg
 end
 
 function load_cred()
