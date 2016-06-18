@@ -2,8 +2,6 @@ return {
 
 	-- Your authorization token from the botfather.
 	bot_api_key = '',
-	-- Bot's username without @
-	bot_user_name = '',
 	-- Your Telegram ID.
 	admin = 1337,
 	-- Two-letter language code.
