@@ -35,12 +35,10 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	self.database.users = self.database.users or {} -- Table to cache userdata.
 	self.database.users[tostring(self.info.id)] = self.info
 
-	plugins = {}
 	self.plugins = {} -- Load plugins.
 	enabled_plugins = load_plugins()
 	for k,v in pairs(enabled_plugins) do
 		local p = require('otouto.plugins.'..v)
-		plugins[k] = p
 		print('loading plugin',v)
 		table.insert(self.plugins, p)
 	    self.plugins[k].name = v
@@ -131,33 +129,6 @@ function pre_process_msg(self, msg, config)
     end
   end
   return new_msg
-end
-
-function bakk_match_plugins(self, msg, config)
-  -- Go over patterns. If one matches is enough.
-  for k, pattern in pairs(plugin.triggers) do
-    local matches = match_pattern(pattern, msg.text)
-    -- local matches = match_pattern(pattern, msg.text, true)
-    if matches then
-      print("msg matches: ", pattern)
-	  
-	  if is_plugin_disabled_on_chat(plugin_name, msg) then
-        return nil
-	  end
-      -- Function exists
-   --[[   if plugin.run then
-	    if not plugin.notyping then send_typing(receiver, ok_cb, true) end
-        if not warns_user_not_allowed(plugin, msg) then
-          local result = plugin.run(msg, matches)
-          if result then
-			send_large_msg(receiver, result)
-          end
-        end
-      end ]]--
-      -- One pattern matches
-      return
-    end
-  end
 end
 
 function match_plugins(self, msg, config)
