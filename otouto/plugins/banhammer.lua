@@ -158,7 +158,7 @@ function banhammer:pre_process(msg, self, config)
   return msg
 end
 
-function banhammer:action(msg, config)
+function banhammer:action(msg, config, matches)
   if msg.from.id ~= config.admin then
     utilities.send_reply(self, msg, config.errors.sudo)
 	return

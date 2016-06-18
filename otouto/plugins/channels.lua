@@ -69,7 +69,7 @@ function channels:pre_process(msg, self, config)
 	return msg
 end
 
-function channels:action(msg, config)
+function channels:action(msg, config, matches)
   if msg.from.id ~= config.admin then
     utilities.send_reply(self, msg, config.errors.sudo)
 	return

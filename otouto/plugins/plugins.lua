@@ -1,5 +1,6 @@
 local plugin_manager = {}
 
+local bot = require('otouto.bot')
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local redis = (loadfile "./otouto/redis.lua")()
@@ -68,14 +69,15 @@ function plugin_manager:list_plugins()
 end
 
 function plugin_manager:reload_plugins(self, config, plugin_name, status)
-  self.plugins = {}
-  load_plugins()
-  for _,v in ipairs(enabled_plugins) do
-	local p = require('otouto.plugins.'..v)
-	print('loading plugin',v)
-	table.insert(self.plugins, p)
-	if p.init then p.init(self, config) end
-  end
+		for pac, _ in pairs(package.loaded) do
+			if pac:match('^otouto%.plugins%.') then
+				package.loaded[pac] = nil
+			end
+		end
+		package.loaded['otouto.bindings'] = nil
+		package.loaded['otouto.utilities'] = nil
+		package.loaded['config'] = nil
+		bot.init(self, config)
   if plugin_name then
     return 'Plugin '..plugin_name..' wurde '..status
   else
