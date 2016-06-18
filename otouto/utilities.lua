@@ -589,8 +589,40 @@ utilities.char = {
 	em_dash = '—'
 }
 
+-- taken from http://stackoverflow.com/a/11130774/3163199
+function scandir(directory)
+  local i, t, popen = 0, {}, io.popen
+  for filename in popen('ls -a "'..directory..'"'):lines() do
+    i = i + 1
+    t[i] = filename
+  end
+  return t
+end
+
+-- Returns at table of lua files inside plugins
+function plugins_names()
+  local files = {}
+  for k, v in pairs(scandir("otouto/plugins")) do
+    -- Ends with .lua
+    if (v:match(".lua$")) then
+      table.insert(files, v)
+    end 
+  end
+  return files
+end
+
+-- Function name explains what it does.
+function file_exists(name)
+  local f = io.open(name,"r")
+  if f ~= nil then 
+    io.close(f) 
+    return true 
+  else 
+    return false 
+  end
+end
+
 -- Returns a table with matches or nil
---function match_pattern(pattern, text, lower_case)
 function match_pattern(pattern, text)
   if text then
     local matches = { string.match(text, pattern) }

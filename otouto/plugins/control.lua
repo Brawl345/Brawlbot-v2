@@ -8,7 +8,7 @@ local cmd_pat -- Prevents the command from being uncallable.
 function control:init(config)
 	cmd_pat = config.cmd_pat
 	control.triggers = utilities.triggers(self.info.username, cmd_pat,
-		{'^'..cmd_pat..'script'}):t('reload', true):t('halt').table
+		{'^'..cmd_pat..'script'}):t('restart', true):t('halt').table
 end
 
 function control:action(msg, config)
@@ -19,7 +19,7 @@ function control:action(msg, config)
 
 	if msg.date < os.time() - 1 then return end
 
-	if msg.text_lower:match('^'..cmd_pat..'reload') then
+	if msg.text_lower:match('^'..cmd_pat..'restart') then
 		for pac, _ in pairs(package.loaded) do
 			if pac:match('^otouto%.plugins%.') then
 				package.loaded[pac] = nil

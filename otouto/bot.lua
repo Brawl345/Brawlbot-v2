@@ -16,7 +16,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 	assert(
 		config.bot_api_key and config.bot_api_key ~= '',
-		'You did not set your bot token in the config!'
+    'You did not set your bot token in the config!'
 	)
 	self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
 
@@ -35,14 +35,18 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	self.database.users = self.database.users or {} -- Table to cache userdata.
 	self.database.users[tostring(self.info.id)] = self.info
 
+	plugins = {}
 	self.plugins = {} -- Load plugins.
-	for _,v in ipairs(config.plugins) do
+	enabled_plugins = load_plugins()
+	for k,v in pairs(enabled_plugins) do
 		local p = require('otouto.plugins.'..v)
+		plugins[k] = p
+		print('loading plugin',v)
 		table.insert(self.plugins, p)
+	    self.plugins[k].name = v
 		if p.init then p.init(self, config) end
 	end
-
-	print('@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
+	print('Bot started successfully as:\n@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
 
 	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,
 	self.last_cron = self.last_cron or os.date('%M') -- the time of the last cron job,
@@ -76,41 +80,8 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	msg.text_lower = string.gsub(msg.text, '@'..string.lower(config.bot_user_name), "")
 
 	msg = pre_process_msg(self, msg, config)
-	for _, plugin in ipairs(self.plugins) do
-		for _, trigger in pairs(plugin.triggers) do
-			if string.match(msg.text_lower, trigger) then
-				local success, result = pcall(function()
-				 -- trying to port matches to otouto
-				      for k, pattern in pairs(plugin.triggers) do
-					    matches = match_pattern(pattern, msg.text)
-						if matches then
-						  break;
-						end
-					  end
-					return plugin.action(self, msg, config, matches)
-				end)
-				if not success then
-					-- If the plugin has an error message, send it. If it does
-					-- not, use the generic one specified in config. If it's set
-					-- to false, do nothing.
-					if plugin.error then
-						utilities.send_reply(self, msg, plugin.error)
-					elseif plugin.error == nil then
-						utilities.send_reply(self, msg, config.errors.generic, true)
-					end
-					utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
-					return
-				end
-				-- If the action returns a table, make that table the new msg.
-				if type(result) == 'table' then
-					msg = result
-				-- If the action returns true, continue.
-				elseif result ~= true then
-					return
-				end
-			end
-		end
-	end
+	
+    match_plugins(self, msg, config)
 
 end
 
@@ -160,6 +131,174 @@ function pre_process_msg(self, msg, config)
     end
   end
   return new_msg
+end
+
+function bakk_match_plugins(self, msg, config)
+  -- Go over patterns. If one matches is enough.
+  for k, pattern in pairs(plugin.triggers) do
+    local matches = match_pattern(pattern, msg.text)
+    -- local matches = match_pattern(pattern, msg.text, true)
+    if matches then
+      print("msg matches: ", pattern)
+	  
+	  if is_plugin_disabled_on_chat(plugin_name, msg) then
+        return nil
+	  end
+      -- Function exists
+   --[[   if plugin.run then
+	    if not plugin.notyping then send_typing(receiver, ok_cb, true) end
+        if not warns_user_not_allowed(plugin, msg) then
+          local result = plugin.run(msg, matches)
+          if result then
+			send_large_msg(receiver, result)
+          end
+        end
+      end ]]--
+      -- One pattern matches
+      return
+    end
+  end
+end
+
+function match_plugins(self, msg, config)
+  for _, plugin in ipairs(self.plugins) do
+	for _, trigger in pairs(plugin.triggers) do
+	  if string.match(msg.text_lower, trigger) then
+	  -- Check if Plugin is disabled
+	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
+	  local success, result = pcall(function()
+	    -- trying to port matches to otouto
+		for k, pattern in pairs(plugin.triggers) do
+		  matches = match_pattern(pattern, msg.text)
+		  if matches then
+		    break;
+		  end
+		end
+		return plugin.action(self, msg, config, matches)
+	  end)
+	  if not success then
+	  -- If the plugin has an error message, send it. If it does
+	  -- not, use the generic one specified in config. If it's set
+	  -- to false, do nothing.
+	    if plugin.error then
+	      utilities.send_reply(self, msg, plugin.error)
+	    elseif plugin.error == nil then
+	      utilities.send_reply(self, msg, config.errors.generic, true)
+	    end
+	    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	    return
+	  end
+	  -- If the action returns a table, make that table the new msg.
+	  if type(result) == 'table' then
+	    msg = result
+		-- If the action returns true, continue.
+		elseif result ~= true then
+		  return
+	    end
+      end
+    end
+  end
+end
+
+function is_plugin_disabled_on_chat(plugin_name, msg)
+  local hash = get_redis_hash(msg, 'disabled_plugins')
+  local disabled = redis:hget(hash, plugin_name)
+  
+  -- Plugin is disabled
+  if disabled == 'true' then
+    print('Plugin '..plugin_name..' ist in diesem Chat deaktiviert')
+	return true
+  else
+    return false
+  end
+end
+
+function load_plugins()
+  enabled_plugins = redis:smembers('telegram:enabled_plugins')
+  if not enabled_plugins[1] then
+    create_plugin_set()
+  end
+  return enabled_plugins
+end
+
+-- create plugin set if it doesn't exist
+function create_plugin_set()
+  enabled_plugins = {
+    'control',
+    'blacklist',
+    'about',
+    'ping',
+    'whoami',
+    'nick',
+    'echo',
+    'imgblacklist',
+    'gImages',
+    'gSearch',
+    'wikipedia',
+    'hackernews',
+    'imdb',
+    'calc',
+    'urbandictionary',
+    'time',
+    'reddit',
+    'xkcd',
+    'slap',
+    'commit',
+    'pun',
+    'currency',
+    'shout',
+    'set',
+    'get',
+    'patterns',
+    '9gag',
+    'shell',
+    'adfly',
+    'twitter',
+    'rss',
+    'remind',
+    'youtube',
+    'youtube_search',
+    'youtube_channel',
+    'youtube_playlist',
+    'tagesschau_eil',
+    'twitter_send',
+    'respond',
+    'roll',
+    'quotes',
+    'pasteee',
+    'images',
+    'media',
+    'location_manager',
+    'creds',
+    'weather',
+    'forecast',
+    'expand',
+    'facebook',
+    'github',
+    'bitly',
+    'app_store',
+    'bitly_create',
+    'br',
+    'heise',
+    'tagesschau',
+    'wiimmfi',
+    'wikia',
+    'afk',
+    'stats',
+    'btc',
+    'cats',
+    'cleverbot',
+    'imgur',
+    'banhammer',
+    'channels',
+	'plugins',
+    'help',
+    'greetings'
+  }
+  print ('enabling a few plugins - saving to redis set telegram:enabled_plugins')
+  for _,plugin in pairs(enabled_plugins) do
+    redis:sadd("telegram:enabled_plugins", plugin)
+  end
 end
 
 function load_cred()

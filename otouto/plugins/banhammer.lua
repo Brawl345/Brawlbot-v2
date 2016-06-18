@@ -151,8 +151,8 @@ function banhammer:pre_process(msg, self, config)
 	  msg.entities = ''
     end
 
-  else 
-    print('Whitelist not enabled or is sudo')
+ -- else 
+   -- print('Whitelist not enabled or is sudo')
   end
 
   return msg
