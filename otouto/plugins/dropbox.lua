@@ -17,7 +17,7 @@ function dropbox:action(msg, config, matches)
   
   local v,code  = https.request(link)
   if code == 200 then
-	if string.ends(link, ".png") or string.ends(link, ".jpeg") or string.ends(link, ".jpg") then
+	if string.ends(link, ".png") or string.ends(link, ".jpe?g")then
 	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
 	  local file = download_to_file(link)
       utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
