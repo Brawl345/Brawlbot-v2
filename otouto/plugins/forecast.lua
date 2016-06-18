@@ -36,7 +36,7 @@ function forecast:init(config)
 ]]
 end
 
-forecast.command = 'forecast'
+forecast.command = 'f [Ort]'
 
 local BASE_URL = "https://api.forecast.io/forecast"
 local apikey = cred_data.forecastio_apikey

@@ -30,7 +30,7 @@ function weather:init(config)
 ]]
 end
 
-weather.command = 'wetter'
+weather.command = 'w [Ort]'
 
 local BASE_URL = "https://api.forecast.io/forecast"
 local apikey = cred_data.forecastio_apikey

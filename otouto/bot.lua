@@ -44,6 +44,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	    self.plugins[k].name = v
 		if p.init then p.init(self, config) end
 	end
+	
 	print('Bot started successfully as:\n@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
 
 	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,

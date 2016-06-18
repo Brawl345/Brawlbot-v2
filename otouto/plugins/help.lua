@@ -8,12 +8,17 @@ local utilities = require('otouto.utilities')
 local help_text
 
 function help:init(config)
+  help.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hilfe', true):t('help', true).table
+end
+
+function help:action(msg, config)
 
 	local commandlist = {}
 	help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
 
 	for _,plugin in ipairs(self.plugins) do
 		if plugin.command then
+		    
 			table.insert(commandlist, plugin.command)
 			--help_text = help_text .. '\n• '..config.cmd_pat .. plugin.command:gsub('%[', '\\[')
 		end
@@ -21,17 +26,9 @@ function help:init(config)
 
 	table.insert(commandlist, 'hilfe [Plugin]')
 	table.sort(commandlist)
-
 	help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
 
 	help_text = help_text:gsub('%[', '\\[')
-
-	help.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hilfe', true):t('help', true).table
-
-end
-
-function help:action(msg)
-
 	local input = utilities.input(msg.text_lower)
 
 	-- Attempts to send the help message via PM.

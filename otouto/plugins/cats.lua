@@ -3,6 +3,8 @@ local cats = {}
 local HTTP = require('socket.http')
 local utilities = require('otouto.utilities')
 
+cats.command = 'cat [gif]'
+
 function cats:init(config)
 	if not cred_data.cat_apikey then
 		print('Missing config value: cat_apikey.')
@@ -19,7 +21,7 @@ function cats:init(config)
 *]]..config.cmd_pat..[[cat* _gif_: Postet eine zufällige, animierte Katze]]
 end
 
-cats.command = 'cat [gif]'
+
 local apikey = cred_data.cat_apikey or "" -- apply for one here: http://thecatapi.com/api-key-registration.html
 
 function cats:action(msg, config)
