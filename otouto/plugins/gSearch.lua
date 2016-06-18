@@ -5,15 +5,13 @@ local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-gSearch.command = 'google <query>'
+gSearch.command = 'google <Suchbegriff>'
 
 function gSearch:init(config)
 	gSearch.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('g', true):t('google', true):t('gnsfw', true).table
-	gSearch.doc = [[```
-]]..config.cmd_pat..[[google <Suchbegriff>
-Sendet Suchergebnisse von Google
-Alias: ]]..config.cmd_pat..[[g
-```]]
+	gSearch.doc = [[*
+]]..config.cmd_pat..[[google* _<Suchbegriff>_: Sendet Suchergebnisse von Google
+Alias: _]]..config.cmd_pat..[[g_]]
 end
 
 function gSearch:googlethat(query, config)
