@@ -70,8 +70,10 @@ function gImages:action(msg, config)
   local file = download_to_file(img_url)
   if string.ends(img_url, ".gif") then
     utilities.send_document(self, msg.chat.id, file, img_url)
+	return
   else
     utilities.send_photo(self, msg.chat.id, file, img_url)
+	return
   end
 end
 
