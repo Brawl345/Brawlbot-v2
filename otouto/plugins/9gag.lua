@@ -34,7 +34,7 @@ function ninegag:action(msg, config)
   end
 
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, title)
+  utilities.send_photo(self, msg.chat.id, file, title, msg.message_id)
 end
 
 return ninegag
