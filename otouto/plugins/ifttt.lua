@@ -47,7 +47,7 @@ function ifttt:do_ifttt_request(key, event, value1, value2, value3)
   local res,code = https.request(url)
   if code ~= 200 then return "*Ein Fehler ist aufgetreten!* Aktion wurde nicht ausgeführt." end
   
-  return "*Event "..event.." getriggert!*"
+  return "*Event \""..event.."\" getriggert!*"
 end
 
 function ifttt:action(msg, config, matches)
