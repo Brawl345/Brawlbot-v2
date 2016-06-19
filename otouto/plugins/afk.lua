@@ -62,8 +62,8 @@ function afk:switch_afk(user_name, user_id, chat_id, timestamp, text)
 end
 
 function afk:pre_process(msg, self)
- if msg.chat.type == "private" then
-    -- Ignore
+  if msg.chat.type == "private" then
+	-- Ignore
     return
   end
 

@@ -20,7 +20,7 @@ function gImages:init(config)
 		return
 	end
 
-	gImages.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('img', true):t('i', true):t('insfw', true).table
+	gImages.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('img', true):t('i', true).table
 	gImages.doc = [[*
 ]]..config.cmd_pat..[[img* _<Suchbegriff>_
 Sucht Bild mit Google und versendet es (SafeSearch aktiv)
