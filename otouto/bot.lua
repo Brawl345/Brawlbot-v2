@@ -80,8 +80,9 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 
 	msg = pre_process_msg(self, msg, config)
 	
-    match_plugins(self, msg, config)
-
+	for _, plugin in ipairs(self.plugins) do
+	  match_plugins(self, msg, config, plugin)
+	end
 end
 
 function bot:run(config)
@@ -132,43 +133,41 @@ function pre_process_msg(self, msg, config)
   return new_msg
 end
 
-function match_plugins(self, msg, config)
-  for _, plugin in ipairs(self.plugins) do
-	for _, trigger in pairs(plugin.triggers) do
-	  if string.match(msg.text_lower, trigger) then
-	  -- Check if Plugin is disabled
-	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
-	  local success, result = pcall(function()
-	    -- trying to port matches to otouto
-		for k, pattern in pairs(plugin.triggers) do
-		  matches = match_pattern(pattern, msg.text)
-		  if matches then
-		    break;
-		  end
+function match_plugins(self, msg, config, plugin)
+  for _, trigger in pairs(plugin.triggers) do
+    if string.match(msg.text_lower, trigger) then
+	-- Check if Plugin is disabled
+	if is_plugin_disabled_on_chat(plugin.name, msg) then return end
+	local success, result = pcall(function()
+	  -- trying to port matches to otouto
+	  for k, pattern in pairs(plugin.triggers) do
+	    matches = match_pattern(pattern, msg.text)
+		if matches then
+		  break;
 		end
-		return plugin.action(self, msg, config, matches)
-	  end)
-	  if not success then
-	  -- If the plugin has an error message, send it. If it does
-	  -- not, use the generic one specified in config. If it's set
-	  -- to false, do nothing.
-	    if plugin.error then
-	      utilities.send_reply(self, msg, plugin.error)
-	    elseif plugin.error == nil then
-	      utilities.send_reply(self, msg, config.errors.generic, true)
-	    end
-	    utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	  end
+	  return plugin.action(self, msg, config, matches)
+	end)
+	if not success then
+	-- If the plugin has an error message, send it. If it does
+	-- not, use the generic one specified in config. If it's set
+	-- to false, do nothing.
+	if plugin.error then
+	  utilities.send_reply(self, msg, plugin.error)
+	elseif plugin.error == nil then
+	  utilities.send_reply(self, msg, config.errors.generic, true)
+	end
+	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	  return
+	end
+	-- If the action returns a table, make that table the new msg.
+	if type(result) == 'table' then
+	  msg = result
+	  -- If the action returns true, continue.
+	  elseif result ~= true then
 	    return
 	  end
-	  -- If the action returns a table, make that table the new msg.
-	  if type(result) == 'table' then
-	    msg = result
-		-- If the action returns true, continue.
-		elseif result ~= true then
-		  return
-	    end
-      end
-    end
+	end
   end
 end
 

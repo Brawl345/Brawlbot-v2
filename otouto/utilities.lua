@@ -9,7 +9,6 @@ local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local http = require('socket.http')
-local https = require('ssl.https')
 local serpent = require("serpent")
 local bindings = require('otouto.bindings')
 local redis = (loadfile "./otouto/redis.lua")()
@@ -250,74 +249,34 @@ function string.starts(String, Start)
    return Start == string.sub(String,1,string.len(Start))
 end
 
-function get_http_file_name(url, headers)
-  -- Eg: fooo.var
-  local file_name = url:match("[^%w]+([%.%w]+)$")
-  -- Any delimited aphanumeric on the url
-  file_name = file_name or url:match("[^%w]+(%w+)[^%w]+$")
-  -- Random name, hope content-type works
-  file_name = file_name or str:random(5)
-
-  local content_type = headers["content-type"] 
-  
-  local extension = nil
-  if content_type then
-    extension = mimetype.get_mime_extension(content_type) 
-  end
-
-  if extension then
-    file_name = file_name.."."..extension
-  end
-  
-  local disposition = headers["content-disposition"]
-  if disposition then
-    -- attachment; filename=CodeCogsEqn.png
-    file_name = disposition:match('filename=([^;]+)') or file_name
-	file_name = string.gsub(file_name, "\"", "")
-  end
-  
-  return file_name
-end
-
 -- Saves file to $HOME/tmp/. If file_name isn't provided,
 -- will get the text after the last "/" for filename
 -- and content-type for extension
 function download_to_file(url, file_name)
-  print("url to download: "..url)
-
-  local respbody = {}
-  local options = {
-    url = url,
-    sink = ltn12.sink.table(respbody),
-    redirect = true
- }
-
-  -- nil, code, headers, status
-  local response = nil
-
-  if string.starts(url, 'https') then
-    options.redirect = false
-    response = {HTTPS.request(options)}
-  else
-    response = {HTTP.request(options)}
-  end
-
-  local code = response[2]
-  local headers = response[3]
-  local status = response[4]
-
-  if code ~= 200 then return nil end
-
-  file_name = file_name or get_http_file_name(url, headers)
-
- local file_path = "/home/anditest/tmp/telegram-bot/"..file_name
- print("Saved to: "..file_path)
- 
-  file = io.open(file_path, "w+")
-  file:write(table.concat(respbody))
-  file:close()
-
-  return file_path
+    print('url to download: '..url)
+	if not file_name then
+		file_name = '/tmp/' .. url:match('.+/(.-)$') or '/tmp/' .. os.time()
+	else
+	    file_name = '/tmp/' .. file_name
+	end
+	local body = {}
+	local doer = HTTP
+	local do_redir = true
+	if url:match('^https') then
+		doer = HTTPS
+		do_redir = false
+	end
+	local _, res = doer.request{
+		url = url,
+		sink = ltn12.sink.table(body),
+		redirect = do_redir
+	}
+	if res ~= 200 then return false end
+	local file = io.open(file_name, 'w+')
+	file:write(table.concat(body))
+	file:close()
+	print('Saved to: '..file_name)
+	return file_name
 end
 
 function vardump(value)
@@ -462,28 +421,9 @@ function utilities:handle_exception(err, message, config)
 
 end
 
+-- MOVED TO DOWNLOAD_TO_FILE
 function utilities.download_file(url, filename)
-	if not filename then
-		filename = url:match('.+/(.-)$') or os.time()
-		filename = '/tmp/' .. filename
-	end
-	local body = {}
-	local doer = HTTP
-	local do_redir = true
-	if url:match('^https') then
-		doer = HTTPS
-		do_redir = false
-	end
-	local _, res = doer.request{
-		url = url,
-		sink = ltn12.sink.table(body),
-		redirect = do_redir
-	}
-	if res ~= 200 then return false end
-	local file = io.open(filename, 'w+')
-	file:write(table.concat(body))
-	file:close()
-	return filename
+  return download_to_file(url, filename)
 end
 
 function utilities.markdown_escape(text)
@@ -674,7 +614,7 @@ function post_petition(url, arguments, headers)
    if post_prot == "http" then
      ok, response_code, response_headers, response_status_line = http.request(request_constructor)
    else
-     ok, response_code, response_headers, response_status_line = https.request(request_constructor)
+     ok, response_code, response_headers, response_status_line = HTTPS.request(request_constructor)
    end
 
    if not ok then
