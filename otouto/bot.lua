@@ -124,9 +124,9 @@ end
 
 -- Apply plugin.pre_process function
 function pre_process_msg(self, msg, config)
-  for number,plugin in ipairs(self.plugins) do
+  for _,plugin in ipairs(self.plugins) do
     if plugin.pre_process and msg then
-	 -- print('Preprocess #'..number) -- remove comment to restore old behaviour
+	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
 	  new_msg = plugin:pre_process(msg, self, config)
     end
   end

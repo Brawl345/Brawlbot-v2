@@ -80,6 +80,15 @@ function stats:pre_process(msg, self)
     return
   end
 
+  if msg.left_chat_member then
+    -- delete user from redis set, but keep message count
+	local hash = 'chat:'..msg.chat.id..':users'
+	local user_id_left = msg.left_chat_member.id
+	print('User '..user_id_left..' was kicked, deleting him/her from redis set '..hash)
+	redis:srem(hash, user_id_left)
+    return msg
+  end
+  
   -- Save user on Redis
   local hash = 'user:'..msg.from.id
   -- print('Saving user', hash) -- remove comment to restore old behaviour
