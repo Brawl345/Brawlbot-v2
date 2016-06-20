@@ -1,19 +1,16 @@
 local reddit = {}
 
-local HTTP = require('socket.http')
+local https = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 
-reddit.command = 'reddit [r/subreddit | query]'
+reddit.command = 'reddit [r/subreddit | Suchbegriff]'
 
 function reddit:init(config)
 	reddit.triggers = utilities.triggers(self.info.username, config.cmd_pat, {'^/r/'}):t('reddit', true):t('r', true):t('r/', true).table
-	reddit.doc = [[```
-]]..config.cmd_pat..[[reddit [r/subreddit | query]
-Returns the top posts or results for a given subreddit or query. If no argument is given, returns the top posts from r/all. Querying specific subreddits is not supported.
-Aliases: ]]..config.cmd_pat..[[r, /r/subreddit
-```]]
+	reddit.doc = [[*
+]]..config.cmd_pat..[[r* _[r/subreddit | Suchbegriff]_: Gibt Top-Posts oder Ergebnisse eines Subreddits aus. Wenn kein Argument gegeben ist, wird /r/all genommen.]]
 end
 
 local format_results = function(posts)
@@ -25,7 +22,7 @@ local format_results = function(posts)
 			title = title:sub(1, 253)
 			title = utilities.trim(title) .. '...'
 		end
-		local short_url = 'redd.it/' .. post.id
+		local short_url = 'https://redd.it/' .. post.id
 		local s = '[' .. title .. '](' .. short_url .. ')'
 		if post.domain and not post.is_self and not post.over_18 then
 			s = '`[`[' .. post.domain .. '](' .. post.url:gsub('%)', '\\)') .. ')`]` ' .. s
@@ -35,9 +32,9 @@ local format_results = function(posts)
 	return output
 end
 
-reddit.subreddit_url = 'http://www.reddit.com/%s/.json?limit='
-reddit.search_url = 'http://www.reddit.com/search.json?q=%s&limit='
-reddit.rall_url = 'http://www.reddit.com/.json?limit='
+reddit.subreddit_url = 'https://www.reddit.com/%s/.json?limit='
+reddit.search_url = 'https://www.reddit.com/search.json?q=%s&limit='
+reddit.rall_url = 'https://www.reddit.com/.json?limit='
 
 function reddit:action(msg, config)
 	-- Eight results in PM, four results elsewhere.
@@ -59,7 +56,7 @@ function reddit:action(msg, config)
 			source = '*/' .. utilities.md_escape(input) .. '*\n'
 		else
 			input = utilities.input(msg.text)
-			source = '*Results for* _' .. utilities.md_escape(input) .. '_ *:*\n'
+			source = '*Ergebnisse für* _' .. utilities.md_escape(input) .. '_ *:*\n'
 			input = URL.escape(input)
 			url = reddit.search_url:format(input) .. limit
 		end
@@ -67,7 +64,7 @@ function reddit:action(msg, config)
 		url = reddit.rall_url .. limit
 		source = '*/r/all*\n'
 	end
-	local jstr, res = HTTP.request(url)
+	local jstr, res = https.request(url)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 	else

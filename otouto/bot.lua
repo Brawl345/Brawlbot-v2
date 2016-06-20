@@ -146,6 +146,7 @@ function match_plugins(self, msg, config, plugin)
 		  break;
 		end
 	  end
+	  print(plugin.name..' triggered')
 	  return plugin.action(self, msg, config, matches)
 	end)
 	if not success then

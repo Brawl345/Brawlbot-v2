@@ -50,10 +50,9 @@ function utilities:send_photo(chat_id, file, text, reply_to_message_id)
 end
 
 -- https://core.telegram.org/bots/api#sendaudio
-function utilities:send_audio(chat_id, file, text, reply_to_message_id, duration, performer, title)
+function utilities:send_audio(chat_id, file, reply_to_message_id, duration, performer, title)
 	local output = bindings.request(self, 'sendAudio', {
 		chat_id = chat_id,
-		caption = text or nil,
 		duration = duration or nil,
 		performer = performer or nil,
 		title = title or nil,
