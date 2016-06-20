@@ -2,14 +2,12 @@ local echo = {}
 
 local utilities = require('otouto.utilities')
 
-echo.command = 'echo <text>'
+echo.command = 'echo <Text>'
 
 function echo:init(config)
 	echo.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('echo', true).table
-	echo.doc = [[```
-]]..config.cmd_pat..[[echo <text>
-Repeats a string of text.
-```]]
+	echo.doc = [[*
+]]..config.cmd_pat..[[echo* _<Text>_: Gibt den Text aus]]
 end
 
 function echo:action(msg)

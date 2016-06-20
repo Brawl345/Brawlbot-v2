@@ -43,9 +43,9 @@ function urbandictionary:action(msg, config)
 		return
 	end
 
-	local output = '*' .. jdat.list[1].word .. '*\n\n' .. utilities.trim(jdat.list[1].definition)
+	local output = '*' .. jdat.list[1].word .. '*\n' .. utilities.trim(jdat.list[1].definition)
 	if string.len(jdat.list[1].example) > 0 then
-		output = output .. '_\n\n' .. utilities.trim(jdat.list[1].example) .. '_'
+		output = output .. '_\n' .. utilities.trim(jdat.list[1].example) .. '_'
 	end
 
 	output = output:gsub('%[', ''):gsub('%]', '')
