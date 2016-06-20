@@ -32,10 +32,10 @@ function control:action(msg, config)
 			config[k] = v
 		end end
 		bot.init(self, config)
-		utilities.send_reply(self, msg, 'Bot reloaded!')
+		utilities.send_reply(self, msg, 'Bot neu gestartet!')
 	elseif msg.text_lower:match('^'..cmd_pat..'halt') then
 		self.is_started = false
-		utilities.send_reply(self, msg, 'Stopping bot!')
+		utilities.send_reply(self, msg, 'Stoppe Bot!')
 	elseif msg.text_lower:match('^'..cmd_pat..'script') then
 		local input = msg.text_lower:match('^'..cmd_pat..'script\n(.+)')
 		if not input then

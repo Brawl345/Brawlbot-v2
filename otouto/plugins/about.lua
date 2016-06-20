@@ -17,7 +17,7 @@ function about:action(msg, config)
 	-- disabled to restore old behaviour
 	-- if msg.forward_from then return end
 
-	local output = config.about_text .. '\nBrawlbot v2, basierend auf Otouto von topkecleon.'
+	local output = config.about_text .. '\nBrawlbot v2.0, basierend auf Otouto von topkecleon.'
 
 	if
 		(msg.new_chat_participant and msg.new_chat_participant.id == self.info.id)
