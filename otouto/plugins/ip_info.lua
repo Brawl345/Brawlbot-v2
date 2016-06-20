@@ -82,7 +82,7 @@ function ip_info:action(msg, config, matches)
   
   if image_url then
     utilities.send_typing(self, msg.chat.id, 'upload_photo')
-    local file = download_to_file(image_url)
+    local file = download_to_file(image_url, 'map.png')
     utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
   else
     utilities.send_reply(self, msg, text)
