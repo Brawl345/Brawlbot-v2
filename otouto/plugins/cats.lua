@@ -27,11 +27,11 @@ local apikey = cred_data.cat_apikey or "" -- apply for one here: http://thecatap
 function cats:action(msg, config)
   if matches[1] == 'gif' then
     local url = 'http://thecatapi.com/api/images/get?type=gif&apikey='..apikey
-	local file = download_to_file(url)
+	local file = download_to_file(url, 'miau.gif')
     utilities.send_document(self, msg.chat.id, file, nil, msg.message_id)
   else
     local url = 'http://thecatapi.com/api/images/get?type=jpg,png&apikey='..apikey
-	local file = download_to_file(url)
+	local file = download_to_file(url, 'miau.png')
     utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
   end
 end

@@ -7,7 +7,8 @@ about.command = 'about'
 about.doc = '`Sendet Informationen über den Bot.`'
 
 about.triggers = {
-	'/about'
+	'/about',
+	'/start'
 }
 
 function about:action(msg, config)

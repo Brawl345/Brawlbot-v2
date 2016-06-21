@@ -10,6 +10,7 @@ function shell:action(msg, config)
 
 	if msg.from.id ~= config.admin then
 		utilities.send_reply(self, msg, config.errors.sudo)
+		return
 	end
 
 	local input = utilities.input(msg.text)
