@@ -163,7 +163,7 @@ function plugin_manager:reenable_plugin_on_chat(msg, plugin)
   end
 end
 
-function plugin_manager:action(msg, config)
+function plugin_manager:action(msg, config, matches)
   if msg.from.id ~= config.admin then
     utilities.send_reply(self, msg, config.errors.sudo)
 	return

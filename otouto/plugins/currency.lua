@@ -3,7 +3,7 @@ local currency = {}
 local HTTPS = require('ssl.https')
 local utilities = require('otouto.utilities')
 
-currency.command = 'cash [Menge] <von> in <zu>'
+currency.command = 'cash [Menge] <von> <zu>'
 
 function currency:init(config)
 	currency.triggers = {

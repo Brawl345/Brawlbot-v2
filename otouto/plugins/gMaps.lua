@@ -6,7 +6,7 @@ local utilities = require('otouto.utilities')
 gMaps.command = 'loc <Ort>'
 
 function gMaps:init(config)
-	gMaps.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('location', true):t('loc', true).table
+	gMaps.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('loc', true).table
 	gMaps.doc = [[*
 ]]..config.cmd_pat..[[loc* _<Ort>_: Sendet Ort via Google Maps]]
 end

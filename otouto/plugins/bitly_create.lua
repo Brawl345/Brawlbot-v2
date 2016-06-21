@@ -127,7 +127,7 @@ function bitly_create:action(msg, config, matches)
     print('Not signed in, will use global bitly access_token')
     bitly_access_token = cred_data.bitly_access_token
   end
-  
+
   if matches[2] == nil then
     long_url = url_encode(matches[1])
 	domain = 'bit.ly'
