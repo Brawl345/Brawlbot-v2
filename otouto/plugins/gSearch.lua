@@ -25,8 +25,7 @@ function gSearch:googlethat(query, config)
   -- Do the request
   local res, code = HTTPS.request(api..parameters)
   if code == 403 then
-    utilities.send_reply(self, msg, config.errors.quotaexceeded)
-	return
+    return '403'
   end
   if code ~= 200 then
     utilities.send_reply(self, msg, config.errors.connection)
@@ -67,7 +66,11 @@ function gSearch:action(msg, config)
 	end
   end
   
-  local results, stats = gSearch:googlethat(input, config)
+  local results, stats = gSearch:googlethat(input, onfig)
+  if results == '403' then
+    utilities.send_reply(self, msg, config.errors.quotaexceeded)
+	return
+  end
   utilities.send_message(self, msg.chat.id, gSearch:stringlinks(results, stats), true, nil, true)
 
 end

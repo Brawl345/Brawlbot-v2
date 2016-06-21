@@ -1,112 +1,188 @@
 local wikipedia = {}
 
-local HTTPS = require('ssl.https')
+local https = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
+local socket = require('socket')
 local utilities = require('otouto.utilities')
 
 wikipedia.command = 'wiki <Begriff>'
 
 function wikipedia:init(config)
-	wikipedia.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('wikipedia', true):t('wiki', true).table
+	wikipedia.triggers = {
+    "^/[Ww]iki(%w+) (search) (.+)$",
+    "^/[Ww]iki (search) ?(.*)$",
+    "^/[Ww]iki(%w+) (.+)$",
+    "^/[Ww]iki ?(.*)$",
+	"(%w+).wikipedia.org/wiki/(.+)"
+	}
 	wikipedia.doc = [[*
 ]]..config.cmd_pat..[[wiki* _<Begriff>_: Gibt Wikipedia-Artikel aus
 Alias: ]]..config.cmd_pat..[[wikipedia]]
 end
 
-local get_title = function(search)
-	for _,v in ipairs(search) do
-		if not v.snippet:match('steht für') then
-			return v.title
-		end
-	end
-	return false
+local decodetext
+do
+    local char, gsub, tonumber = string.char, string.gsub, tonumber
+    local function _(hex) return char(tonumber(hex, 16)) end
+
+    function decodetext(s)
+        s = gsub(s, '%%(%x%x)', _)
+        return s
+    end
 end
 
-function wikipedia:action(msg, config)
+local server = {
+  -- http://meta.wikimedia.org/wiki/List_of_Wikipedias
+  wiki_server = "https://%s.wikipedia.org",
+  wiki_path = "/w/api.php",
+  wiki_load_params = {
+    action = "query",
+    prop = "extracts",
+    format = "json",
+    exchars = 350,
+    exsectionformat = "plain",
+    explaintext = "",
+    redirects = ""
+  },
+  wiki_search_params = {
+    action = "query",
+	 list = "search",
+    srlimit = 20,
+	 format = "json",
+  },
+  default_lang = "de",
+}
 
-	-- Get the query. If it's not in the message, check the replied-to message.
-	-- If those don't exist, send the help text.
-	local input = utilities.input(msg.text)
-	if not input then
-		if msg.reply_to_message and msg.reply_to_message.text then
-			input = msg.reply_to_message.text
-		else
-			utilities.send_message(self, msg.chat.id, wikipedia.doc, true, msg.message_id, true)
-			return
-		end
-	end
+function wikipedia:getWikiServer(lang)
+  return string.format(server.wiki_server, lang or server.default_lang)
+end
 
-	-- This kinda sucks, but whatever.
-	input = input:gsub('#', ' sharp')
+--[[
+--  return decoded JSON table from Wikipedia
+--]]
+function wikipedia:loadPage(text, lang, intro, plain, is_search)
+  local request, sink = {}, {}
+  local query = ""
+  local parsed
 
-	-- Disclaimer: These variables will be reused.
-	local jstr, res, jdat
+  if is_search then
+    for k,v in pairs(server.wiki_search_params) do
+      query = query .. k .. '=' .. v .. '&'
+    end
+    parsed = URL.parse(wikipedia:getWikiServer(lang))
+    parsed.path = server.wiki_path
+    parsed.query = query .. "srsearch=" .. URL.escape(text)
+  else
+    server.wiki_load_params.explaintext = plain and "" or nil
+    for k,v in pairs(server.wiki_load_params) do
+      query = query .. k .. '=' .. v .. '&'
+    end
+    parsed = URL.parse(wikipedia:getWikiServer(lang))
+    parsed.path = server.wiki_path
+    parsed.query = query .. "titles=" .. URL.escape(text)
+  end
 
-	-- All pretty standard from here.
-	local search_url = 'https://de.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch='
+  -- HTTP request
+  request['url'] = URL.build(parsed)
+  request['method'] = 'GET'
+  request['sink'] = ltn12.sink.table(sink)
+  
+  local httpRequest = parsed.scheme == 'http' and http.request or https.request
+  local code, headers, status = socket.skip(1, httpRequest(request))
 
-	jstr, res = HTTPS.request(search_url .. URL.escape(input))
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
-	end
+  if not headers or not sink then
+    return nil
+  end
 
-	jdat = JSON.decode(jstr)
-	if jdat.query.searchinfo.totalhits == 0 then
-		utilities.send_reply(self, msg, config.errors.results)
-		return
-	end
+  local content = table.concat(sink)
+  if content ~= "" then
+    local ok, result = pcall(JSON.decode, content)
+    if ok and result then
+      return result
+    else
+      return nil
+    end
+  else 
+    return nil
+  end
+end
 
-	local title = get_title(jdat.query.search)
-	if not title then
-		utilities.send_reply(self, msg, config.errors.results)
-		return
-	end
+-- extract intro passage in wiki page
+function wikipedia:wikintro(text, lang)
+  local text = decodetext(text)
+  local result = self:loadPage(text, lang, true, true)
 
-	local res_url = 'https://de.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exchars=4000&exsectionformat=plain&titles='
+  if result and result.query then
 
-	jstr, res = HTTPS.request(res_url .. URL.escape(title))
-	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
-		return
-	end
+    local query = result.query
+    if query and query.normalized then
+      text = query.normalized[1].to or text
+    end
 
-	local _
-	local text = JSON.decode(jstr).query.pages
-	_, text = next(text)
-	if not text then
-		utilities.send_reply(self, msg, config.errors.results)
-		return
-	else
-		text = text.extract
-	end
+    local page = query.pages[next(query.pages)]
 
-	-- Remove needless bits from the article, take only the first paragraph.
-	text = text:gsub('</?.->', '')
-	local l = text:find('\n')
-	if l then
-		text = text:sub(1, l-1)
-	end
+    if page and page.extract then
+	  local lang = lang or "de"
+	  local title = page.title
+	  local title_enc = URL.escape(title)
+      return '*'..title.."*:\n"..page.extract.."\n[Auf Wikipedia ansehen](https://"..lang..".wikipedia.org/wiki/"..title_enc..")"
+    else
+      local text = text.." nicht gefunden"
+      return text
+    end
+  else
+    return "Ein Fehler ist aufgetreten."
+  end
+end
 
-	-- This block can be annoying to read.
-	-- We use the initial title to make the url for later use. Then we remove
-	-- the extra bits that won't be in the article. We determine whether the
-	-- first part of the text is the title, and if so, we embolden that.
-	-- Otherwise, we prepend the text with a bold title. Then we append a "Read
-	-- More" link.
-	local url = 'https://de.wikipedia.org/wiki/' .. URL.escape(title)
-	title = title:gsub('%(.+%)', '')
-	local output
-	if string.match(text:sub(1, title:len()), title) then
-		output = '*' .. title .. '*' .. text:sub(title:len()+1)
-	else
-		output = '*' .. title:gsub('%(.+%)', '') .. '*\n' .. text:gsub('%[.+%]','')
-	end
-	output = output .. '\n[Wikipedia - '..title..'](' .. url:gsub('%)', '\\)') .. ')'
+-- search for term in wiki
+function wikipedia:wikisearch(text, lang)
+  local result = wiki:loadPage(text, lang, true, true, true)
 
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
+  if result and result.query then
+    local titles = ""
+	 for i,item in pairs(result.query.search) do
+      titles = titles .. "\n" .. item["title"]
+	 end
+	 titles = titles ~= "" and titles or "Keine Ergebnisse gefunden"
+	 return titles
+  else
+    return "Ein Fehler ist aufgetreten."
+  end
 
+end
+
+function wikipedia:action(msg, config, matches)
+  local search, term, lang
+  if matches[1] == "search" then
+    search = true
+	 term = matches[2]
+	 lang = nil
+  elseif matches[2] == "search" then
+    search = true
+	 term = matches[3]
+	 lang = matches[1]
+  else
+    term = matches[2]
+	 lang = matches[1]
+  end
+  if not term then
+    term = lang
+    lang = nil
+  end
+  if term == "" then
+    utilities.send_reply(msg, self, wikipedia.doc)
+    return
+  end
+
+  local result
+  if search then
+    result = wikipedia:wikisearch(term, lang)
+  else
+    result = wikipedia:wikintro(term, lang)
+  end
+  utilities.send_reply(self, msg, result, true)
 end
 
 return wikipedia
