@@ -50,29 +50,39 @@ function gImages:action(msg, config)
   local apikey = cred_data.google_apikey
   local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
-  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. URL.escape(input)
+  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. URL.escape(input) .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
   
+  if res == 403 then
+    local jdat = JSON.decode(jstr)
+	utilities.send_reply(self, msg, 'Fehler '..jdat.error.code..': '..jdat.error.message..' ('..jdat.error.errors[1].reason..')', nil, msg.message_id)
+	return
+  end
+  
   if res ~= 200 then
-    utilities.send_reply(self, msg, config.errors.connection)
+    utilities.send_reply(self, msg, config.errors.connection, true)
     return
   end
   
   local jdat = JSON.decode(jstr)
   if jdat.searchInformation.totalResults == '0' then
-	utilities.send_reply(self, msg, config.errors.results)
+	utilities.send_reply(self, msg, config.errors.results, true)
     return
   end
 
   local i = math.random(jdat.queries.request[1].count)
   local img_url = jdat.items[i].link
   
-  local file = download_to_file(img_url)
-  if string.ends(img_url, ".gif") then
-    utilities.send_document(self, msg.chat.id, file, img_url)
-	return
+  if jdat.items[i].mime == 'image/gif' then
+    local file = download_to_file(img_url, 'img.gif')
+    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id)
   else
-    utilities.send_photo(self, msg.chat.id, file, img_url)
+    local file = download_to_file(img_url, 'img.png')
+    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id)
+  end
+
+  if not result then
+    utilities.send_reply(self, msg, config.errors.connection, true)
 	return
   end
 end
