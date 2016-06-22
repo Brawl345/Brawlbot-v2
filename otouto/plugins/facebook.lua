@@ -53,7 +53,7 @@ function facebook:fb_post (id, story_id)
   local message = data.message
   local name = data.name
   if data.link then
-    link = '\n'..data.name..':\n'..data.link
+    link = '\n'..data.name..':\n'..utilities.md_escape(data.link)
   else
     link = ""
   end
