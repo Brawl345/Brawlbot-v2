@@ -35,7 +35,7 @@ end
 
 function set:action(msg)
   local input = utilities.input(msg.text)
-  if not input:match('([^%s]+) (.+)') then
+  if not input or not input:match('([^%s]+) (.+)') then
     utilities.send_message(self, msg.chat.id, set.doc, true, msg.message_id, true)
     return
   end
