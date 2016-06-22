@@ -72,7 +72,7 @@ function pocket:add_pocket_item(access_token, url)
   local result = post_petition(BASE_URL..'/add', 'consumer_key='..consumer_key..'&access_token='..access_token..'&url='..url, headers)
   if result.status ~= 1 then return 'Ein Fehler beim Hinzufügen der URL ist aufgetreten :(' end
   local given_url = result.item.given_url
-  if result.item.title == "" then
+  if result.item.title == "" or not result.item.title then
     title = 'Seite'
   else
     title = '"'..result.item.title..'"'

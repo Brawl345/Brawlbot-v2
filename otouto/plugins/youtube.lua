@@ -14,6 +14,7 @@ function youtube:init(config)
 	
 	youtube.triggers = {
 		'youtu.be/([A-Za-z0-9-_-]+)',
+		'youtube.com/embed/([A-Za-z0-9-_-]+)',
 		'youtube.com/watch%?v=([A-Za-z0-9-_-]+)'
 	}
 	youtube.doc = [[*YouTube-Link*: Postet Infos zu Video]]
@@ -148,13 +149,8 @@ function send_youtube_data(data, msg, self, link, sendpic)
   end
 end
 
-function youtube:action(msg)
-  if not msg.text:match('youtu.be/([A-Za-z0-9-_-]+)') and not msg.text:match('youtube.com/watch%?v=([A-Za-z0-9-_-]+)') then
-    return
-  end
-  local yt_code = msg.text:match('youtu.be/([A-Za-z0-9-_-]+)')
-  if not yt_code then yt_code = msg.text:match('youtube.com/watch%?v=([A-Za-z0-9-_-]+)') end
-  
+function youtube:action(msg, config, matches)
+  local yt_code = matches[1]
   local data = get_yt_data(yt_code)
   send_youtube_data(data, msg, self)
   return
