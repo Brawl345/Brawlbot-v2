@@ -1,233 +1,103 @@
 # Brawlbot v2
 [![Build Status](https://travis-ci.org/Brawl345/Brawlbot-v2.svg?branch=master)](https://travis-ci.org/Brawl345/Brawlbot-v2)
 
-The plugin-wielding, multipurpose Telegram bot.
+Der multifunktionale Telegram-Bot.
 
-[Public Bot](http://telegram.me/mokubot) | [Official Channel](http://telegram.me/otouto) | [Development Group](http://telegram.me/BotDevelopment)
+[Entwickler auf Telegram](http://telegram.me/Brawl) | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
 
-otouto is a plugin-based, IRC-style bot written for the [Telegram Bot API](http://core.telegram.org/bots/api). Originally written in February of 2015 as a set of Lua scripts to run on [telegram-cli](http://github.com/vysheng/tg), otouto was open-sourced and migrated to the bot API later in June that year.
+Brawlbot ist ein auf Plugins basierender Bot, der die [offizielle Telegram Bot API](http://core.telegram.org/bots/api) benutzt. Ursprünglich wurde er im Dezember 2014 auf Basis von Yagops [Telegram Bot](https://github.com/yagop/telegram-bot/) entwickelt, da aber die Entwicklung von tg-cli [zum Stillstand](https://brawlbot.tk/posts/ein-neuanfang) gekommen ist, wurden alle Plugins des bisher proprietären Brawlbots im Juni 2016 auf die Bot-API portiert und open-sourced.  
+**Brawlbot v2 basiert auf [otouto](https://github.com/topkecleon/otouto) von Topkecleon.**
 
-otouto is free software; you are free to redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3. See **LICENSE** for details.
+Brawlbot v2 ist freie Software; du darfst in modifizieren und weiterverbreiten, allerdings musst du dich an die GNU Affero General Public License v3 halten, siehe **LICENSE** für Details.
 
-**The Manual**
+##Anleitung
 
-| For Users                                     | For Coders                    |
+| Für User                                     | Für Entwickler|
 |:----------------------------------------------|:------------------------------|
 | [Setup](#setup)                               | [Plugins](#plugins)           |
-| [Control plugins](#control-plugins)           | [Bindings](#bindings)         |
-| [Group Administration](#group-administration) | [Output style](#output-style) |
-| [List of plugins](#list-of-plugins)           | [Contributors](#contributors) |
+| [Bot steuern](#bot-steuern)           | [Bindings](#bindings)         |
 
 * * *
-
+# Für User
 ## Setup
-You _must_ have Lua (5.2+), luasocket, luasec, multipart-post, and dkjson installed. You should also have lpeg, though it is not required. It is recommended you install these with LuaRocks.
+Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
+* luasocket
+* luasec
+* multipart-post
+* dkjson
+* lpeg
+* redis-lua
+* oauth
+* xml
+* feedparser
+* serpent
 
-To get started, clone the repository and set the following values in `config.lua`:
+Klone danach diese Repo. kopiere die `config.lua.example` nach `config.lua` und trage folgendes ein:
 
- - `bot_api_key` as your bot authorization token from the BotFather.
- - `admin` as your Telegram ID.
+ - `bot_api_key`: API-Token vom BotFather
+ - `admin`: Deine Telegram-ID
 
-Optionally:
+Starte danach den Bot mit `./launch.sh`. Um den Bot anzuhalten, führe erst `/halt` über Telegram aus.
 
- - `lang` as the two-letter code representing your language.
+Beim Start werden einige Werte in die Redis-Datenbank unter `telegram:credentials` und `telegram:enabled_plugins` eingetragen. Mit `/plugins enable` kannst du Plugins aktivieren, es sind nicht alle von Haus aus aktiviert.
 
-Some plugins are not enabled by default. If you wish to enable them, add them to the `plugins` array.
-
-When you are ready to start the bot, run `./launch.sh`. To stop the bot, send "/halt" through Telegram. If you terminate the bot manually, you risk data loss. If you do you not want the bot to restart automatically, run it with `lua main.lua`.
-
-Note that certain plugins, such as translate.lua and greetings.lua, will require privacy mode to be disabled. Additionally, some plugins may require or make use of various API keys:
-
- - `bing.lua`: [Bing Search API](http://datamarket.azure.com/dataset/bing/search) key (`bing_api_key`)
- - `gImages.lua` & `youtube.lua`: Google [API](http://console.developers.google.com) and [CSE](https://cse.google.com/cse) keys (`google_api_key`, `google_cse_key`)
- - `weather.lua`: [OpenWeatherMap](http://openweathermap.org) API key (`owm_api_key`)
- - `lastfm.lua`: [last.fm](http://last.fm/api) API key (`lastfm_api_key`)
- - `bible.lua`: [Biblia](http://api.biblia.com) API key (`biblia_api_key`)
- - `cats.lua`: [The Cat API](http://thecatapi.com) API key (optional) (`thecatapi_key`)
- - `apod.lua`: [NASA](http://api.nasa.gov) API key (`nasa_api_key`)
- - `translate.lua`: [Yandex](http://tech.yandex.com/keys/get) API key (`yandex_key`)
- - `chatter.lua`: [SimSimi](http://developer.simsimi.com/signUp) API key (`simsimi_key`)
+Einige Plugins benötigen API-Keys, bitte gehe die einzelnen Plugins durch, bevor du sie aktivierst!
 
 * * *
 
-## Control plugins
-Some plugins are designed to be used by the bot's owner. Here are some examples, how they're used, and what they do.
+## Bot steuern
+Ein Administrator kann den Bot über folgende Plugins steuern:
 
-| Plugin          | Command    | Function                                           |
+| Plugin          | Kommando   | Funktion                                           |
 |:----------------|:-----------|:---------------------------------------------------|
-| `control.lua`   | /reload    | Reloads all plugins and configuration.             |
-|                 | /halt      | Shuts down the bot after saving the database.      |
-|                 | /script    | Runs a list a bot commands, separated by newlines. |
-| `blacklist.lua` | /blacklist | Blocks people from using the bot.                  |
-| `shell.lua`     | /run       | Executes shell commands on the host system.        |
-| `luarun.lua`    | /lua       | Executes Lua commands in the bot's environment.    |
+| `banhammer.lua` | Siehe /hilfe banhammer| Blockt User vom Bot und kann Whitelist aktivieren
+| `control.lua`   | /restart    | Startet den Bot neu             |
+|                 | /halt      | Speichert die Datenbank und stoppt den Bot      |
+|                 | /script    | Führt mehrere Kommandos aus, getrennt mit Zeilenumbrüchen |
+| `luarun.lua`    | /lua       | Führt LUA-Kommandos aus    |
+| `plugins.lua`    | /plugins enable/disable       | Aktiviert/deaktiviert Plugins   |
+| `shell.lua`     | /sh       | Führt Shell-Kommandos aus        |
 
 * * *
 
-## Group Administration
-The administration plugin enables self-hosted, single-realm group administration, supporting both normal groups and supergroups whch are owned by the bot owner. This works by sending TCP commands to an instance of tg running on the owner's account.
-
-To get started, run `./tg-install.sh`. Note that this script is written for Ubuntu/Debian. If you're running Arch (the only acceptable alternative), you'll have to do it yourself. If that is the case, note that otouto uses the "test" branch of tg, and the AUR package `telegram-cli-git` will not be sufficient, as it does not have support for supergroups yet.
-
-Once the installation is finished, enable the `administration` plugin in your config file. **The administration plugin must be loaded before the `about` and `blacklist` plugins.** You may have reason to change the default TCP port (4567); if that is the case, remember to change it in `tg-launch.sh` as well. Run `./tg-launch.sh` in a separate screen/tmux window. You'll have to enter your phone number and go through the login process the first time. The script is set to restart tg after two seconds, so you'll need to Ctrl+C after exiting.
-
-While tg is running, you may start/reload otouto with `administration.lua` enabled, and have access to a wide variety of administrative commands and automata. The administration "database" is stored in `administration.json`. To start using otouto to administrate a group (note that you must be the owner (or an administrator)), send `/gadd` to that group. For a list of commands, use `/ahelp`. Below I'll describe various functions now available to you.
-
-| Command     | Function                                        | Privilege | Internal? |
-|:------------|:------------------------------------------------|:----------|:----------|
-| /groups     | Returns a list of administrated groups (except the unlisted).   | 1 | N |
-| /ahelp      | Returns a list of accessible administrative commands.           | 1 | Y |
-| /ops        | Returns a list of the moderators and governor of a group.       | 1 | Y |
-| /desc       | Returns detailed information for a group.                       | 1 | Y |
-| /rules      | Returns the rules of a group.                                   | 1 | Y |
-| /motd       | Returns the message of the day of a group.                      | 1 | Y |
-| /link       | Returns the link for a group.                                   | 1 | Y |
-| /kick       | Removes the target from the group.                              | 2 | Y |
-| /ban        | Bans the target from the group.                                 | 2 | Y |
-| /unban      | Unbans the target from the group.                               | 2 | Y |
-| /setmotd    | Sets the message of the day for a group.                        | 2 | Y |
-| /changerule | Changes an individual group rule.                               | 3 | Y |
-| /setrules   | Sets the rules for a group.                                     | 3 | Y |
-| /setlink    | Sets the link for a group.                                      | 3 | Y |
-| /alist      | Returns a list of administrators.                               | 3 | Y |
-| /flags      | Returns a list of flags and their states, or toggles one.       | 3 | Y |
-| /antiflood  | Configures antiflood (flag 5) settings.                         | 3 | Y |
-| /mod        | Promotes a user to a moderator.                                 | 3 | Y |
-| /demod      | Demotes a moderator to a user.                                  | 3 | Y |
-| /gov        | Promotes a user to the governor.                                | 4 | Y |
-| /degov      | Demotes the governor to a user.                                 | 4 | Y |
-| /hammer     | Blacklists and globally bans a user.                            | 4 | N |
-| /unhammer   | Unblacklists and globally bans a user.                          | 4 | N |
-| /admin      | Promotes a user to an administrator.                            | 5 | N |
-| /deadmin    | Demotes an administrator to a user.                             | 5 | N |
-| /gadd       | Adds a group to the administrative system.                      | 5 | N |
-| /grem       | Removes a group from the administrative system.                 | 5 | Y |
-| /glist      | Returns a list of all administrated groups and their governors. | 5 | N |
-| /broadcast  | Broadcasts a message to all administrated groups.               | 5 | N |
-
-Internal commands can only be run within an administrated group.
-
-### Description of Privileges
-
-| # | Title         | Description                                                       | Scope  |
-|:-:|:--------------|:------------------------------------------------------------------|:-------|
-| 0 | Banned        | Cannot enter the group(s).                                        | Either |
-| 1 | User          | Default rank.                                                     | Local  |
-| 2 | Moderator     | Can kick/ban/unban users. Can set MOTD.                           | Local  |
-| 3 | Governor      | Can set rules/link, promote/demote moderators, modify flags.      | Local  |
-| 4 | Administrator | Can globally ban/unban users, promote/demote governors.           | Global |
-| 5 | Owner         | Can add/remove groups, broadcast, promote/demote administrators.  | Global |
-
-Obviously, each greater rank inherits the privileges of the lower, positive ranks.
-
-### Flags
-
-| # | Name        | Description                                                                      |
-|:-:|:------------|:---------------------------------------------------------------------------------|
-| 1 | unlisted    | Removes a group from the /groups listing.                                        |
-| 2 | antisquig   | Automatically removes users for posting Arabic script or RTL characters.         |
-| 3 | antisquig++ | Automatically removes users whose names contain Arabic script or RTL characters. |
-| 4 | antibot     | Prevents bots from being added by non-moderators.                                |
-| 5 | antiflood   | Prevents flooding by rate-limiting messages per user.                            |
-| 6 | antihammer  | Allows globally-banned users to enter a group.                                   |
-
-#### antiflood
-antiflood (flag 5) provides a system of automatic flood protection by removing users who post too much. It is entirely configurable by a group's governor, an administrator, or the bot owner. For each message to a particular group, a user is awarded a certain number of "points". The number of points is different for each message type. When the user reaches 100 points, he is removed. Points are reset each minute. In this way, if a user posts twenty messages within one minute, he is removed.
-
-**Default antiflood values:**
-
-| Type | Points |
-|:-----|:------:|
-| text     | 5  |
-| contact  | 5  |
-| audio    | 5  |
-| voice    | 5  |
-| photo    | 10 |
-| document | 10 |
-| location | 10 |
-| video    | 10 |
-| sticker  | 20 |
-
-Additionally, antiflood can be configured to automatically ban a user after he has been automatically kicked from a single group a certain number of times in one day. This is configurable as the antiflood value `autoban` and is set to three by default.
+## Gruppenadministration über tg-cli
+Dieses Feature wird in Brawlbot nicht unterstützt.
 
 * * *
 
-## List of plugins
+## Liste aller Plugins
 
-| Plugin                | Command                       | Function                                                | Aliases |
-|:----------------------|:------------------------------|:--------------------------------------------------------|:--------|
-| `help.lua`            | /help [command]               | Returns a list of commands or command-specific help.       | /h   |
-| `about.lua`           | /about                        | Returns the about text as configured in config.lua.               |
-| `ping.lua`            | /ping                         | The simplest plugin ever!                                         |
-| `echo.lua`            | /echo ‹text›                  | Repeats a string of text.                                         |
-| `bing.lua`            | /bing ‹query›                 | Returns Bing web results.                                  | /g   |
-| `gImages.lua`         | /images ‹query›               | Returns a Google image result.                             | /i   |
-| `gMaps.lua`           | /location ‹query›             | Returns location data from Google Maps.                    | /loc |
-| `youtube.lua`         | /youtube ‹query›              | Returns the top video result from YouTube.                 | /yt  |
-| `wikipedia.lua`       | /wikipedia ‹query›            | Returns the summary of a Wikipedia article.                | /w   |
-| `lastfm.lua`          | /np [username]                | Returns the song you are currently listening to.                  |
-| `lastfm.lua`          | /fmset [username]             | Sets your username for /np. /fmset -- will delete it.             |
-| `hackernews.lua`      | /hackernews                   | Returns the latest posts from Hacker News.                 | /hn  |
-| `imdb.lua`            | /imdb ‹query›                 | Returns film information from IMDb.                               |
-| `hearthstone.lua`     | /hearthstone ‹query›          | Returns data for Hearthstone cards matching the query.     | /hs  |
-| `calc.lua`            | /calc ‹expression›            | Returns conversions and solutions to math expressions.            |
-| `bible.lua`           | /bible ‹reference›            | Returns a Bible verse.                                     | /b   |
-| `urbandictionary.lua` | /urban ‹query›                | Returns the top definition from Urban Dictionary.          | /ud  |
-| `time.lua`            | /time ‹query›                 | Returns the time, date, and a timezone for a location.            |
-| `weather.lua`         | /weather ‹query›              | Returns current weather conditions for a given location.          |
-| `nick.lua`            | /nick ‹nickname›              | Set your nickname. /nick - will delete it.                        |
-| `whoami.lua`          | /whoami                       | Returns user and chat info for you or the replied-to user. | /who |
-| `eightball.lua`       | /8ball                        | Returns an answer from a magic 8-ball.                            |
-| `dice.lua`            | /roll ‹nDr›                   | Returns RNG dice rolls. Uses D&D notation.                        |
-| `reddit.lua`          | /reddit [r/subreddit ¦ query] | Returns the top results from a subreddit, query, or r/all. | /r   |
-| `xkcd.lua`            | /xkcd [query]                 | Returns an xkcd strip and its alt text.                           |
-| `slap.lua`            | /slap ‹target›                | Gives someone a slap (or worse).                                  |
-| `commit.lua`          | /commit                       | Returns a commit message from whatthecommit.com.                  |
-| `fortune.lua`         | /fortune                      | Returns a UNIX fortune.                                           |
-| `pun.lua`             | /pun                          | Returns a pun.                                                    |
-| `pokedex.lua`         | /pokedex ‹query›              | Returns a Pokedex entry.                                   | /dex |
-| `currency.lua`        | /cash [amount] ‹cur› to ‹cur› | Converts one currency to another.                                 |
-| `cats.lua`            | /cat                          | Returns a cat picture.                                            |
-| `reactions.lua`       | /reactions                    | Returns a list of emoticons which can be posted by the bot.       |
-| `apod.lua`            | /apod [date]                  | Returns the NASA Astronomy Picture of the Day.                    |
-| `dilbert.lua`         | /dilbert [date]               | Returns a Dilbert strip.                                          |
-| `patterns.lua`        | /s/‹from›/‹to›/               | Search-and-replace using Lua patterns.                            |
-| `me.lua`              | /me                           | Returns user-specific data stored by the bot.                     |
-| `remind.lua`          | /remind <duration> <message>  | Reminds a user of something after a duration of minutes.          |
-| `channel.lua`         | /ch <channel> \n <message>    | Sends a markdown-enabled message to a channel.                    |
+Brawlbot erhält laufend neue Plugins und wird kontinuierlich weiterentwickelt! Siehe [hier](https://github.com/Brawl345/Brawlbot-v2/tree/master/otouto/plugins) für eine Liste aller Plugins.
 
 * * *
-
+#Für Entwickler
 ## Plugins
-otouto uses a robust plugin system, similar to yagop's [Telegram-Bot](http://github.com/yagop/telegram-bot).
+Brawlbot benutzt ein Plugin-System, ähnlich Yagops [Telegram-Bot](http://github.com/yagop/telegram-bot).
 
-Most plugins are intended for public use, but a few are for other purposes, like those for [use by the bot's owner](#control-plugins). See [here](#list-of-plugins) for a list of plugins.
+Ein Plugin kann fünf Komponenten haben, aber nur zwei werden benötigt:
 
-A plugin can have five components, and two of them are required:
-
-| Component         | Description                                  | Required? |
+| Komponente        | Beschreibung                                  | Benötigt? |
 |:------------------|:---------------------------------------------|:----------|
-| `plugin:action`   | Main function. Expects `msg` table as an argument.   | Y |
-| `plugin.triggers` | Table of triggers for the plugin. Uses Lua patterns. | Y |
-| `plugin:init`     | Optional function run when the plugin is loaded.     | N |
-| `plugin:cron`     | Optional function to be called every minute.         | N |
-| `plugin.command`  | Basic command and syntax. Listed in the help text.   | N |
-| `plugin.doc`      | Usage for the plugin. Returned by "/help $command".  | N |
-| `plugin.error`    | Plugin-specific error message; false for no message. | N |
+| `plugin:action`   | Hauptfunktion. Benötigt `msg` als Argument, empfohlen wird auch `matches` als drittes Argument nach `config`   | J |
+| `plugin.triggers` | Tabelle von Triggern, (Lua-Patterns), auf die der Bot reagiert | J |
+| `plugin:init`     | Optionale Funkion, die beim Start geladen wird     | N |
+| `plugin:cron`     | Wird jede Minute ausgeführt         | N |
+| `plugin.command`  | Einfaches Kommando mit Syntax. Wird bei `/hilfe` gelistet   | N |
+| `plugin.doc`      | Plugin-Hilfe. Wird mit `/help $kommando` gelistet  | N |
+| `plugin.error`    | Plugin-spezifische Fehlermeldung | N |
 
-The `bot:on_msg_receive` function adds a few variables to the `msg` table for your convenience. These are self-explanatory: `msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
+Die`bot:on_msg_receive` Funktion fügt einige nützte Variablen zur ` msg` Tabelle hinzu. Diese sind:`msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 
-Return values from `plugin:action` are optional, but they do effect the flow. If it returns a table, that table will become `msg`, and `on_msg_receive` will continue with that. If it returns `true`, it will continue with the current `msg`.
+Rückgabewerte für `plugin:action` sind optional, aber wenn eine Tabelle zurückgegeben wird, wird diese die neue `msg`,-Tabelle und `on_msg_receive` wird damit fortfahren.
 
-When an action or cron function fails, the exception is caught and passed to the `handle_exception` utilty and is either printed to the console or send to the chat/channel defined in `log_chat` in config.lua.
+Interaktionen mit der Bot-API sind sehr einfach. Siehe [Bindings](#bindings) für Details.
 
-Interactions with the bot API are straightforward. See the [Bindings section](#bindings) for details.
-
-Several functions used in multiple plugins are defined in utilities.lua. Refer to that file for usage and documentation.
+Einige Funktionen, die oft benötigt werden, sind in `utilites.lua` verfügbar.
 
 * * *
 
 ## Bindings
+**Diese Sektion wurde noch nicht lokalisiert.**
 Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts four arguments: `self`, `method`, `parameters`, `file`. (At the very least, `self` should be a table containing `BASE_URL`, which is bot's API endpoint, ending with a slash, eg `https://api.telegram.org/bot123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ987654321/`.)
 
 `method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
@@ -278,56 +148,3 @@ bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVW
 ```
 
 Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
-
-* * *
-
-## Output style
-otouto plugins should maintain a consistent visual style in their output. This provides a recognizable and comfortable user experience.
-
-### Titles
-Title lines should be **bold**, including any names and trailing punctuation (such as colons). The exception to this rule is if the title line includes a query, which should be _italic_. It is also acceptable to have a link somewhere inside a title, usually within parentheses. eg:
-
-> **Star Wars: Episode IV - A New Hope (1977)**
->
-> **Search results for** _star wars_ **:**
->
-> **Changelog for otouto (**[Github](http://github.com/topkecleon/otouto)**):**
-
-### Lists
-Numerated lists should be done with the number and its following punctuation bolded. Unnumbered lists should use the bullet character ( • ). eg:
-
-> **1.** Life as a quick brown fox.
->
-> **2.** The art of jumping over lazy dogs.
-
-and
-
-> • Life as a quick brown fox.
->
-> • The art of jumping over lazy dogs.
-
-### Links
-Always name your links. Even then, use them with discretion. Excessive links make a post look messy. Links are reasonable when a user may want to learn more about something, but should be avoided when all desirable information is provided. One appropriate use of linking is to provide a preview of an image, as xkcd.lua and apod.lua do.
-
-### Other Stuff
-User IDs should appear within brackets, monospaced (`[123456789]`). Descriptions and information should be in plain text, but "flavor" text should be italic. The standard size for arbitrary lists (such as search results) is eight within a private conversation and four elsewhere. This is a trivial pair of numbers (leftover from the deprecated Google search API), but consistency is noticeable and desirable.
-
-* * *
-
-## Contributors
-Everybody is free to contribute to otouto. If you are interested, you are invited to [fork the repo](http://github.com/topkecleon/otouto/fork) and start making pull requests. If you have an idea and you are not sure how to implement it, open an issue or bring it up in the [Bot Development group](http://telegram.me/BotDevelopment).
-
-The creator and maintainer of otouto is [topkecleon](http://github.com/topkecleon). He can be contacted via [Telegram](http://telegram.me/topkecleon), [Twitter](http://twitter.com/topkecleon), or [email](mailto:drew@otou.to).
-
-[List of contributors.](https://github.com/topkecleon/otouto/graphs/contributors)
-
-There are a a few ways to contribute if you are not a programmer. For one, your feedback is always appreciated. Drop me a line on Telegram or on Twitter. Secondly, we are always looking for new ideas for plugins. Most new plugins start with community input. Feel free to suggest them on Github or in the Bot Dev group. You can also donate Bitcoin to the following address:
-`1BxegZJ73hPu218UrtiY8druC7LwLr82gS`
-
-Contributions are appreciated in all forms. Monetary contributions will go toward server costs. Donators will be eternally honored (at their discretion) on this page.
-
-| Donators (in chronological order)             |
-|:----------------------------------------------|
-| [n8 c00](http://telegram.me/n8_c00)           |
-| [Alex](http://telegram.me/sandu)              |
-| [Brayden](http://telegram.me/bb010g)          |
