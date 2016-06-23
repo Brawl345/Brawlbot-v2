@@ -156,8 +156,9 @@ function facebook:action(msg, config, matches)
     else
       photo_id = matches[4]
     end
-	utilities.send_typing(self, msg.chat.id, 'upload_photo')
     local text, image_url = facebook:send_facebook_photo(photo_id, receiver)
+	if not image_url then return end
+	utilities.send_typing(self, msg.chat.id, 'upload_photo')
 	local file = download_to_file(image_url)
 	utilities.send_reply(self, msg, text, true)
 	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)

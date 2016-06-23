@@ -39,7 +39,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	enabled_plugins = load_plugins()
 	for k,v in pairs(enabled_plugins) do
 		local p = require('otouto.plugins.'..v)
-		print('loading plugin',v)
+		-- print('loading plugin',v)
 		table.insert(self.plugins, p)
 	    self.plugins[k].name = v
 		if p.init then p.init(self, config) end
