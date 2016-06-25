@@ -17,11 +17,15 @@ function heise:get_heise_article(article)
   if code ~= 200 then return "HTTP-Fehler" end
   
   local title = data.h2
-  local teaser = data.strong
+  if data.strong then
+    teaser = '\n'..data.strong
+  else
+    teaser = ''
+  end
   if data.img then
     image_url = 'https:'..data.img.src
   end
-  local text = '*'..title..'*\n'..teaser
+  local text = '*'..title..'*'..teaser
   
   if data.img then
     return text, image_url
