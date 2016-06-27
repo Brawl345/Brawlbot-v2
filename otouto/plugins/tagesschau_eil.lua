@@ -92,7 +92,7 @@ function tagesschau_eil:cron(self_plz)
   if code ~= 200 then return end
   if not data then return end
   if data.breakingnews[1] then
-    if data.breakingnews[1].details ~= last_eil then
+    if data.breakingnews[1].date ~= last_eil then
       local title = '#EIL: *'..data.breakingnews[1].headline..'*'
       local news = data.breakingnews[1].shorttext
       local posted_at = makeOurDate(data.breakingnews[1].date)..' Uhr'
