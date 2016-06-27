@@ -31,9 +31,9 @@ end
 
 function github:send_github_data(data)
   if not data.owner then return nil end
-  local name = '*'..data.name..'*'
-  local description = '_'..data.description..'_'
-  local owner = data.owner.login
+  local name = '*'..utilities.md_escape(data.name)..'*'
+  local description = '_'..utilities.md_escape(data.description)..'_'
+  local owner = utilities.md_escape(data.owner.login)
   local clone_url = data.clone_url
   if data.language == nil or data.language == "" then
     language = ''
@@ -57,7 +57,7 @@ end
 function github:send_gh_commit_data(gh_code, gh_commit_sha, data)
   if not data.committer then return nil end
   local committer = data.committer.name
-  local message = data.message
+  local message = utilities.md_escape(data.message)
   local text = '`'..gh_code..'@'..gh_commit_sha..'` von *'..committer..'*:\n'..message
   return text
 end
