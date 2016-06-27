@@ -16,13 +16,14 @@ local mimetype = (loadfile "./otouto/mimetype.lua")()
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
-function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown)
+function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)
 	return bindings.request(self, 'sendMessage', {
 		chat_id = chat_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
 		reply_to_message_id = reply_to_message_id,
-		parse_mode = use_markdown and 'Markdown' or nil
+		parse_mode = use_markdown and 'Markdown' or nil,
+		reply_markup = reply_markup
 	} )
 end
 

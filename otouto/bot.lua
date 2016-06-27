@@ -94,7 +94,9 @@ function bot:run(config)
 		if res then
 			for _,v in ipairs(res.result) do -- Go through every new message.
 				self.last_update = v.update_id
-				if v.message then
+				if v.callback_query then
+				    print('callback_query wird noch nicht unterstützt! Erhaltener Wert: '..v.callback_query.data)
+				elseif v.message then
 					bot.on_msg_receive(self, v.message, config)
 				end
 			end
