@@ -19,7 +19,7 @@ youtube_dl.command = 'mp3 <URL>, /mp4 <URL>'
 function youtube_dl:convert_video(link)
   local output = io.popen('youtube-dl -f mp4 --max-filesize 49m -o "/tmp/%(title)s.%(ext)s" '..link):read('*all')
   print(output)
-  if string.match(output, '%[download%]File is larger than max-filesize (.*)') then
+  if string.match(output, '.* File is larger .*') then
     return 'TOOBIG'
   end
   local video = string.match(output, '%[download%] Destination: /tmp/(.*).mp4')
@@ -32,7 +32,7 @@ end
 function youtube_dl:convert_audio(link)
   local output = io.popen('youtube-dl --max-filesize 49m -o "/tmp/%(title)s.%(ext)s" --extract-audio --audio-format mp3 '..link):read('*all')
   print(output)
-  if string.match(output, '%[download%]File is larger than max-filesize (.*)') then
+  if string.match(output, '.* File is larger .*') then
     return 'TOOBIG'
   end
   local audio = string.match(output, '%[ffmpeg%] Destination: /tmp/(.*).mp3')
