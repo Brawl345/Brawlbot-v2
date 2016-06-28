@@ -25,7 +25,7 @@ function vine:send_vine_data(data)
   local loops = data.loops.count
   local video_url = data.videoUrls[1].videoUrl
   local profile_name = string.gsub(data.user.profileUrl, '/', '')
-  local text = '"'..title..'", hochgeladen von '..author_name..' ('..profile_name..') im '..creation_date..', '..loops..'x angesehen'
+  local text = '"'..title..'", hochgeladen von '..author_name..' ('..profile_name..'), '..creation_date..', '..loops..'x angesehen'
   if data.explicitContent == 1 then
     text = text..' (ðŸ”ž NSFW ðŸ”ž)'
   end

@@ -51,7 +51,7 @@ end
 function play_store:action(msg, config, matches)
   local appid = matches[1]
   local data = play_store:get_playstore_data(appid)
-  if data.title == nil then
+  if data == nil then
     return
   else
 	utilities.send_reply(self, msg, play_store:send_playstore_data(data), true)

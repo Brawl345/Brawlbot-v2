@@ -23,7 +23,7 @@ local format_results = function(posts)
 			title = utilities.trim(title) .. '...'
 		end
 		local short_url = 'https://redd.it/' .. post.id
-		local s = '[' .. title .. '](' .. short_url .. ')'
+		local s = '[' .. unescape(title) .. '](' .. short_url .. ')'
 		if post.domain and not post.is_self and not post.over_18 then
 			s = '`[`[' .. post.domain .. '](' .. post.url:gsub('%)', '\\)') .. ')`]` ' .. s
 		end
