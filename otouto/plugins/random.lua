@@ -27,7 +27,19 @@ function fun:choose_random(user_name, other_user)
 	user_name..' wirft einen Gameboy auf '..other_user..'.',
 	user_name..' hetzt die NSA auf '..other_user..'.',
 	user_name..' ersetzt alle CDs von '..other_user..' durch Nickelback-CDs.',
-	other_user..' melkt '..user_name..'. *muuh* :D'
+	other_user..' melkt '..user_name..'. *muuh* :D',
+	user_name..' ist in '..other_user..' verliebt.',
+	user_name..' schmeißt '..other_user..' in einen Fluss.',
+	user_name..' klaut '..other_user..' einen Lolli.',
+	user_name..' hätte gern Sex mit '..other_user..'.',
+	user_name..' schenkt '..other_user..' ein Foto von seinem Penis.',
+	user_name..' dreht durch und wirft '..other_user..' in einen Häcksler.',
+	user_name..' gibt '..other_user..' einen Keks.',
+	user_name..' lacht '..other_user..' aus.',
+	user_name..' gibt '..other_user..[[ ganz viel Liebe. ( ͡° ͜ʖ ͡°)]],
+	user_name..' läd '..other_user..' zum Essen ein.',
+	user_name..' schwatzt '..other_user..' Ubuntu auf.',
+	user_name..' fliegt mit '..other_user..' nach Hawaii.'
   }
   math.randomseed(os.time())
   math.randomseed(os.time())
