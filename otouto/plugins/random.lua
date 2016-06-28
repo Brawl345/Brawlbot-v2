@@ -12,25 +12,26 @@ fun.command = 'random <Username>'
 
 function fun:choose_random(user_name, other_user)
   randoms = {
-      user_name..' schlägt '..other_user..' mit einem stinkenden Fisch.',
-      user_name..' versucht, '..other_user..' mit einem Messer zu töten, bringt sich dabei aber selbst um.',
-	  user_name..' versucht, '..other_user..' mit einem Messer zu töten, stolpert aber und schlitzt sich dabei das Knie auf.',
-      user_name..' ersticht '..other_user..'.',
-	  user_name..' tritt '..other_user..'.',
-	  user_name..' hat '..other_user..' umgebracht! Möge er in der Hölle schmoren!',
-	  user_name..' hat die Schnauze voll von '..other_user..' und sperrt ihn in einen Schrank.',
-	  user_name..' erwürgt '..other_user..'. BILD sprach als erstes mit der Hand.',
-	  user_name..' schickt '..other_user..' nach /dev/null.',
-	  user_name..' umarmt '..other_user..'.',
-	  user_name..' verschenkt eine Kartoffel an '..other_user..'.',
-	  user_name..' melkt '..other_user..'. *muuh* :D',
-	  user_name..' wirft einen Gameboy auf '..other_user..'.',
-	  user_name..' hetzt die NSA auf '..other_user..'.',
-	  user_name..' ersetzt alle CDs von '..other_user..' durch Nickelback-CDs.',
+    user_name..' schlägt '..other_user..' mit einem stinkenden Fisch.',
+	user_name..' versucht, '..other_user..' mit einem Messer zu töten, bringt sich dabei aber selbst um.',
+	user_name..' versucht, '..other_user..' mit einem Messer zu töten, stolpert aber und schlitzt sich dabei das Knie auf.',
+	user_name..' ersticht '..other_user..'.',
+	user_name..' tritt '..other_user..'.',
+	user_name..' hat '..other_user..' umgebracht! Möge er in der Hölle schmoren!',
+	user_name..' hat die Schnauze voll von '..other_user..' und sperrt ihn in einen Schrank.',
+	user_name..' erwürgt '..other_user..'. BILD sprach als erstes mit der Hand.',
+	user_name..' schickt '..other_user..' nach /dev/null.',
+	user_name..' umarmt '..other_user..'.',
+	user_name..' verschenkt eine Kartoffel an '..other_user..'.',
+	user_name..' melkt '..other_user..'. *muuh* :D',
+	user_name..' wirft einen Gameboy auf '..other_user..'.',
+	user_name..' hetzt die NSA auf '..other_user..'.',
+	user_name..' ersetzt alle CDs von '..other_user..' durch Nickelback-CDs.',
+	other_user..' melkt '..user_name..'. *muuh* :D'
   }
   math.randomseed(os.time())
   math.randomseed(os.time())
-  local random = math.random(15)
+  local random = math.random(#randoms)
   return randoms[random]
 end
 
