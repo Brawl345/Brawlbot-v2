@@ -18,7 +18,7 @@ function leave_group:check_for_admin(msg, self, config)
     print('Konnte nicht prüfen, ob Admin in Gruppe ist! Verlasse sie sicherheitshalber...')
 	return false
   end
-  if result.result.status ~= "member" and result.result.status ~= "administrator" then
+  if result.result.status ~= "member" and result.result.status ~= "administrator" and result.result.status ~= "creator" then
     return false
   else
     return true
