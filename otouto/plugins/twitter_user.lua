@@ -67,6 +67,7 @@ function twitter_user:action(msg)
   local twitter_url = "https://api.twitter.com/1.1/users/show/"..matches[1]..".json"
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
   local response = json.decode(response_body)
+  if response_code ~= 200 then return end
   
   local full_name = response.name
   local user_name = response.screen_name
