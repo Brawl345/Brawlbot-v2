@@ -71,9 +71,9 @@ function twitter_send:do_twitter_authorization_flow(hash, is_chat)
   
   local auth_url = client:BuildAuthorizationUrl({ oauth_callback = callback_url, force_login = true })
   if is_chat then
-    return 'Bitte schließe den Vorgang ab, indem du unten auf den Link klickst und mir die angezeigte PIN per `/tw auth PIN` *im Chat von gerade* übergibst.\n[Bei Twitter anmelden]('..auth_url..')'
+    return 'Bitte schließe den Vorgang ab, indem du unten auf den attraktiven Button klickst und mir die angezeigte PIN per `/tw auth PIN` *in der Gruppe von gerade eben* übergibst.', auth_url
   else
-    return 'Bitte schließe den Vorgang ab, indem du unten auf den Link klickst und mir die angezeigte PIN per `/tw auth PIN` übergibst.\n[Bei Twitter anmelden]('..auth_url..')'
+    return 'Bitte schließe den Vorgang ab, indem du unten auf den attraktiven Button klickst und mir die angezeigte PIN per `/tw auth PIN` übergibst.', auth_url
   end
 end
 
@@ -283,19 +283,20 @@ function twitter_send:action(msg, config, matches)
         utilities.send_reply(self, msg, config.errors.sudo)
 	    return
       else
-	    -- maybe we can edit the older message to update it to "logged in!"?
-		-- this should be interesting: https://core.telegram.org/bots/api#editmessagetext
-        local text = twitter_send:do_twitter_authorization_flow(hash, true)
-		local res = utilities.send_message(self, msg.from.id, text, true, nil, true)
+        local text, auth_url = twitter_send:do_twitter_authorization_flow(hash, true)
+		local res = utilities.send_message(self, msg.from.id, text, true, nil, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
 		if not res then
 			utilities.send_reply(self, msg, 'Bitte starte mich zuerst [privat](http://telegram.me/' .. self.info.username .. '?start).', true)
 		elseif msg.chat.type ~= 'private' then
-			utilities.send_message(self, msg.chat.id, '_Bitte warten, der Administrator meldet sich an..._', true, nil, true)
+			local result = utilities.send_message(self, msg.chat.id, '_Bitte warten, der Administrator meldet sich an..._', true, nil, true)
+			redis:hset(hash, 'login_msg', result.result.message_id)
 		end
 		return
 	  end
     else
-	  utilities.send_reply(self, msg, twitter_send:do_twitter_authorization_flow(hash), true)
+	  local text, auth_url = twitter_send:do_twitter_authorization_flow(hash)
+	  local result = utilities.send_reply(self, msg, text, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
+	  redis:hset(hash, 'login_msg', result.result.message_id)
 	  return
 	end
   end
@@ -309,6 +310,9 @@ function twitter_send:action(msg, config, matches)
 	end
     if string.len(matches[2]) > 7 then utilities.send_reply(self, msg, 'Invalide PIN!') return end
 	utilities.send_reply(self, msg, twitter_send:get_twitter_access_token(hash, matches[2], oauth_token, oauth_token_secret))
+	local message_id = redis:hget(hash, 'login_msg')
+	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
+	redis:hdel(hash, 'login_msg')
 	return
   end
   

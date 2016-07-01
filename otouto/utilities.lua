@@ -27,13 +27,26 @@ function utilities:send_message(chat_id, text, disable_web_page_preview, reply_t
 	} )
 end
 
-function utilities:send_reply(old_msg, text, use_markdown)
+-- https://core.telegram.org/bots/api#editmessagetext
+function utilities:edit_message(chat_id, message_id, text, disable_web_page_preview, use_markdown, reply_markup)
+	return bindings.request(self, 'editMessageText', {
+		chat_id = chat_id,
+		message_id = message_id,
+		text = text,
+		disable_web_page_preview = disable_web_page_preview,
+		parse_mode = use_markdown and 'Markdown' or nil,
+		reply_markup = reply_markup
+	} )
+end
+
+function utilities:send_reply(old_msg, text, use_markdown, reply_markup)
 	return bindings.request(self, 'sendMessage', {
 		chat_id = old_msg.chat.id,
 		text = text,
 		disable_web_page_preview = true,
 		reply_to_message_id = old_msg.message_id,
-		parse_mode = use_markdown and 'Markdown' or nil
+		parse_mode = use_markdown and 'Markdown' or nil,
+		reply_markup = reply_markup
 	} )
 end
 
