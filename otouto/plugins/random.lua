@@ -39,7 +39,8 @@ function fun:choose_random(user_name, other_user)
 	user_name..' gibt '..other_user..[[ ganz viel Liebe. ( ͡° ͜ʖ ͡°)]],
 	user_name..' läd '..other_user..' zum Essen ein.',
 	user_name..' schwatzt '..other_user..' Ubuntu auf.',
-	user_name..' fliegt mit '..other_user..' nach Hawaii.'
+	user_name..' fliegt mit '..other_user..' nach Hawaii.',
+	user_name..' küsst '..other_user..' leidenschaftlich.'
   }
   math.randomseed(os.time())
   math.randomseed(os.time())
