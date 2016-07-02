@@ -59,8 +59,10 @@ function utilities:send_photo(chat_id, file, text, reply_to_message_id, reply_ma
 		reply_to_message_id = reply_to_message_id,
 		reply_markup = reply_markup
 	}, {photo = file} )
-	os.remove(file)
-	print("Deleted: "..file)
+	if string.match(file, '/tmp/') then
+	  os.remove(file)
+	  print("Deleted: "..file)
+	end
 	return output
 end
 
@@ -73,8 +75,10 @@ function utilities:send_audio(chat_id, file, reply_to_message_id, duration, perf
 		title = title or nil,
 		reply_to_message_id = reply_to_message_id
 	}, {audio = file} )
-	os.remove(file)
-	print("Deleted: "..file)
+	if string.match(file, '/tmp/') then
+	  os.remove(file)
+	  print("Deleted: "..file)
+	end
 	return output
 end
 
@@ -86,8 +90,10 @@ function utilities:send_document(chat_id, file, text, reply_to_message_id, reply
 		reply_to_message_id = reply_to_message_id,
 		reply_markup = reply_markup
 	}, {document = file} )
-	os.remove(file)
-	print("Deleted: "..file)
+	if string.match(file, '/tmp/') then
+	  os.remove(file)
+	  print("Deleted: "..file)
+	end
 	return output
 end
 
@@ -101,8 +107,10 @@ function utilities:send_video(chat_id, file, text, reply_to_message_id, duration
 		height = height or nil,
 		reply_to_message_id = reply_to_message_id
 	}, {video = file} )
-	os.remove(file)
-	print("Deleted: "..file)
+	if string.match(file, '/tmp/') then
+	  os.remove(file)
+	  print("Deleted: "..file)
+	end
 	return output
 end
 
@@ -114,8 +122,10 @@ function utilities:send_voice(chat_id, file, text, reply_to_message_id, duration
 		duration = duration or nil,
 		reply_to_message_id = reply_to_message_id
 	}, {voice = file} )
-	os.remove(file)
-	print("Deleted: "..file)
+	if string.match(file, '/tmp/') then
+	  os.remove(file)
+	  print("Deleted: "..file)
+	end
 	return output
 end
 
