@@ -33,6 +33,13 @@ function gImages:callback(callback, msg, self, config, input)
   utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..input..'"')
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local img_url, mimetype = gImages:get_image(input)
+  if img_url == 403 then
+    utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	return
+  elseif not img_url then
+    utilities.send_reply(self, msg, config.errors.connection, true)
+	return
+  end
   
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
@@ -53,19 +60,17 @@ function gImages:get_image(input)
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
   local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
-  
-  if res == 403 then
-    local jdat = JSON.decode(jstr)
-	utilities.send_reply(self, msg, 'Fehler '..jdat.error.code..': '..jdat.error.message..' ('..jdat.error.errors[1].reason..')', nil, msg.message_id)
-	return
-  end
-  
-  if res ~= 200 then
-    utilities.send_reply(self, msg, config.errors.connection, true)
-    return
-  end
-  
   local jdat = JSON.decode(jstr)
+
+  if jdat.error then
+    if jdat.error.code == 403 then
+	  return 403
+    else
+	  return false
+	end
+  end
+  
+  
   if jdat.searchInformation.totalResults == '0' then
 	utilities.send_reply(self, msg, config.errors.results, true)
     return
@@ -94,6 +99,15 @@ function gImages:action(msg, config, matches)
 
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local img_url, mimetype = gImages:get_image(URL.escape(input))
+  
+  if img_url == 403 then
+    utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	return
+  elseif not img_url then
+    utilities.send_reply(self, msg, config.errors.connection, true)
+	return
+  end
+  
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
     result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
