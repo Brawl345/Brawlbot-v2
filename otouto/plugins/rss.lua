@@ -193,11 +193,19 @@ function rss:print_subs(id, chat_name)
    if not subs[1] then
      return 'Keine Feeds abonniert!'
    end
+   local keyboard = '{"keyboard":[['
+   local keyboard_buttons = ''
    local text = '*'..chat_name..'* hat abonniert:\n---------\n'
    for k,v in pairs(subs) do
       text = text .. k .. ") " .. v .. '\n'
+	  if k == #subs then
+	    keyboard_buttons = keyboard_buttons..'{"text":"/rss del '..k..'"}'
+		break;
+	  end
+	  keyboard_buttons = keyboard_buttons..'{"text":"/rss del '..k..'"},'
    end
-   return text
+   local keyboard = keyboard..keyboard_buttons..']], "one_time_keyboard":true, "selective":true, "resize_keyboard":true}'
+   return text, keyboard
 end
 
 function rss:action(msg, config)
@@ -236,7 +244,16 @@ function rss:action(msg, config)
     end
 	local rss_url = input:match('(%d+)$')
 	local output = rss:unsubscribe(id, rss_url)
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, true, '{"hide_keyboard":true}')
+  elseif input:match('(del)$') then
+	if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
+      chat_name = msg.chat.title
+	else
+	  chat_name = msg.chat.first_name
+	end
+    local list_subs, keyboard = rss:print_subs(id, chat_name)
+	utilities.send_reply(self, msg, list_subs, true, keyboard)
+    return
   elseif input:match('(sync)$') then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
