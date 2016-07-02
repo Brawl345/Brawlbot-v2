@@ -29,28 +29,29 @@ end
 
 gImages.command = 'img <Suchbegriff>'
 
-function gImages:action(msg, config)
-  local input = utilities.input(msg.text)
-  if not input then
-    if msg.reply_to_message and msg.reply_to_message.text then
-      input = msg.reply_to_message.text
-    else
-	  utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
-	  return
-	end
-  end
+function gImages:callback(callback, msg, self, config, input)
+  utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..input..'"')
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  local img_url, mimetype = gImages:get_image(input)
   
-  print ('Checking if search contains blacklisted word: '..input)
-  if is_blacklisted(input) then
-    utilities.send_reply(self, msg, 'Vergiss es! ._.')
+  if mimetype == 'image/gif' then
+    local file = download_to_file(img_url, 'img.gif')
+    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+  else
+    local file = download_to_file(img_url, 'img.png')
+    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+  end
+  if not result then
+    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
 	return
   end
+end
 
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+function gImages:get_image(input)
   local apikey = cred_data.google_apikey
   local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
-  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. URL.escape(input) .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
+  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
   
   if res == 403 then
@@ -71,18 +72,38 @@ function gImages:action(msg, config)
   end
 
   local i = math.random(jdat.queries.request[1].count)
-  local img_url = jdat.items[i].link
+  return jdat.items[i].link, jdat.items[i].mime
+end
+
+function gImages:action(msg, config, matches)
+  local input = utilities.input(msg.text)
+  if not input then
+    if msg.reply_to_message and msg.reply_to_message.text then
+      input = msg.reply_to_message.text
+    else
+	  utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
+	  return
+	end
+  end
   
-  if jdat.items[i].mime == 'image/gif' then
+  print ('Checking if search contains blacklisted word: '..input)
+  if is_blacklisted(input) then
+    utilities.send_reply(self, msg, 'Vergiss es! ._.')
+	return
+  end
+
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  local img_url, mimetype = gImages:get_image(URL.escape(input))
+  if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id)
+    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   else
     local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id)
+    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   end
 
   if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true)
+    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
 	return
   end
 end
