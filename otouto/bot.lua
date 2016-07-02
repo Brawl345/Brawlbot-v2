@@ -86,7 +86,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 end
 
 function bot:on_callback_receive(callback, msg, config) -- whenever a new callback is received
-  -- remove comment to enable debugging
+  -- remove comments to enable debugging
   -- vardump(msg)
   -- vardump(callback)
 
@@ -104,21 +104,12 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   print('Callback Query "'..param..'" für Plugin "'..called_plugin..'" ausgelöst von '..callback.from.first_name..' ('..callback.from.id..')')
 
   msg = utilities.enrich_message(msg)
- -- called_plugin:callback(callback, msg, self, config, param)
- -- if is_plugin_disabled_on_chat(plugin.name, msg) then return end
-	for _, plugin in ipairs(self.plugins) do
-	  if plugin.name == called_plugin then
-	    if is_plugin_disabled_on_chat(plugin.name, msg) then return end
-	    plugin:callback(callback, msg, self, config, param)
-	  end
-	  --plugin.callback(callback, msg, self, config, para)
+  for _, plugin in ipairs(self.plugins) do
+	if plugin.name == called_plugin then
+	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
+	  plugin:callback(callback, msg, self, config, param)
 	end
- -- called_plugin:callback(callback, msg, self, config, param)
- --[[ for _,plugin in ipairs(self.plugins) do
-	if plugin.callback and msg then
-	  plugin:callback(callback, msg, self, config)
-	end
-  end]]--
+  end
 end
 
 function bot:run(config)
