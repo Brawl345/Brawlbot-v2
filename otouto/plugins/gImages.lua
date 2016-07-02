@@ -29,27 +29,24 @@ end
 
 gImages.command = 'img <Suchbegriff>'
 
-function gImages:callback(callback, msg, self, config)
-  local input = callback.data
-  utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..input..'"')
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype = gImages:get_image(input)
-  
-  if mimetype == 'image/gif' then
-    local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"'..input..'"}]]}')
-  else
-    local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"'..input..'"}]]}')
+function gImages:action(msg, config)
+  local input = utilities.input(msg.text)
+  if not input then
+    if msg.reply_to_message and msg.reply_to_message.text then
+      input = msg.reply_to_message.text
+    else
+	  utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
+	  return
+	end
   end
-
-  if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"'..input..'"}]]}')
+  
+  print ('Checking if search contains blacklisted word: '..input)
+  if is_blacklisted(input) then
+    utilities.send_reply(self, msg, 'Vergiss es! ._.')
 	return
   end
-end
 
-function gImages:get_image(input)
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local apikey = cred_data.google_apikey
   local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
@@ -74,35 +71,14 @@ function gImages:get_image(input)
   end
 
   local i = math.random(jdat.queries.request[1].count)
-  return jdat.items[i].link, jdat.items[i].mime
-end
-
-function gImages:action(msg, config, matches)
-  local input = utilities.input(msg.text)
-  if not input then
-    if msg.reply_to_message and msg.reply_to_message.text then
-      input = msg.reply_to_message.text
-    else
-	  utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
-	  return
-	end
-  end
+  local img_url = jdat.items[i].link
   
-  print ('Checking if search contains blacklisted word: '..input)
-  if is_blacklisted(input) then
-    utilities.send_reply(self, msg, 'Vergiss es! ._.')
-	return
-  end
-
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype = gImages:get_image(input)
-  
-  if mimetype == 'image/gif' then
+  if jdat.items[i].mime == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"'..input..'"}]]}')
+    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id)
   else
     local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"'..input..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id)
   end
 
   if not result then

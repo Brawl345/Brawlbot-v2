@@ -52,12 +52,11 @@ end
 
 -- NOTE: Telegram currently only allows file uploads up to 50 MB
 -- https://core.telegram.org/bots/api#sendphoto
-function utilities:send_photo(chat_id, file, text, reply_to_message_id, reply_markup	)
+function utilities:send_photo(chat_id, file, text, reply_to_message_id)
 	local output = bindings.request(self, 'sendPhoto', {
 		chat_id = chat_id,
 		caption = text or nil,
-		reply_to_message_id = reply_to_message_id,
-		reply_markup = reply_markup
+		reply_to_message_id = reply_to_message_id
 	}, {photo = file} )
 	os.remove(file)
 	print("Deleted: "..file)
@@ -147,15 +146,6 @@ function utilities:send_typing(chat_id, action)
 	return bindings.request(self, 'sendChatAction', {
 		chat_id = chat_id,
 		action = action
-	} )
-end
-
--- https://core.telegram.org/bots/api#answercallbackquery
-function utilities:answer_callback_query(callback, text, show_alert)
-	return bindings.request(self, 'answerCallbackQuery', {
-		callback_query_id = callback.id,
-		text = text,
-		show_alert = show_alert
 	} )
 end
 

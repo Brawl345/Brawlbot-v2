@@ -85,24 +85,6 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 end
 
-function bot:on_callback_receive(callback, msg, config) -- whenever a new callback is received
-  -- remove comment to enable debugging
-  -- vardump(msg)
-  -- vardump(callback)
-
-  if msg.date < os.time() - 3600 then -- Do not process old messages.
-    utilities.answer_callback_query(self, callback, 'Nachricht älter als eine Stunde, bitte sende den Befehl selbst noch einmal.', true)
-    return
-  end
-
-  msg = utilities.enrich_message(msg)
-  for _,plugin in ipairs(self.plugins) do
-	if plugin.callback and msg then
-	  plugin:callback(callback, msg, self, config)
-	end
-  end
-end
-
 function bot:run(config)
 	bot.init(self, config) -- Actually start the script.
 
@@ -113,7 +95,7 @@ function bot:run(config)
 			for _,v in ipairs(res.result) do -- Go through every new message.
 				self.last_update = v.update_id
 				if v.callback_query then
-				    bot.on_callback_receive(self, v.callback_query, v.callback_query.message, config)
+				    print('callback_query wird noch nicht unterstützt! Erhaltener Wert: '..v.callback_query.data)
 				elseif v.message then
 					bot.on_msg_receive(self, v.message, config)
 				end
