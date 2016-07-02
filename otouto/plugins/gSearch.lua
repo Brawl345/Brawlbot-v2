@@ -71,7 +71,7 @@ function gSearch:action(msg, config)
     utilities.send_reply(self, msg, config.errors.quotaexceeded)
 	return
   end
-  utilities.send_message(self, msg.chat.id, gSearch:stringlinks(results, stats), true, nil, true)
+  utilities.send_message(self, msg.chat.id, gSearch:stringlinks(results, stats), true, nil, true, '{"inline_keyboard":[[{"text":"Alle Ergebnisse anzeigen","url":"https://www.google.com/search?q='..URL.escape(input)..'"}]]}')
 
 end
 
