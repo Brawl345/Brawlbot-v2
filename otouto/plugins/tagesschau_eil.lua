@@ -98,12 +98,12 @@ function tagesschau_eil:cron(self_plz)
       local posted_at = makeOurDate(data.breakingnews[1].date)..' Uhr'
 	  local post_url = string.gsub(data.breakingnews[1].details, '/api/', '/')
 	  local post_url = string.gsub(post_url, '.json', '.html')
-      local eil = title..'\n_'..posted_at..'_\n'..news..'\n[Artikel aufrufen]('..post_url..')'
+      local eil = title..'\n_'..posted_at..'_\n'..news
       redis:set(hash..':last_entry', data.breakingnews[1].date)
 	  for _,user in pairs(redis:smembers(hash..':subs')) do
 	    local user = string.gsub(user, 'chat%#id', '')
 		local user = string.gsub(user, 'user%#id', '')
-	    utilities.send_message(self, user, eil, true, nil, true)
+	    utilities.send_message(self, user, eil, true, nil, true, '{"inline_keyboard":[[{"text":"Eilmeldung aufrufen","url":"'..post_url..'"}]]}')
       end
     end
   end
