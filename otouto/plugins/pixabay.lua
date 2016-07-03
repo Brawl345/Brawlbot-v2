@@ -111,8 +111,8 @@ function pixabay:action(msg, config, matches)
   else
     utilities.send_typing(self, msg.chat.id, 'upload_photo')
     local file = download_to_file(url)
-	local text = tags..' von '..user..':\nSeite: '..page_url..'\nVoll: '..full_url..' (Login notwendig)'
-    utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+	local text = '"'..tags..'" von '..user
+    utilities.send_photo(self, msg.chat.id, file, text, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..page_url..'"},{"text":"Volles Bild (Login notwendig)","url":"'..full_url..'"}]]}')
     return
   end
 end
