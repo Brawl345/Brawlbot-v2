@@ -28,6 +28,7 @@ function bindings:request(method, parameters, file)
 	end
 	if file and next(file) ~= nil then
 	    local file_type, file_name = next(file)
+		if not file_name then return false end
 	    if string.match(file_name, '/tmp/') then
 		  local file_file = io.open(file_name, 'r')
 		  local file_data = {

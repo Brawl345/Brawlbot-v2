@@ -53,6 +53,7 @@ end
 -- NOTE: Telegram currently only allows file uploads up to 50 MB
 -- https://core.telegram.org/bots/api#sendphoto
 function utilities:send_photo(chat_id, file, text, reply_to_message_id, reply_markup)
+    if not file then return false end
 	local output = bindings.request(self, 'sendPhoto', {
 		chat_id = chat_id,
 		caption = text or nil,
@@ -68,6 +69,7 @@ end
 
 -- https://core.telegram.org/bots/api#sendaudio
 function utilities:send_audio(chat_id, file, reply_to_message_id, duration, performer, title)
+    if not file then return false end
 	local output = bindings.request(self, 'sendAudio', {
 		chat_id = chat_id,
 		duration = duration or nil,
@@ -84,6 +86,7 @@ end
 
 -- https://core.telegram.org/bots/api#senddocument
 function utilities:send_document(chat_id, file, text, reply_to_message_id, reply_markup)
+	if not file then return false end
 	local output = bindings.request(self, 'sendDocument', {
 		chat_id = chat_id,
 		caption = text or nil,
@@ -99,6 +102,7 @@ end
 
 -- https://core.telegram.org/bots/api#sendvideo
 function utilities:send_video(chat_id, file, text, reply_to_message_id, duration, width, height)
+	if not file then return false end
 	local output = bindings.request(self, 'sendVideo', {
 		chat_id = chat_id,
 		caption = text or nil,
@@ -117,6 +121,7 @@ end
 -- NOTE: Voice messages are .ogg files encoded with OPUS
 -- https://core.telegram.org/bots/api#sendvoice
 function utilities:send_voice(chat_id, file, text, reply_to_message_id, duration)
+	if not file then return false end
 	local output = bindings.request(self, 'sendVoice', {
 		chat_id = chat_id,
 		duration = duration or nil,

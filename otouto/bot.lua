@@ -90,8 +90,8 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   -- vardump(msg)
   -- vardump(callback)
 
-  if msg.date < os.time() - 3600 then -- Do not process old messages.
-    utilities.answer_callback_query(self, callback, 'Nachricht älter als eine Stunde, bitte sende den Befehl selbst noch einmal.', true)
+  if msg.date < os.time() - 1800 then -- Do not process old messages.
+    utilities.answer_callback_query(self, callback, 'Nachricht älter als eine halbe Stunde, bitte sende den Befehl selbst noch einmal.', true)
     return
   end
 

@@ -30,7 +30,8 @@ end
 gImages.command = 'img <Suchbegriff>'
 
 function gImages:callback(callback, msg, self, config, input)
-  utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..input..'"')
+  if not msg then return end
+  utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..URL.unescape(input)..'"')
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local img_url, mimetype, context = gImages:get_image(input)
   if img_url == 403 then
@@ -40,14 +41,18 @@ function gImages:callback(callback, msg, self, config, input)
     utilities.send_reply(self, msg, config.errors.connection, true)
 	return
   end
-  
+
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  else
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+  elseif mimetype == 'image/png' then
     local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+  elseif mimetype == 'image/jpeg' then
+    local file = download_to_file(img_url, 'img.jpg')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
   end
+
   if not result then
     utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
 	return
@@ -55,8 +60,8 @@ function gImages:callback(callback, msg, self, config, input)
 end
 
 function gImages:get_image(input)
-  local apikey = cred_data.google_apikey
-  local cseid = cred_data.google_cse_id
+  local apikey = cred_data.google_apikey_2 -- 100 requests is RIDICULOUS Google!
+  local cseid = cred_data.google_cse_id_2
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
   local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
@@ -99,7 +104,6 @@ function gImages:action(msg, config, matches)
 
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
   local img_url, mimetype, context = gImages:get_image(URL.escape(input))
-  
   if img_url == 403 then
     utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
 	return
@@ -111,8 +115,11 @@ function gImages:action(msg, config, matches)
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
     result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"}],[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  else
+  elseif mimetype == 'image/png' then
     local file = download_to_file(img_url, 'img.png')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+  elseif mimetype == 'image/jpeg' then
+    local file = download_to_file(img_url, 'img.jpg')
     result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   end
 
