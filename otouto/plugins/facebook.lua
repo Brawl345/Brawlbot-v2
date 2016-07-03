@@ -93,12 +93,7 @@ function facebook:send_facebook_video(video_id)
   local from = '*'..data.from.name..'*'
   local description = data.description
   local source = data.source
-  if data.title then
-    text = from..' hat ein Video gepostet:\n'..description..'\n['..data.title..']('..source..')'
-  else
-    text = from..' hat ein Video gepostet:\n'..description..'\n'..utilities.md_escape(source)
-  end
-  return text
+  return from..' hat ein Video gepostet:\n'..description, source, data.title
 end
 
 function facebook:facebook_info(name)
@@ -169,8 +164,14 @@ function facebook:action(msg, config, matches)
     else
       video_id = matches[3]
     end
-    local output = facebook:send_facebook_video(video_id)
-	utilities.send_reply(self, msg, output, true)
+    local output, video_url, title = facebook:send_facebook_video(video_id)
+	if not title then
+	  title = 'Video aufrufen'
+	else
+	  title = 'VIDEO: '..title
+	end
+	if not video_url then return end
+	utilities.send_reply(self, msg, output, true, '{"inline_keyboard":[[{"text":"'..utilities.md_escape(title)..'","url":"'..video_url..'"}]]}')
 	return
   else
     utilities.send_reply(self, msg, facebook:facebook_info(matches[1]), true)
