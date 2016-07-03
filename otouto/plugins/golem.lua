@@ -25,10 +25,15 @@ function golem:get_golem_data (article_identifier)
   local res,code  = http.request(url)
   if code ~= 200 then return "HTTP-FEHLER" end
   local data = json.decode(res).data
-  return data
+
+  local url = BASE_URL..'/article/images/'..article_identifier..'/?key='..apikey..'&format=json'
+  local res,code  = http.request(url)
+  if code ~= 200 then return "HTTP-FEHLER" end
+  local image_data = json.decode(res).data
+  return data, image_data
 end
 
-function golem:send_golem_data(data)
+function golem:send_golem_data(data, image_data)
   local headline = '*'..data.headline..'*'
   if data.subheadline ~= "" then
     subheadline = '\n_'..data.subheadline..'_'
@@ -38,15 +43,19 @@ function golem:send_golem_data(data)
   local subheadline = data.subheadline
   local abstracttext = data.abstracttext
   local text = headline..subheadline..'\n'..abstracttext
-  local image_url = data.leadimg.url
+  if image_data[1] then
+    image_url = image_data[1].native.url
+  else
+	image_url = data.leadimg.url
+  end
   return text, image_url
 end
 
 function golem:action(msg, config, matches)
   local article_identifier = matches[2]
-  local data = golem:get_golem_data(article_identifier)
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
-  local text, image_url = golem:send_golem_data(data)
+  local data, image_data = golem:get_golem_data(article_identifier)
+  if not data and not image_data then utilities.send_reply(self, msg, config.errors.connection) return end
+  local text, image_url = golem:send_golem_data(data, image_data)
   
   if image_url then
     utilities.send_typing(self, msg.chat.id, 'upload_photo')
