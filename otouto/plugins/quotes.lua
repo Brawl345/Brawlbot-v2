@@ -75,7 +75,7 @@ function quotes:list_quotes(msg)
       text = text..num..") "..quote..'\n'
     end
 	if not text or text == "" then
-	  return 'Es wurden noch keine Zitate gespeichert.\nSpeichere doch welche mit !addquote [Zitat]'
+	  return '*Es wurden noch keine Zitate gespeichert.*\nSpeichere doch welche mit `/addquote [Zitat]`', true
 	else
 	  return upload(text)
 	end
@@ -99,10 +99,10 @@ function quotes:action(msg, config, matches)
   elseif matches[1] == "listquotes" then
     local link, iserror = quotes:list_quotes(msg)
 	if iserror then
-      utilities.send_reply(self, msg, link)
+      utilities.send_reply(self, msg, link, true)
 	  return
     end
-    utilities.send_reply(self, msg, '[Lise aller Zitate auf Paste.ee ansehen]('..link..')', true)
+    utilities.send_reply(self, msg, 'Ich habe eine Liste aller Zitate hochgeladen.', false, '{"inline_keyboard":[[{"text":"Alle Zitate abrufen","url":"'..link..'"}]]}')
     return
   end
   utilities.send_reply(self, msg, quotes.doc, true)
