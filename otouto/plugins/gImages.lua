@@ -32,7 +32,7 @@ gImages.command = 'img <Suchbegriff>'
 function gImages:callback(callback, msg, self, config, input)
   utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..input..'"')
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype = gImages:get_image(input)
+  local img_url, mimetype, context = gImages:get_image(input)
   if img_url == 403 then
     utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
 	return
@@ -43,10 +43,10 @@ function gImages:callback(callback, msg, self, config, input)
   
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   else
     local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   end
   if not result then
     utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
@@ -77,7 +77,7 @@ function gImages:get_image(input)
   end
 
   local i = math.random(jdat.queries.request[1].count)
-  return jdat.items[i].link, jdat.items[i].mime
+  return jdat.items[i].link, jdat.items[i].mime, jdat.items[i].image.contextLink
 end
 
 function gImages:action(msg, config, matches)
@@ -98,7 +98,7 @@ function gImages:action(msg, config, matches)
   end
 
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype = gImages:get_image(URL.escape(input))
+  local img_url, mimetype, context = gImages:get_image(URL.escape(input))
   
   if img_url == 403 then
     utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
@@ -110,10 +110,10 @@ function gImages:action(msg, config, matches)
   
   if mimetype == 'image/gif' then
     local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"}],[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   else
     local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, img_url, msg.message_id, '{"inline_keyboard":[[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   end
 
   if not result then
