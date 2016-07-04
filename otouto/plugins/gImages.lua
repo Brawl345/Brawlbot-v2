@@ -37,6 +37,9 @@ function gImages:callback(callback, msg, self, config, input)
   if img_url == 403 then
     utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
 	return
+  elseif img_url == 'NORESULTS' then
+    utilities.send_reply(self, msg, config.errors.results, true)
+    return
   elseif not img_url then
     utilities.send_reply(self, msg, config.errors.connection, true)
 	return
@@ -77,8 +80,7 @@ function gImages:get_image(input)
   
   
   if jdat.searchInformation.totalResults == '0' then
-	utilities.send_reply(self, msg, config.errors.results, true)
-    return
+	return 'NORESULTS'
   end
 
   local i = math.random(jdat.queries.request[1].count)
@@ -107,6 +109,9 @@ function gImages:action(msg, config, matches)
   if img_url == 403 then
     utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
 	return
+  elseif img_url == 'NORESULTS' then
+    utilities.send_reply(self, msg, config.errors.results, true)
+    return
   elseif not img_url then
     utilities.send_reply(self, msg, config.errors.connection, true)
 	return
