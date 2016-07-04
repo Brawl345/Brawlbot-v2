@@ -47,7 +47,7 @@ function imgblacklist:remove_blacklist(word)
   end
 end
 
-function imgblacklist:action(msg)
+function imgblacklist:action(msg, config)
   if msg.from.id ~= config.admin then
     utilities.send_reply(self, msg, config.errors.sudo)
 	return
