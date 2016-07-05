@@ -7,10 +7,16 @@ images.triggers = {
 }
 
 function images:action(msg)
-   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-   local url = matches[1]
-   local file = download_to_file(url)
-   utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  local url = matches[1]
+  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, 'upload_photo', self)
+  local result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+
+  if nocache then return end
+  if not result then return end
+
+  -- Cache File-ID und Last-Modified-Header in Redis
+  cache_file(result, url, last_modified)
 end
 
 return images

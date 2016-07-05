@@ -724,6 +724,91 @@ function cache_data(plugin, query, data, timeout, typ)
   end
 end
 
+-- Caches file_id and last_modified
+-- result = result of send_X() (see media.lua)
+function cache_file(result, url, last_modified)
+  local hash = 'telegram:cache:sent_file'
+  if result.result.video then
+    file_id = result.result.video.file_id
+  elseif result.result.audio then
+    file_id = result.result.audio.file_id
+  elseif result.result.voice then
+    file_id = result.result.voice.file_id
+  elseif result.result.document then
+    file_id = result.result.document.file_id
+  elseif result.result.photo then
+    local lv = #result.result.photo
+    file_id = result.result.photo[lv].file_id
+  end
+  print('Caching File...')
+  redis:hset(hash..':'..url, 'file_id', file_id)
+  redis:hset(hash..':'..url, 'last_modified', last_modified)
+  -- Why do we set a TTL? Because Telegram recycles outgoing file_id's
+  -- See: https://core.telegram.org/bots/faq#can-i-count-on-file-ids-to-be-persistent
+  redis:expire(hash..':'..url, 5259600) -- 2 months
+end
+
+function get_last_modified_header(url)
+  local doer = HTTP
+  local do_redir = true
+  if url:match('^https') then
+	doer = HTTPS
+	do_redir = false
+  end
+  local _, code, header = doer.request {
+	method = "HEAD",
+	url = url,
+	redirect = do_redir
+  }
+  if header["last-modified"] then
+    last_modified = header["last-modified"]
+  elseif header["Last-Modified"] then
+    last_modified = header["Last-Modified"]
+  end
+  return last_modified, code
+end
+
+-- only url is needed!
+function get_cached_file(url, file_name, receiver, chat_action, self)
+  local hash = 'telegram:cache:sent_file'
+  local cached_file_id = redis:hget(hash..':'..url, 'file_id')
+  local cached_last_modified = redis:hget(hash..':'..url, 'last_modified')
+
+  -- get last-modified header
+  local last_modified, code = get_last_modified_header(url)
+  if code ~= 200 then
+    if cached_file_id then
+      redis:del(hash..':'..url)
+	end
+    return
+  end
+  
+  if not last_modified then
+	nocache = true
+  else
+    nocache = false
+  end
+  
+  if receiver and chat_action and self then
+    utilities.send_typing(self, receiver, chat_action)
+  end
+  
+  if not nocache then
+    if last_modified == cached_last_modified then
+      print('File not modified and already cached')
+      nocache = true
+	  file = cached_file_id
+    else
+	  print('File cached, but modified or not already cached. (Re)downloading...')
+      file = download_to_file(url, file_name)
+    end
+  else
+    print('No Last-Modified header!')
+    file = download_to_file(url, file_name)
+  end
+  return file, last_modified, nocache
+end
+
 -- converts total amount of seconds (e.g. 65 seconds) to human redable time (e.g. 1:05 minutes)
 function makeHumanTime(totalseconds)
   local seconds = totalseconds % 60
