@@ -110,8 +110,8 @@ function gImages:callback(callback, msg, self, config, input)
 end
 
 function gImages:get_image(input)
-  local apikey = cred_data.google_apikey_2 -- 100 requests is RIDICULOUS, Google!
-  local cseid = cred_data.google_cse_id_2
+  local apikey = cred_data.google_apikey -- 100 requests is RIDICULOUS, Google!
+  local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
   local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
@@ -173,7 +173,7 @@ function gImages:action(msg, config, matches)
 	if results == 403 then
 	  utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
 	  return
-    elseif not results then
+    elseif not results or results == 'NORESULTS' then
       utilities.send_reply(self, msg, config.errors.results, true)
 	  return
     end
