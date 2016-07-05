@@ -30,30 +30,76 @@ end
 
 gImages.command = 'img <Suchbegriff>'
 
+-- Yes, the callback is copied from below, but I can't think of another method :\
 function gImages:callback(callback, msg, self, config, input)
   if not msg then return end
   utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..URL.unescape(input)..'"')
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype, context = gImages:get_image(input)
-  if img_url == 403 then
-    utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
-	return
-  elseif img_url == 'NORESULTS' then
-    utilities.send_reply(self, msg, config.errors.results, true)
-    return
-  elseif not img_url then
-    utilities.send_reply(self, msg, config.errors.connection, true)
-	return
+  local hash = 'telegram:cache:gImages'
+  local results = redis:smembers(hash..':'..string.lower(URL.unescape(input)))
+  
+  if not results[1] then
+    print('doing web request')
+    results = gImages:get_image(input)
+	if results == 403 then
+	  utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	  return
+    elseif not results then
+      utilities.send_reply(self, msg, config.errors.results, true)
+	  return
+    end
+    gImages:cache_result(results, input)
   end
 
+  -- Random image from table
+  local i = math.random(#results)
+  
+  -- Thanks to Amedeo for this!
+  local failed = true
+  local nofTries = 0
+  
+  while failed and nofTries < #results do
+    if results[i].image then
+      img_url = results[i].link
+      mimetype = results[i].mime
+      context = results[i].image.contextLink
+    else -- from cache
+      img_url = results[i]
+	  mimetype = redis:hget(hash..':'..img_url, 'mime')
+	  context = redis:hget(hash..':'..img_url, 'contextLink')
+    end
+
+    -- It's important to save the image with the right ending!
+    if mimetype == 'image/gif' then
+      file = download_to_file(img_url, 'img.gif')
+    elseif mimetype == 'image/png' then
+     file = download_to_file(img_url, 'img.png')
+    elseif mimetype == 'image/jpeg' then
+      file = download_to_file(img_url, 'img.jpg')
+    else
+      file = nil
+    end
+	
+	if not file then
+	  nofTries = nofTries + 1
+	  i = i+1
+	  if i > #results then
+	    i = 1
+	  end
+	else
+	  failed = false
+	end
+
+  end
+  
+  if failed then
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
+	return
+  end
+  
   if mimetype == 'image/gif' then
-    local file = download_to_file(img_url, 'img.gif')
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
-  elseif mimetype == 'image/png' then
-    local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
-  elseif mimetype == 'image/jpeg' then
-    local file = download_to_file(img_url, 'img.jpg')
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"}],[{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+  else
     result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
   end
 
@@ -64,17 +110,6 @@ function gImages:callback(callback, msg, self, config, input)
 end
 
 function gImages:get_image(input)
-  local hash = 'telegram:cache:gImages'
-  local results = redis:smembers(hash..':'..string.lower(input))
-  if results[1] then
-    print('getting image from cache')
-    local i = math.random(#results)
-    local img_url = results[i]
-	local mime = redis:hget(hash..':'..img_url, 'mime')
-	local contextLink = redis:hget(hash..':'..img_url, 'contextLink')
-	return img_url, mime, contextLink
-  end
-
   local apikey = cred_data.google_apikey_2 -- 100 requests is RIDICULOUS, Google!
   local cseid = cred_data.google_cse_id_2
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
@@ -94,9 +129,7 @@ function gImages:get_image(input)
 	end
   end
   
-  gImages:cache_result(jdat, input)
-  local i = math.random(#jdat)
-  return jdat[i].link, jdat[i].mime, jdat[i].image.contextLink
+  return jdat
 end
 
 function gImages:cache_result(results, text)
@@ -130,26 +163,72 @@ function gImages:action(msg, config, matches)
   end
 
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local img_url, mimetype, context = gImages:get_image(URL.escape(input))
-  if img_url == 403 then
-    utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
-	return
-  elseif img_url == 'NORESULTS' then
-    utilities.send_reply(self, msg, config.errors.results, true)
-    return
-  elseif not img_url then
-    utilities.send_reply(self, msg, config.errors.connection, true)
+
+  local hash = 'telegram:cache:gImages'
+  local results = redis:smembers(hash..':'..string.lower(input))
+  
+  if not results[1] then
+    print('doing web request')
+    results = gImages:get_image(URL.escape(input))
+	if results == 403 then
+	  utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	  return
+    elseif not results then
+      utilities.send_reply(self, msg, config.errors.results, true)
+	  return
+    end
+    gImages:cache_result(results, input)
+  end
+
+  -- Random image from table
+  local i = math.random(#results)
+  
+  -- Thanks to Amedeo for this!
+  local failed = true
+  local nofTries = 0
+  
+  while failed and nofTries < #results do
+    if results[i].image then
+      img_url = results[i].link
+      mimetype = results[i].mime
+      context = results[i].image.contextLink
+    else -- from cache
+      img_url = results[i]
+	  mimetype = redis:hget(hash..':'..img_url, 'mime')
+	  context = redis:hget(hash..':'..img_url, 'contextLink')
+    end
+
+    -- It's important to save the image with the right ending!
+    if mimetype == 'image/gif' then
+      file = download_to_file(img_url, 'img.gif')
+    elseif mimetype == 'image/png' then
+     file = download_to_file(img_url, 'img.png')
+    elseif mimetype == 'image/jpeg' then
+      file = download_to_file(img_url, 'img.jpg')
+    else
+      file = nil
+    end
+	
+	if not file then
+	  nofTries = nofTries + 1
+	  i = i+1
+	  if i > #results then
+	    i = 1
+	  end
+	else
+	  failed = false
+	end
+
+  end
+  
+  if failed then
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
 	return
   end
   
   if mimetype == 'image/gif' then
-    local file = download_to_file(img_url, 'img.gif')
     result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"}],[{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  elseif mimetype == 'image/png' then
-    local file = download_to_file(img_url, 'img.png')
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  elseif mimetype == 'image/jpeg' then
-    local file = download_to_file(img_url, 'img.jpg')
+  else
     result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
   end
 
