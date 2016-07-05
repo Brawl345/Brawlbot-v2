@@ -79,7 +79,9 @@ local function convertISO8601Time(duration)
 end
 
 function send_youtube_data(data, msg, self, link, sendpic)
-  local title = utilities.md_escape(data.snippet.localized.title)
+  local title = data.snippet.localized.title
+  local title = title:gsub('%*', '\\*')
+  local title = title:gsub('`', '\\`')
   -- local description = data.snippet.localized.description
   local uploader = data.snippet.channelTitle
   local upload_date = makeOurDate(data.snippet.publishedAt)
