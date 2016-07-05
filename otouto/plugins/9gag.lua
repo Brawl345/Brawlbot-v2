@@ -22,19 +22,20 @@ function ninegag:get_9GAG()
   -- random max json table size
   local i = math.random(#gag)  local link_image = gag[i].src
   local title = gag[i].title
+  local post_url = gag[i].url
   return link_image, title, post_url
 end
 
 function ninegag:action(msg, config)
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  local url, title = ninegag:get_9GAG()
+  local url, title, post_url = ninegag:get_9GAG()
   if not url then
 	utilities.send_reply(self, msg, config.errors.connection)
 	return
   end
 
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, title, msg.message_id)
+  utilities.send_photo(self, msg.chat.id, file, title, msg.message_id, '{"inline_keyboard":[[{"text":"Post aufrufen","url":"'..post_url..'"}]]}')
 end
 
 return ninegag

@@ -6,6 +6,7 @@ local gImages = {}
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
 local JSON = require('dkjson')
+local redis = (loadfile "./otouto/redis.lua")()
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
 
@@ -63,12 +64,27 @@ function gImages:callback(callback, msg, self, config, input)
 end
 
 function gImages:get_image(input)
-  local apikey = cred_data.google_apikey_2 -- 100 requests is RIDICULOUS Google!
+  local hash = 'telegram:cache:gImages'
+  local results = redis:smembers(hash..':'..string.lower(input))
+  if results[1] then
+    print('getting image from cache')
+    local i = math.random(#results)
+    local img_url = results[i]
+	local mime = redis:hget(hash..':'..img_url, 'mime')
+	local contextLink = redis:hget(hash..':'..img_url, 'contextLink')
+	return img_url, mime, contextLink
+  end
+
+  local apikey = cred_data.google_apikey_2 -- 100 requests is RIDICULOUS, Google!
   local cseid = cred_data.google_cse_id_2
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
-  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=searchInformation(totalResults),queries(request(count)),items(link,mime,image(contextLink))'
+  local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=items(link,mime,image(contextLink))'
   local jstr, res = HTTPS.request(url)
-  local jdat = JSON.decode(jstr)
+  local jdat = JSON.decode(jstr).items
+  
+  if not jdat then
+	return 'NORESULTS'
+  end
 
   if jdat.error then
     if jdat.error.code == 403 then
@@ -78,13 +94,22 @@ function gImages:get_image(input)
 	end
   end
   
-  
-  if jdat.searchInformation.totalResults == '0' then
-	return 'NORESULTS'
-  end
+  gImages:cache_result(jdat, input)
+  local i = math.random(#jdat)
+  return jdat[i].link, jdat[i].mime, jdat[i].image.contextLink
+end
 
-  local i = math.random(jdat.queries.request[1].count)
-  return jdat.items[i].link, jdat.items[i].mime, jdat.items[i].image.contextLink
+function gImages:cache_result(results, text)
+  local cache = {}
+  for v in pairs(results) do
+    table.insert(cache, results[v].link)
+  end
+  for n, link in pairs(cache) do
+   redis:hset('telegram:cache:gImages:'..link, 'mime', results[n].mime)
+   redis:hset('telegram:cache:gImages:'..link, 'contextLink', results[n].image.contextLink)
+   redis:expire('telegram:cache:gImages:'..link, 1209600)
+  end
+  cache_data('gImages', string.lower(text), cache, 1209600, 'set')
 end
 
 function gImages:action(msg, config, matches)
