@@ -5,7 +5,7 @@ local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '2.0'
+bot.version = '2.1'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -31,7 +31,29 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	if not self.database then
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
+	
+	-- MIGRATION CODE 2.0 -> 2.1
+	if self.database.users and self.database.version ~= '2.1' then
+		self.database.userdata = {}
+		for id, user in pairs(self.database.users) do
+			self.database.userdata[id] = {}
+			self.database.userdata[id].nickname = user.nickname
+			self.database.userdata[id].lastfm = user.lastfm
+			user.nickname = nil
+			user.lastfm = nil
+			user.id_str = nil
+			user.name = nil
+		end
+	end
+	-- END MIGRATION CODE
 
+	-- Table to cache user info (usernames, IDs, etc).
+	self.database.users = self.database.users or {}
+	-- Table to store userdata (nicknames, lastfm usernames, etc).
+	self.database.userdata = self.database.userdata or {}
+	-- Save the bot's version in the database to make migration simpler.
+	self.database.version = bot.version
+	-- Add updated bot info to the user info cache.
 	self.database.users = self.database.users or {} -- Table to cache userdata.
 	self.database.users[tostring(self.info.id)] = self.info
 
@@ -49,6 +71,7 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,
 	self.last_cron = self.last_cron or os.date('%M') -- the time of the last cron job,
+	self.last_database_save = self.last_database_save or os.date('%H') -- the time of the last database save,
 	self.is_started = true -- and whether or not the bot should be running.
 
 end
@@ -57,18 +80,24 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	-- remove comment to enable debugging
 	-- vardump(msg)
 	-- Cache user info for those involved.
-	utilities.create_user_entry(self, msg.from)
-	if msg.forward_from and msg.forward_from.id ~= msg.from.id then
-		utilities.create_user_entry(self, msg.forward_from)
-	elseif msg.reply_to_message and msg.reply_to_message.from.id ~= msg.from.id then
-		utilities.create_user_entry(self, msg.reply_to_message.from)
-	end
-
+	
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 
-	msg = utilities.enrich_message(msg)
-	
+	-- Cache user info for those involved.
+	self.database.users[tostring(msg.from.id)] = msg.from
+	if msg.reply_to_message then
+		self.database.users[tostring(msg.reply_to_message.from.id)] = msg.reply_to_message.from
+	elseif msg.forward_from then
+		self.database.users[tostring(msg.forward_from.id)] = msg.forward_from
+	elseif msg.new_chat_member then
+		self.database.users[tostring(msg.new_chat_member.id)] = msg.new_chat_member
+	elseif msg.left_chat_member then
+		self.database.users[tostring(msg.left_chat_member.id)] = msg.left_chat_member
+	end
 
+	msg = utilities.enrich_message(msg)
+
+	-- Support deep linking.
 	if msg.text:match('^'..config.cmd_pat..'start .+') then
 		msg.text = config.cmd_pat .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
@@ -104,6 +133,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   print('Callback Query "'..param..'" für Plugin "'..called_plugin..'" ausgelöst von '..callback.from.first_name..' ('..callback.from.id..')')
 
   msg = utilities.enrich_message(msg)
+
   for _, plugin in ipairs(self.plugins) do
 	if plugin.name == called_plugin then
 	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
@@ -143,7 +173,10 @@ function bot:run(config)
 				end
 			end
 		end
-
+		if self.last_database_save ~= os.date('%H') then
+			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
+			self.last_database_save = os.date('%H')
+		end
 	end
 
 	-- Save the database before exiting.
@@ -163,7 +196,7 @@ function pre_process_msg(self, msg, config)
 end
 
 function match_plugins(self, msg, config, plugin)
-  for _, trigger in pairs(plugin.triggers) do
+  for _, trigger in pairs(plugin.triggers or {}) do
     if string.match(msg.text_lower, trigger) then
 	-- Check if Plugin is disabled
 	if is_plugin_disabled_on_chat(plugin.name, msg) then return end

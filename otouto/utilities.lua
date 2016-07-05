@@ -216,40 +216,11 @@ function utilities.utf8_len(s)
     return chars
 end
 
- -- I swear, I copied this from PIL, not yago! :)
-function utilities.trim(str) -- Trims whitespace from a string.
+-- Trims whitespace from a string.
+function utilities.trim(str)
 	local s = str:gsub('^%s*(.-)%s*$', '%1')
 	return s
 end
-
-local lc_list = {
--- Latin = 'Cyrillic'
-	['A'] = 'А',
-	['B'] = 'В',
-	['C'] = 'С',
-	['E'] = 'Е',
-	['I'] = 'І',
-	['J'] = 'Ј',
-	['K'] = 'К',
-	['M'] = 'М',
-	['H'] = 'Н',
-	['O'] = 'О',
-	['P'] = 'Р',
-	['S'] = 'Ѕ',
-	['T'] = 'Т',
-	['X'] = 'Х',
-	['Y'] = 'Ү',
-	['a'] = 'а',
-	['c'] = 'с',
-	['e'] = 'е',
-	['i'] = 'і',
-	['j'] = 'ј',
-	['o'] = 'о',
-	['s'] = 'ѕ',
-	['x'] = 'х',
-	['y'] = 'у',
-	['!'] = 'ǃ'
-}
 
 -- Retruns true if the string is empty
 function string:isempty()
@@ -322,14 +293,6 @@ function vardump(value)
   print(serpent.block(value, {comment=false}))
 end
 
- -- Replaces letters with corresponding Cyrillic characters.
-function utilities.latcyr(str)
-	for k,v in pairs(lc_list) do
-		str = str:gsub(k, v)
-	end
-	return str
-end
-
  -- Loads a JSON file as a table.
 function utilities.load_data(filename)
 	local f = io.open(filename)
@@ -393,15 +356,46 @@ end
 
 function utilities:resolve_username(input)
 	input = input:gsub('^@', '')
-	for _,v in pairs(self.database.users) do
-		if v.username and v.username:lower() == input:lower() then
-			return v
+	for _, user in pairs(self.database.users) do
+		if user.username and user.username:lower() == input:lower() then
+			local t = {}
+			for key, val in pairs(user) do
+				t[key] = val
+			end
+			return t
+		end
+	end
+end
+
+ -- Simpler than above function; only returns an ID.
+ -- Returns nil if no ID is available.
+function utilities:id_from_username(input)
+	input = input:gsub('^@', '')
+	for _, user in pairs(self.database.users) do
+		if user.username and user.username:lower() == input:lower() then
+			return user.id
+		end
+	end
+end
+
+ -- Simpler than below function; only returns an ID.
+ -- Returns nil if no ID is available.
+function utilities:id_from_message(msg)
+	if msg.reply_to_message then
+		return msg.reply_to_message.from.id
+	else
+		local input = utilities.input(msg.text)
+		if input then
+			if tonumber(input) then
+				return tonumber(input)
+			elseif input:match('^@') then
+				return utilities.id_from_username(self, input)
+			end
 		end
 	end
 end
 
 function utilities:user_from_message(msg, no_extra)
-
 	local input = utilities.input(msg.text_lower)
 	local target = {}
 	if msg.reply_to_message then
@@ -540,21 +534,6 @@ function utilities.pretty_float(x)
 		return tostring(math.floor(x))
 	else
 		return tostring(x)
-	end
-end
-
-function utilities:create_user_entry(user)
-	local id = tostring(user.id)
-	-- Clear things that may no longer exist, or create a user entry.
-	if self.database.users[id] then
-		self.database.users[id].username = nil
-		self.database.users[id].last_name = nil
-	else
-		self.database.users[id] = {}
-	end
-	-- Add all the user info to the entry.
-	for k,v in pairs(user) do
-		self.database.users[id][k] = v
 	end
 end
 

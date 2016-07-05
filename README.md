@@ -16,6 +16,7 @@ Brawlbot v2 ist freie Software; du darfst in modifizieren und weiterverbreiten, 
 |:----------------------------------------------|:------------------------------|
 | [Setup](#setup)                               | [Plugins](#plugins)           |
 | [Bot steuern](#bot-steuern)           | [Bindings](#bindings)         |
+|												| [Datenbank](#datenbank)
 
 * * *
 # Für User
@@ -148,3 +149,37 @@ bindings.sendPhoto(self, { chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVW
 ```
 
 Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+
+* * *
+
+## Datenbank
+Brawlbot benutzt eine interne Datenbank, wie Otouto sie benutzt und Redis. Die "Datenbank" ist eine Tabelle, auf die über die Variable `database` zugegriffen werden kann (normalerweise `self.database`) und die als JSON-encodierte Plaintext-Datei jede Stunde gespeichert wird oder wenn der Bot gestoppt wird (über `/halt`).
+
+Das ist die Datenbank-Struktur:
+
+```
+{
+	users = {
+		["55994550"] = {
+			id = 55994550,
+			first_name = "Drew",
+			username = "topkecleon"
+		}
+	},
+	userdata = {
+		["55994550"] = {
+			nickname = "Best coder ever",
+			lastfm = "topkecleon"
+		}
+	},
+	version = "2.1"
+}
+```
+
+`database.users` speichert User-Informationen, wie Usernamen, IDs, etc., wenn der Bot den User sieht. Jeder Tabellen-Key ist die User-ID als String.
+
+`database.userdata` speichert Daten von verschiedenen Plugins, hierzu wird aber für Brawlbot-Plugins Redis verwendet.
+
+`database.version` speichert die Bot-Version.
+
+* * *

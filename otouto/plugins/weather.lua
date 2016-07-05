@@ -2,6 +2,7 @@ local weather = {}
 
 local HTTPS = require('ssl.https')
 local URL = require('socket.url')
+local HTTP = require('socket.http')
 local JSON = require('dkjson')
 local utilities = require('otouto.utilities')
 local bindings = require('otouto.bindings')
