@@ -24,15 +24,6 @@ local apikey = cred_data.google_apikey
 
 local BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
-function table.contains(table, element)
-  for _, value in pairs(table) do
-    if value == element then
-      return true
-    end
-  end
-  return false
-end
-
 local makeOurDate = function(dateString)
   local pattern = "(%d+)%-(%d+)%-(%d+)T"
   local year, month, day = dateString:match(pattern)

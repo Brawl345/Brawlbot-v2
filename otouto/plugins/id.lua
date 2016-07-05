@@ -95,6 +95,17 @@ function id:action(msg)
       local user_info = id:get_user(user_id, chat_id)
       table.insert(users_info, user_info)
     end
+
+	-- get all administrators and the creator
+	local administrators = utilities.get_chat_administrators(self, chat_id)
+	local admins = {}
+	for num in pairs(administrators.result) do
+	  if administrators.result[num].status ~= 'creator' then
+	    table.insert(admins, tostring(administrators.result[num].user.id))
+	  else
+	    creator_id = administrators.result[num].user.id
+	  end
+    end
 	local result = id:get_member_count(self, msg, chat_id)
 	local member_count = result.result - 1 -- minus the bot
 	if member_count == 1 then
@@ -104,8 +115,13 @@ function id:action(msg)
 	end
     local text = 'IDs für *'..chat_name..'* `['..chat_id..']`\nHier '..member_count..':*\n---------\n'
     for k,user in pairs(users_info) do
-      text = text..'*'..user.name..'* `['..user.id..']`\n'
-	  text = string.gsub(text, "%_", " ")
+	  if table.contains(admins, tostring(user.id)) then
+	    text = text..'*'..user.name..'* `['..user.id..']` _Administrator_\n'
+	  elseif tostring(creator_id) == user.id then
+	    text = text..'*'..user.name..'* `['..user.id..']` _Gruppenersteller_\n'
+	  else
+        text = text..'*'..user.name..'* `['..user.id..']`\n'
+	  end
     end
 	utilities.send_reply(self, msg, text, true)
   end

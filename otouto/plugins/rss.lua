@@ -3,6 +3,7 @@ local rss = {}
 local http = require('socket.http')
 local https = require('ssl.https')
 local url = require('socket.url')
+local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 local redis = (loadfile "./otouto/redis.lua")()
 local feedparser = require("feedparser")
@@ -10,12 +11,22 @@ local feedparser = require("feedparser")
 rss.command = 'rss <sub/del>'
 
 function rss:init(config)
-	rss.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('rss', true).table
+	rss.triggers = {
+	  "^/(rss) @(.*)$",
+      "^/rss$",
+      "^/rss (sub) (https?://[%w-_%.%?%.:/%+=&%~]+) @(.*)$",
+      "^/rss (sub) (https?://[%w-_%.%?%.:/%+=&%~]+)$",
+      "^/rss (del) (%d+) @(.*)$",
+      "^/rss (del) (%d+)$",
+	  "^/rss (del)",
+      "^/rss (sync)$"	
+	}
 	rss.doc = [[*
-]]..config.cmd_pat..[[rss*: Feed-Abonnements anzeigen
-*]]..config.cmd_pat..[[rss* _sub_ _<URL>_: Diesen Feed abonnieren
-*]]..config.cmd_pat..[[rss* _del_ _<#>_: Diesen Feed deabonnieren
-*]]..config.cmd_pat..[[rss* _sync_: Feeds syncen (nur Superuser)]]
+]]..config.cmd_pat..[[rss* _@[Kanalname]_: Feed-Abonnements anzeigen
+*]]..config.cmd_pat..[[rss* _sub_ _<URL>_ _@[Kanalname]_: Diesen Feed abonnieren
+*]]..config.cmd_pat..[[rss* _del_ _<#>_ _@[Kanalname]_: Diesen Feed deabonnieren
+*]]..config.cmd_pat..[[rss* _sync_: Feeds syncen (nur Superuser)
+Der Kanalname ist optional]]
 end
 
 function tail(n, k)
@@ -208,60 +219,91 @@ function rss:print_subs(id, chat_name)
    return text, keyboard
 end
 
-function rss:action(msg, config)
-  local input = utilities.input(msg.text)
+function rss:action(msg, config, matches)
   local id = "user#id" .. msg.from.id
-  if msg.chat.type == 'channel' then
-    print('Kanäle werden momentan nicht unterstützt')
-  end
   if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
     id = 'chat#id'..msg.chat.id
   end
   
-  if not input then
-	if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-      chat_name = msg.chat.title
-	else
-	  chat_name = msg.chat.first_name
+  -- For channels
+  if matches[1] == 'sub' and matches[2] and matches[3] then
+    if msg.from.id ~= config.admin then
+      utilities.send_reply(self, msg, config.errors.sudo)
+	  return
+    end
+	local id = '@'..matches[3]
+	local result = utilities.get_chat_info(self, id)
+	if not result then
+	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  return
 	end
+	local output = rss:subscribe(id, matches[2])
+	utilities.send_reply(self, msg, output, true)
+	return
+  elseif matches[1] == 'del' and matches[2] and matches[3] then
+    if msg.from.id ~= config.admin then
+      utilities.send_reply(self, msg, config.errors.sudo)
+	  return
+    end
+	local id = '@'..matches[3]
+	local result = utilities.get_chat_info(self, id)
+	if not result then
+	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  return
+	end
+	local output = rss:unsubscribe(id, matches[2])
+	utilities.send_reply(self, msg, output, true)
+	return
+  elseif matches[1] == 'rss' and matches[2] then
+    local id = '@'..matches[2]
+	local result = utilities.get_chat_info(self, id)
+	if not result then
+	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  return
+	end
+	local chat_name = result.result.title
     local output = rss:print_subs(id, chat_name)
 	utilities.send_reply(self, msg, output, true)
 	return
   end
-
-  if input:match('(sub) (https?://[%w-_%.%?%.:/%+=&%~]+)$') then
+  
+  if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
+	chat_name = msg.chat.title
+  else
+	chat_name = msg.chat.first_name
+  end
+  
+  if matches[1] == 'sub' and matches[2] then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
 	  return
     end
-	local rss_url = input:match('(https?://[%w-_%.%?%.:/%+=&%~]+)$')
-	local output = rss:subscribe(id, rss_url)
+	local output = rss:subscribe(id, matches[2])
 	utilities.send_reply(self, msg, output, true)
-  elseif input:match('(del) (%d+)$') then
+	return
+  elseif matches[1] == 'del' and matches[2] then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
 	  return
     end
-	local rss_url = input:match('(%d+)$')
-	local output = rss:unsubscribe(id, rss_url)
+	local output = rss:unsubscribe(id, matches[2])
 	utilities.send_reply(self, msg, output, true, '{"hide_keyboard":true}')
-  elseif input:match('(del)$') then
-	if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-      chat_name = msg.chat.title
-	else
-	  chat_name = msg.chat.first_name
-	end
+	return
+  elseif matches[1] == 'del' and not matches[2] then
     local list_subs, keyboard = rss:print_subs(id, chat_name)
 	utilities.send_reply(self, msg, list_subs, true, keyboard)
     return
-  elseif input:match('(sync)$') then
+  elseif matches[1] == 'sync' then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
 	  return
     end
 	rss:cron(self)
+	return
   end
   
+  local output = rss:print_subs(id, chat_name)
+  utilities.send_reply(self, msg, output, true)
   return
 end
 

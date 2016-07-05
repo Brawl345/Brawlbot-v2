@@ -175,6 +175,20 @@ function utilities:answer_callback_query(callback, text, show_alert)
 	} )
 end
 
+-- https://core.telegram.org/bots/api#getchat
+function utilities:get_chat_info(chat_id)
+  return bindings.request(self, 'getChat', {
+		chat_id = chat_id
+	} )
+end
+
+-- https://core.telegram.org/bots/api#getchatadministrators
+function utilities:get_chat_administrators(chat_id)
+  return bindings.request(self, 'getChatAdministrators', {
+		chat_id = chat_id
+	} )
+end
+
  -- get the indexed word in a string
 function utilities.get_word(s, i)
 	s = s or ''
@@ -863,6 +877,15 @@ function url_encode(str)
     str = string.gsub (str, " ", "+")
   end
   return str
+end
+
+function table.contains(table, element)
+  for _, value in pairs(table) do
+    if value == element then
+      return true
+    end
+  end
+  return false
 end
 
 return utilities
