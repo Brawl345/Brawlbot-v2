@@ -72,7 +72,7 @@ function gSearch:action(msg, config)
 	return
   end
  
-  if not results[1] then
+  if not results then
     utilities.send_reply(self, msg, config.errors.results)
 	return
   end
