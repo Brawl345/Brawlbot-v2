@@ -4,6 +4,7 @@
 local gImages = {}
 
 local HTTPS = require('ssl.https')
+HTTPS.timeout = 10
 local URL = require('socket.url')
 local JSON = require('dkjson')
 local redis = (loadfile "./otouto/redis.lua")()

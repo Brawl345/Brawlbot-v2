@@ -774,6 +774,7 @@ function get_last_modified_header(url)
 	url = url,
 	redirect = do_redir
   }
+  if not header then return end
   if header["last-modified"] then
     last_modified = header["last-modified"]
   elseif header["Last-Modified"] then
