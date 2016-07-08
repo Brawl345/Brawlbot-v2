@@ -88,8 +88,8 @@ function tagesschau_eil:cron(self_plz)
   -- print('EIL: Prüfe...')
   local last_eil = redis:get(hash..':last_entry')
   local res,code  = http.request(url)
-  local data = json.decode(res)
   if code ~= 200 then return end
+  local data = json.decode(res)
   if not data then return end
   if data.breakingnews[1] then
     if data.breakingnews[1].date ~= last_eil then

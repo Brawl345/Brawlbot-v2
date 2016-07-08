@@ -6,7 +6,11 @@ local redis = (loadfile "./otouto/redis.lua")()
 imgblacklist.command = 'imgblacklist'
 
 function imgblacklist:init(config)
-	imgblacklist.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('imgblacklist', true).table
+	imgblacklist.triggers = {
+	  "^/imgblacklist show$",
+      "^/imgblacklist (add) (.*)$",
+	  "^/imgblacklist (remove) (.*)$"
+	}
 	imgblacklist.doc = [[*
 ]]..config.cmd_pat..[[imgblacklist* _show_: Zeige Blacklist
 *]]..config.cmd_pat..[[imgblacklist* _add_ _<Wort>_: Fügt Wort der Blacklist hinzu
@@ -47,30 +51,34 @@ function imgblacklist:remove_blacklist(word)
   end
 end
 
-function imgblacklist:action(msg, config)
+function imgblacklist:action(msg, config, matches)
   if msg.from.id ~= config.admin then
     utilities.send_reply(self, msg, config.errors.sudo)
 	return
   end
   
-  local input = utilities.input(msg.text)
-  local input = string.lower(input)
+  
+  local action = matches[1]
+  if matches[2] then word = string.lower(matches[2]) else word = nil end
   _blacklist = redis:smembers("telegram:img_blacklist")
   
-  if input:match('(add) (.*)') then
-    local word = input:match('add (.*)')
-    output = imgblacklist:add_blacklist(word)
-  elseif input:match('(remove) (.*)') then
-    local word = input:match('remove (.*)')
-    output = imgblacklist:remove_blacklist(word)
-  elseif input:match('(show)') then
-    output = imgblacklist:show_blacklist()
-  else
-    utilities.send_message(self, msg.chat.id, imgblacklist.doc, true, msg.message_id, true)
+  if action == 'add' and not word then
+    utilities.send_reply(self, msg, imgblacklist.doc, true)
 	return
+  elseif action == "add" and word then
+	utilities.send_reply(self, msg, imgblacklist:add_blacklist(word), true)
+    return
   end
+  
+  if action == 'remove' and not word then
+    utilities.send_reply(self, msg, imgblacklist.doc, true)
+	return
+  elseif action == "remove" and word then
+	utilities.send_reply(self, msg, imgblacklist:remove_blacklist(word), true)
+    return
+   end
 
-  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+  utilities.send_reply(self, msg, imgblacklist:show_blacklist())
 end
 
 return imgblacklist
