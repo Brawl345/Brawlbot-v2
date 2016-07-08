@@ -61,7 +61,8 @@ end
 
 function notify:action(msg, config, matches)
   if not msg.from.username then
-    return 'Du hast keinen Usernamen und kannst daher dieses Feature nicht nutzen. Tut mir leid!' 
+    utilities.send_reply(self, msg, 'Du hast keinen Usernamen und kannst daher dieses Feature nicht nutzen. Tut mir leid!' )
+	return
   end
   
   local username = string.lower(msg.from.username)
@@ -92,7 +93,7 @@ function notify:action(msg, config, matches)
     redis:sadd('notify:ls', username)
 	local res = utilities.send_message(self, msg.from.id, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true, nil, true)
 	if not res then
-	  utilities.send_reply(self, msg, 'Bitte schreibe mir [privat](http://telegram.me/' .. self.info.username .. '?start=about), um den Vorgang abzuschließen.', true)
+	  utilities.send_reply(self, msg, 'Bitte schreibe mir [privat](http://telegram.me/' .. self.info.username .. '?start=notify), um den Vorgang abzuschließen.', true)
 	elseif msg.chat.type ~= 'private' then
 	  utilities.send_reply(self, msg, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true)
 	end
