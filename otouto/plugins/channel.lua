@@ -3,29 +3,27 @@ local channel = {}
 local bindings = require('otouto.bindings')
 local utilities = require('otouto.utilities')
 
---channel.command = 'ch <channel> \\n <message>'
-channel.doc = [[```
-/ch <channel>
-<message>
+channel.command = 'ch <Kanal> \\n <Nachricht>'
+channel.doc = [[*
+/ch*_ <Kanal>_
+_<Nachricht>_
 
-Sends a message to a channel. Channel may be specified via ID or username. Messages are markdown-enabled. Users may only send messages to channels for which they are the owner or an administrator.
+Sendet eine Nachricht in den Kanal. Der Kanal kann per Username oder ID bestimmt werden, Markdown wird unterstützt. Du musst Administrator oder Besitzer des Kanals sein.
 
-The following markdown syntax is supported:
- *bold text*
- _italic text_
- [text](URL)
- `inline fixed-width code`
- `‌`‌`pre-formatted fixed-width code block`‌`‌`
-
-Due to the frequent dysfunction and incompletion of the API method used to determine the administrators of a channel, this command may not work for the owners of some channels.
-```]]
+Markdown-Syntax:
+ *Fetter Text*
+ _Kursiver Text_
+ [Text](URL)
+ `Inline-Codeblock`
+ `‌`‌`Größere Code-Block über mehrere Zeilen`‌`‌`
+ 
+*Der Kanalname muss mit einem @ beginnen!*]]
 
 function channel:init(config)
 	channel.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('ch', true).table
 end
 
 function channel:action(msg, config)
-	-- An exercise in using zero early returns. :)
 	local input = utilities.input(msg.text)
 	local output
 	if input then
@@ -43,18 +41,18 @@ function channel:action(msg, config)
 				if text then
 					local success, result = utilities.send_message(self, chat_id, text, true, nil, true)
 					if success then
-						output = 'Your message has been sent!'
+						output = 'Deine Nachricht wurde versendet!'
 					else
-						output = 'Sorry, I was unable to send your message.\n`' .. result.description .. '`'
+						output = 'Sorry, ich konnte deine Nachricht nicht senden.\n`' .. result.description .. '`'
 					end
 				else
-					output = 'Please enter a message to be sent. Markdown is supported.'
+					output = 'Bitte gebe deine Nachricht ein. Markdown wird unterstützt.'
 				end
 			else
-				output = 'Sorry, you do not appear to be an administrator for that channel.\nThere is currently a known bug in the getChatAdministrators method, where administrator lists will often not show a channel\'s owner.'
+				output = 'Es sieht nicht so aus, als wärst du der Administrator dieses Kanals.'
 			end
 		else
-			output = 'Sorry, I was unable to retrieve a list of administrators for that channel.\n`' .. t.description .. '`'
+			output = 'Sorry, ich konnte die Administratorenliste nicht abrufen. Falls du den Kanalnamen benutzt: Beginnt er mit einem @?\n`' .. t.description .. '`'
 		end
 	else
 		output = channel.doc
