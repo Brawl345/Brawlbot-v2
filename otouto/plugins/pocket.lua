@@ -14,7 +14,7 @@ function pocket:init(config)
   end
 
   pocket.triggers = {
-    "^/pocket (set) (.+)$",
+    "^/pocket(set)(.+)$",
 	"^/pocket (add) (https?://.*)$",
 	"^/pocket (archive) (%d+)$",
 	"^/pocket (readd) (%d+)$",
@@ -109,12 +109,16 @@ function pocket:action(msg, config, matches)
   if matches[1] == 'set' then
     local access_token = matches[2]
 	utilities.send_reply(self, msg, pocket:set_pocket_access_token(hash, access_token), true)
+	local message_id = redis:hget(hash, 'pocket_login_msg')
+	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
+	redis:hdel(hash, 'pocket_login_msg')
     return
   end
   
   if not access_token then
-    utilities.send_reply(self, msg, 'Bitte authentifiziere dich zuerst, indem du dich anmeldest:\n[Bei Pocket anmelden](https://brawlbot.tk/apis/callback/pocket/connect.php)', true)
-    return
+    local result = utilities.send_reply(self, msg, '*Bitte authentifiziere dich zuerst, indem du dich anmeldest.*', true, '{"inline_keyboard":[[{"text":"Bei Pocket anmelden","url":"https://brawlbot.tk/apis/callback/pocket/connect.php"}]]}')
+    redis:hset(hash, 'pocket_login_msg', result.result.message_id)
+	return
   end
   
   if matches[1] == 'unauth' then

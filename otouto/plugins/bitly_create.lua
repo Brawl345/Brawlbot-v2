@@ -25,7 +25,7 @@ function bitly_create:init(config)
 	end
 
     bitly_create.triggers = {
-    "^/short (auth) (.+)$",
+    "^/short(auth)(.+)$",
     "^/short (auth)$",
 	"^/short (unauth)$",
 	"^/short (me)$",
@@ -93,12 +93,16 @@ function bitly_create:action(msg, config, matches)
   
   if matches[1] == 'auth' and matches[2] then
     utilities.send_reply(self, msg, bitly_create:get_bitly_access_token(hash, matches[2]), true)
+	local message_id = redis:hget(hash, 'bitly_login_msg')
+	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
+	redis:hdel(hash, 'bitly_login_msg')
     return
   end
   
   if matches[1] == 'auth' then
-    utilities.send_reply(self, msg, 'Bitte logge dich ein und folge den Anweisungen:\n[Bei Bitly anmelden](https://bitly.com/oauth/authorize?client_id='..client_id..'&redirect_uri='..redirect_uri..')', true)
-    return
+    local result = utilities.send_reply(self, msg, '*Bitte logge dich ein und folge den Anweisungen.*', true, '{"inline_keyboard":[[{"text":"Bei Bitly anmelden","url":"https://bitly.com/oauth/authorize?client_id='..client_id..'&redirect_uri='..redirect_uri..'&state='..self.info.username..'"}]]}')
+    redis:hset(hash, 'bitly_login_msg', result.result.message_id)
+	return
   end
   
   if matches[1] == 'unauth' and bitly_access_token then
