@@ -126,7 +126,7 @@ function wikipedia:wikintro(text, lang)
 	  local lang = lang or "de"
 	  local title = page.title
 	  local title_enc = URL.escape(title)
-      return '*'..title.."*:\n"..utilities.md_escape(page.extract).."\n[Auf Wikipedia ansehen](https://"..lang..".wikipedia.org/wiki/"..title_enc..")"
+      return '*'..title.."*:\n"..utilities.md_escape(page.extract), '{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
     else
       local text = text.." nicht gefunden"
       return text
@@ -180,9 +180,9 @@ function wikipedia:action(msg, config, matches)
   if search then
     result = wikipedia:wikisearch(term, lang)
   else
-    result = wikipedia:wikintro(term, lang)
+    result, keyboard = wikipedia:wikintro(term, lang)
   end
-  utilities.send_reply(self, msg, result, true)
+  utilities.send_reply(self, msg, result, true, keyboard)
 end
 
 return wikipedia
