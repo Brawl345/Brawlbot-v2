@@ -105,7 +105,7 @@ function gImages:callback(callback, msg, self, config, input)
   end
 
   if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
+    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
 	return
   end
 end
@@ -223,7 +223,7 @@ function gImages:action(msg, config, matches)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
 	return
   end
   
@@ -234,7 +234,7 @@ function gImages:action(msg, config, matches)
   end
 
   if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
 	return
   end
 end
