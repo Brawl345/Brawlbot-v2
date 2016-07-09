@@ -124,9 +124,10 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
     return
   end
 
-  if not callback.data:find(':') then
+  if not callback.data:find(':') or not callback.data:find(self.info.username) then
 	return
   end
+  callback.data = string.gsub(callback.data, '@'..self.info.username..' ', "")
   local called_plugin = callback.data:match('(.*):.*')
   local param = callback.data:sub(callback.data:find(':')+1)
 

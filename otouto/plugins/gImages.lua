@@ -94,14 +94,14 @@ function gImages:callback(callback, msg, self, config, input)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
 	return
   end
   
   if mimetype == 'image/gif' then
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
   else
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
   end
 
   if not result then
@@ -228,9 +228,9 @@ function gImages:action(msg, config, matches)
   end
   
   if mimetype == 'image/gif' then
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
   else
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
   end
 
   if not result then
