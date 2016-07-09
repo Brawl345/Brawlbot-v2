@@ -124,7 +124,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
     return
   end
 
-  if not callback.data:find(':') or not callback.data:find(self.info.username) then
+  if not callback.data:find(':') or not callback.data:find('@'..self.info.username..' ') then
 	return
   end
   callback.data = string.gsub(callback.data, '@'..self.info.username..' ', "")
