@@ -14,6 +14,8 @@ local bindings = require('otouto.bindings')
 local redis = (loadfile "./otouto/redis.lua")()
 local mimetype = (loadfile "./otouto/mimetype.lua")()
 
+HTTP.timeout = 10
+
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
 function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)

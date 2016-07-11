@@ -39,7 +39,7 @@ function get_yt_data (yt_code)
   return data
 end
 
-local function convertISO8601Time(duration)
+function convertISO8601Time(duration)
 	local a = {}
 
 	for part in string.gmatch(duration, "%d+") do
