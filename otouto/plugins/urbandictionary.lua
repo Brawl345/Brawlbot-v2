@@ -50,7 +50,7 @@ function urbandictionary:action(msg, config)
 
 	output = output:gsub('%[', ''):gsub('%]', '')
 
-	utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	utilities.send_reply(self, msg, output, true)
 
 end
 
