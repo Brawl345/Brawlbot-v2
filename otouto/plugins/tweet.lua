@@ -145,7 +145,7 @@ function tweet:getTweet(self, msg, base, all)
       return "Konnte nicht verbinden, evtl. existiert der User nicht?"
    end
 
-   local response = json:decode(response_body)
+   local response = json.decode(response_body)
    if #response == 0 then
       return "Konnte keinen Tweet bekommen, sorry"
    end
