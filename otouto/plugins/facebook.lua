@@ -76,7 +76,7 @@ function facebook:send_facebook_photo(photo_id, receiver)
   
   local from = '*'..data.from.name..'*'
   if data.name then
-    text = from..' hat ein Bild gepostet:\n'..data.name
+    text = from..' hat ein Bild gepostet:\n'..utilities.md_escape(data.name)
   else
     text = from..' hat ein Bild gepostet:'
   end
