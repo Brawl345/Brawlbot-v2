@@ -21,9 +21,7 @@ function mal:init(config)
 
   mal.triggers = {
 	"^/(anime) (.+)$",
-	"myanimelist.net/(anime)/[0-9]+/(.*)$",
-	"^/(manga) (.+)$",
-	"myanimelist.net/(manga)/[0-9]+/(.*)$"
+	"^/(manga) (.+)$"
 	}
   mal.doc = [[*
 ]]..config.cmd_pat..[[anime*_ <Anime>_: Sendet Infos zum Anime
@@ -192,7 +190,7 @@ function mal:send_manga_data(result)
   end 
 end
 
-function mal:action(msg, config)
+function mal:action(msg, config, matches)
   local query = URL.escape(matches[2])
   if matches[1] == 'anime' then
     local anime_info = mal:get_mal_info(query, 'anime')
