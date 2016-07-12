@@ -76,6 +76,15 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 end
 
+function bot:process_inline_query(inline_query, config) -- When an inline query is received
+	-- remove comment to enable debugging
+  if inline_query.query == '' then return end
+  local result, error = bindings.request(self, 'answerInlineQuery', {
+		inline_query_id	 = inline_query.id,
+		results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/b.jpg","title":"Fett","description":"*'..inline_query.query..'*","input_message_content":{"message_text":"*'..inline_query.query..'*","parse_mode":"Markdown"}}]'
+	} )
+end
+
 function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
 	-- remove comment to enable debugging
 	-- vardump(msg)
@@ -152,7 +161,9 @@ function bot:run(config)
 		if res then
 			for _,v in ipairs(res.result) do -- Go through every new message.
 				self.last_update = v.update_id
-				if v.callback_query then
+				if v.inline_query then
+				    bot.process_inline_query(self, v.inline_query, config)
+				elseif v.callback_query then
 				    bot.on_callback_receive(self, v.callback_query, v.callback_query.message, config)
 				elseif v.message then
 					bot.on_msg_receive(self, v.message, config)
@@ -263,61 +274,6 @@ function create_plugin_set()
     'about',
     'id',
     'echo',
-    'imgblacklist',
-    'gImages',
-    'gSearch',
-    'wikipedia',
-    'hackernews',
-    'imdb',
-    'calc',
-    'urbandictionary',
-    'time',
-    'reddit',
-	'reddit_post',
-    'xkcd',
-    'currency',
-    'set',
-    'get',
-    'patterns',
-    '9gag',
-    'shell',
-    'adfly',
-    'twitter',
-    'rss',
-    'remind',
-    'youtube',
-    'youtube_search',
-    'youtube_channel',
-    'youtube_playlist',
-    'tagesschau_eil',
-    'twitter_send',
-    'respond',
-    'roll',
-    'quotes',
-    'pasteee',
-    'images',
-    'media',
-    'location_manager',
-    'creds',
-    'weather',
-    'forecast',
-    'expand',
-    'facebook',
-    'github',
-    'bitly',
-    'app_store',
-    'bitly_create',
-    'br',
-    'heise',
-    'tagesschau',
-    'wiimmfi',
-    'wikia',
-    'afk',
-    'stats',
-    'btc',
-    'cats',
-    'cleverbot',
-    'imgur',
     'banhammer',
     'channels',
 	'plugins',
