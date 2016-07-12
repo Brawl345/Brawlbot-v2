@@ -21,6 +21,10 @@ Sende /hilfe, um zu starten
 	-- The symbol that starts a command. Usually noted as '/' in documentation.
 	cmd_pat = '/',
 
+	-- false = only whitelisted users can use inline querys
+	-- NOTE that it doesn't matter, if the chat is whitelisted! The USER must be whitelisted!
+	enable_inline_for_everyone = true,
+
 	errors = { -- Generic error messages used in various plugins.
 	    generic = 'An unexpected error occurred.',
 		connection = 'Verbindungsfehler.',

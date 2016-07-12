@@ -95,7 +95,9 @@ function afk:pre_process(msg, self)
 	redis:hset(hash, 'afk', false)
     if afk_text then
 	  redis:hset(hash, 'afk_text', false)
-	  utilities.send_message(self, msg.chat.id, user_name..' ist wieder da (war: '..afk_text..' für '..duration..')!')
+	  local afk_text = afk_text:gsub("%*","")
+	  local afk_text = afk_text:gsub("_","")
+	  utilities.send_message(self, msg.chat.id, user_name..' ist wieder da (war: *'..afk_text..'* für '..duration..')!', true, nil, true)
 	else
 	  utilities.send_message(self, msg.chat.id, user_name..' ist wieder da (war '..duration..' weg)!')
 	end

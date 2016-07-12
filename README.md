@@ -21,6 +21,10 @@ Brawlbot v2 ist freie Software; du darfst in modifizieren und weiterverbreiten, 
 * * *
 # Für User
 ## Setup
+### Ubuntu und Debian
+Ubuntu und Debian liefern Luarocks nur für Lua 5.1 aus. Um Luarocks für Lua 5.2 zu verwenden, folge bitte der [Anleitung auf StackOverflow](http://stackoverflow.com/a/20359102)
+
+### Setup
 Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
 * luasocket
 * luasec
@@ -28,6 +32,7 @@ Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **Lu
 * dkjson
 * lpeg
 * redis-lua
+* fakeredis
 * oauth
 * xml
 * feedparser

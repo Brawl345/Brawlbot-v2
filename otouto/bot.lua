@@ -76,15 +76,6 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 end
 
-function bot:process_inline_query(inline_query, config) -- When an inline query is received
-	-- remove comment to enable debugging
-  if inline_query.query == '' then return end
-  local result, error = bindings.request(self, 'answerInlineQuery', {
-		inline_query_id	 = inline_query.id,
-		results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/b.jpg","title":"Fett","description":"*'..inline_query.query..'*","input_message_content":{"message_text":"*'..inline_query.query..'*","parse_mode":"Markdown"}}]'
-	} )
-end
-
 function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
 	-- remove comment to enable debugging
 	-- vardump(msg)
@@ -152,6 +143,23 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   end
 end
 
+-- NOTE: To enable InlineQuerys, send /setinline to @BotFather
+function bot:process_inline_query(inline_query, config) -- When an inline query is received
+  -- remove comment to enable debugging
+  -- vardump(inline_query)
+
+  if not config.enable_inline_for_everyone then
+    local is_whitelisted = redis:get('whitelist:user#id'..inline_query.from.id)
+    if not is_whitelisted then return end
+  end
+
+  if inline_query.query == '' then return end
+
+  for _, plugin in ipairs(self.plugins) do
+    match_inline_plugins(self, inline_query, config, plugin)
+  end
+end
+
 function bot:run(config)
 	bot.init(self, config) -- Actually start the script.
 
@@ -205,6 +213,26 @@ function pre_process_msg(self, msg, config)
     end
   end
   return new_msg
+end
+
+function match_inline_plugins(self, inline_query, config, plugin)
+  for _, trigger in pairs(plugin.inline_triggers or {}) do
+    if string.match(string.lower(inline_query.query), trigger) then
+	local success, result = pcall(function()
+	  for k, pattern in pairs(plugin.inline_triggers) do
+	    matches = match_pattern(pattern, inline_query.query)
+		if matches then
+		  break;
+		end
+	  end
+	  print(plugin.name..' triggered')
+	  return plugin.inline_callback(self, inline_query, config, matches)
+	end)
+	if not success then
+	  print(result)
+	end
+  end
+   end
 end
 
 function match_plugins(self, msg, config, plugin)

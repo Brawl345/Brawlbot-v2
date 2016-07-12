@@ -191,6 +191,19 @@ function utilities:get_chat_administrators(chat_id)
 	} )
 end
 
+-- https://core.telegram.org/bots/api#answerinlinequery
+function utilities:answer_inline_query(inline_query, results, cache_time, is_personal, next_offset, switch_pm_text, switch_pm_parameter)
+  return bindings.request(self, 'answerInlineQuery', {
+		inline_query_id	 = inline_query.id,
+		results = results,
+		cache_time = cache_time,
+		is_personal = is_personal,
+		next_offset = next_offset,
+		switch_pm_text = switch_pm_text,
+		switch_pm_parameter = switch_pm_parameter
+	} )
+end
+
  -- get the indexed word in a string
 function utilities.get_word(s, i)
 	s = s or ''
