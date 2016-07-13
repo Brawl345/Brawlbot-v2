@@ -181,7 +181,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
   local results = '['
   for num in pairs(data.search) do
     local title = data.search[num].title
-    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"input_message_content":{"message_text":"'..config.cmd_pat..'wiki'..lang..'@'..self.info.username..' '..title..'"}}'
+    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"input_message_content":{"message_text":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","disable_web_page_preview":true}}'
 	if num < #data.search then
 	 results = results..','
 	end
