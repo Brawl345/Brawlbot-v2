@@ -200,7 +200,8 @@ function youtube:inline_callback(inline_query, config, matches)
 
 	local readable_dur = makeHumanTime(video_duration)
 	local viewCount = comma_value(video_results.items[num].statistics.viewCount)
-	local description = viewCount..' Views, '..readable_dur..likeCount..dislikeCount..commentCount
+	local uploader = video_results.items[num].snippet.channelTitle
+	local description = uploader..', '..viewCount..' Views, '..readable_dur..likeCount..dislikeCount..commentCount
 	
     results = results..'{"type":"video","id":"'..math.random(100000000000000000)..'","video_url":"'..video_url..'","mime_type":"text/html","thumb_url":"'..thumb_url..'","title":"'..video_title..'","description":"'..description..'","video_duration":'..video_duration..',"input_message_content":{"message_text":"'..video_url..'"}}'
 	if num < #video_results.items then
