@@ -78,7 +78,7 @@ end
 
 function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
 	-- remove comment to enable debugging
-	-- vardump(msg)
+    -- vardump(msg)
 	-- Cache user info for those involved.
 	
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
@@ -155,7 +155,9 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   end
 
   if inline_query.query == '' then return end
-
+  if inline_query.query:match('"') then
+    inline_query.query = inline_query.query:gsub('"', '\\"')
+  end
   for _, plugin in ipairs(self.plugins) do
     match_inline_plugins(self, inline_query, config, plugin)
   end
@@ -165,7 +167,6 @@ function bot:run(config)
 	bot.init(self, config) -- Actually start the script.
 
 	while self.is_started do -- Start a loop while the bot should be running.
-
 		local res = bindings.getUpdates(self, { timeout=20, offset = self.last_update+1 } )
 		if res then
 			for _,v in ipairs(res.result) do -- Go through every new message.

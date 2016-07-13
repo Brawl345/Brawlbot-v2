@@ -16,9 +16,6 @@ end
 function echo:inline_callback(inline_query, config, matches)
   local text = matches[1]  
   local results = '['
-  if text:match('"') then
-    text = text:gsub('"', '\\"')
-  end
 
   -- enable custom markdown button
   if text:match('%[.*%]%(.*%)') or text:match('%*.*%*') or text:match('_.*_') or text:match('`.*`') then
