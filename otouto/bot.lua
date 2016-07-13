@@ -104,8 +104,10 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 
 	-- gsub out user name if multiple bots are in the same group
-	msg.text = string.gsub(msg.text, '@'..self.info.username, "")
-	msg.text_lower = string.gsub(msg.text, '@'..string.lower(self.info.username), "")
+	if msg.text:match(config.cmd_pat..'([A-Za-z0-9-_-]+)@'..self.info.username) then
+	  msg.text = string.gsub(msg.text, '@'..self.info.username, "")
+	  msg.text_lower = msg.text:lower()
+	end
 
 	msg = pre_process_msg(self, msg, config)
 	
