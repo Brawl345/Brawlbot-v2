@@ -576,7 +576,6 @@ utilities.char = {
 	em_dash = '—'
 }
 
-
 -- taken from http://stackoverflow.com/a/11130774/3163199
 function scandir(directory)
   local i, t, popen = 0, {}, io.popen
