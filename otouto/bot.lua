@@ -154,7 +154,6 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
     if not is_whitelisted then return end
   end
 
-  if inline_query.query == '' then return end
   if inline_query.query:match('"') then
     inline_query.query = inline_query.query:gsub('"', '\\"')
   end
