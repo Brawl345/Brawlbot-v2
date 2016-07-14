@@ -218,7 +218,7 @@ function pre_process_msg(self, msg, config)
 end
 
 function match_inline_plugins(self, inline_query, config, plugin)
-  for _, trigger in pairs(plugin.inline_triggers or {}) do
+  for _, trigger in ipairs(plugin.inline_triggers or {}) do
     if string.match(string.lower(inline_query.query), trigger) then
 	local success, result = pcall(function()
 	  for k, pattern in pairs(plugin.inline_triggers) do
@@ -238,7 +238,7 @@ function match_inline_plugins(self, inline_query, config, plugin)
 end
 
 function match_plugins(self, msg, config, plugin)
-  for _, trigger in pairs(plugin.triggers or {}) do
+  for _, trigger in ipairs(plugin.triggers or {}) do
     if string.match(msg.text_lower, trigger) then
 	-- Check if Plugin is disabled
 	if is_plugin_disabled_on_chat(plugin.name, msg) then return end
