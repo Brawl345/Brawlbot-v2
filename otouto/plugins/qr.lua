@@ -9,6 +9,9 @@ function qr:init(config)
     '^/qr "(%w+)" "(%w+)" (.+)$',
     "^/qr (.+)$"
 	}
+	qr.inline_triggers = {
+	  "^qr (https?://[%w-_%.%?%.:/%+=&]+)"
+	}
 	qr.doc = [[*
 ]]..config.cmd_pat..[[qr* _<Text>_: Sendet QR-Code mit diesem Text
 *]]..config.cmd_pat..[[qr* _"[Hintergrundfarbe]"_ _"[Datenfarbe]"_ _[Text]_
@@ -40,11 +43,15 @@ function qr:get_hex(str)
   return str
 end
 
-function qr:qr(text, color, bgcolor)
+function qr:qr(text, color, bgcolor, img_format)
 
   local url = "http://api.qrserver.com/v1/create-qr-code/?"
     .."size=600x600"  --fixed size otherways it's low detailed
     .."&data="..URL.escape(utilities.trim(text))
+	
+  if img_format then
+    url = url..'&format='..img_format
+  end
 
   if color then
     url = url.."&color="..qr:get_hex(color)
@@ -64,6 +71,30 @@ function qr:qr(text, color, bgcolor)
   end
 
   return nil
+end
+
+function qr:inline_callback(inline_query, config, matches)
+  local text = matches[1]
+  if string.len(text) > 200 then return end
+  local image_url = qr:qr(text, nil, nil, 'jpg')
+  if not image_url then return end
+ 
+  local results = '[{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"},'
+  
+  local i = 0
+  while i < 29 do
+	i = i+1
+    local color = math.random(255)
+	local bgcolor = math.random(255)
+    local image_url = qr:qr(text, color, bgcolor, 'jpg')
+    results = results..'{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"}'
+	if i < 29 then
+	  results = results..','
+	end
+  end
+  
+  local results = results..']'
+  utilities.answer_inline_query(self, inline_query, results, 10000)
 end
 
 function qr:action(msg, config, matches)
