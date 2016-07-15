@@ -3,12 +3,12 @@
 
 Der multifunktionale Telegram-Bot.
 
-[Entwickler auf Telegram](http://telegram.me/Brawl) | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
+[Offizielle Webseite](https://brawlbot.tk) | [Entwickler auf Telegram](http://telegram.me/Brawl) | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
 
 Brawlbot ist ein auf Plugins basierender Bot, der die [offizielle Telegram Bot API](http://core.telegram.org/bots/api) benutzt. Ursprünglich wurde er im Dezember 2014 auf Basis von Yagops [Telegram Bot](https://github.com/yagop/telegram-bot/) entwickelt, da aber die Entwicklung von tg-cli [zum Stillstand](https://brawlbot.tk/posts/ein-neuanfang) gekommen ist, wurden alle Plugins des bisher proprietären Brawlbots im Juni 2016 auf die Bot-API portiert und open-sourced.  
 **Brawlbot v2 basiert auf [otouto](https://github.com/topkecleon/otouto) von Topkecleon.**
 
-Brawlbot v2 ist freie Software; du darfst in modifizieren und weiterverbreiten, allerdings musst du dich an die GNU Affero General Public License v3 halten, siehe **LICENSE** für Details.
+Brawlbot v2 ist freie Software; du darfst ihn modifizieren und weiterverbreiten, allerdings musst du dich an die GNU Affero General Public License v3 halten, siehe **LICENSE** für Details.
 
 ##Anleitung
 
@@ -22,7 +22,7 @@ Brawlbot v2 ist freie Software; du darfst in modifizieren und weiterverbreiten, 
 # Für User
 ## Setup
 ### Ubuntu und Debian
-Ubuntu und Debian liefern Luarocks nur für Lua 5.1 aus. Um Luarocks für Lua 5.2 zu verwenden, folge bitte der [Anleitung auf StackOverflow](http://stackoverflow.com/a/20359102)
+Ubuntu und Debian liefern Luarocks nur für Lua 5.1 aus. Um Luarocks für Lua 5.2 zu verwenden, folge bitte der [Anleitung auf StackOverflow](http://stackoverflow.com/a/20359102).
 
 ### Setup
 Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
@@ -80,17 +80,21 @@ Brawlbot erhält laufend neue Plugins und wird kontinuierlich weiterentwickelt! 
 ## Plugins
 Brawlbot benutzt ein Plugin-System, ähnlich Yagops [Telegram-Bot](http://github.com/yagop/telegram-bot).
 
-Ein Plugin kann fünf Komponenten haben, aber nur zwei werden benötigt:
+Ein Plugin kann acht Komponenten haben, aber nur zwei werden benötigt:
 
 | Komponente        | Beschreibung                                  | Benötigt? |
 |:------------------|:---------------------------------------------|:----------|
 | `plugin:action`   | Hauptfunktion. Benötigt `msg` als Argument, empfohlen wird auch `matches` als drittes Argument nach `config`   | J |
-| `plugin.triggers` | Tabelle von Triggern, (Lua-Patterns), auf die der Bot reagiert | J |
+| `plugin.triggers` | Tabelle von Triggern (Lua-Patterns), auf die der Bot reagiert | J |
+| `plugin.inline_triggers | Tabelle von Triggern (Lua-Patterns), auf die der Bot bei Inline-Querys reagiert | N |
 | `plugin:init`     | Optionale Funkion, die beim Start geladen wird     | N |
 | `plugin:cron`     | Wird jede Minute ausgeführt         | N |
 | `plugin.command`  | Einfaches Kommando mit Syntax. Wird bei `/hilfe` gelistet   | N |
 | `plugin.doc`      | Plugin-Hilfe. Wird mit `/help $kommando` gelistet  | N |
 | `plugin.error`    | Plugin-spezifische Fehlermeldung | N |
+| `plugin:callback` | Aktion, die ausgeführt wird, nachdem auf einen Callback-Button gedrückt wird. Siehe `gImages.lua` für ein Beispiel. Argumente: `callback` (enthält Callback-Daten), `msg`, `self`, `config`, `input` (enthält Parameter ohne `callback` | N |
+| `plugin:inline_callback` | Aktion, die ausgeführt wird, wenn der Bot per Inline-Query ausgelöst wird. Argumente sind `inline_query` für die Daten, `config` und `matches` | N |
+
 
 Die`bot:on_msg_receive` Funktion fügt einige nützte Variablen zur ` msg` Tabelle hinzu. Diese sind:`msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
 
