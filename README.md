@@ -80,13 +80,13 @@ Brawlbot erhält laufend neue Plugins und wird kontinuierlich weiterentwickelt! 
 ## Plugins
 Brawlbot benutzt ein Plugin-System, ähnlich Yagops [Telegram-Bot](http://github.com/yagop/telegram-bot).
 
-Ein Plugin kann acht Komponenten haben, aber nur zwei werden benötigt:
+Ein Plugin kann zehn Komponenten haben, aber nur zwei werden benötigt:
 
 | Komponente        | Beschreibung                                  | Benötigt? |
 |:------------------|:---------------------------------------------|:----------|
 | `plugin:action`   | Hauptfunktion. Benötigt `msg` als Argument, empfohlen wird auch `matches` als drittes Argument nach `config`   | J |
 | `plugin.triggers` | Tabelle von Triggern (Lua-Patterns), auf die der Bot reagiert | J |
-| `plugin.inline_triggers | Tabelle von Triggern (Lua-Patterns), auf die der Bot bei Inline-Querys reagiert | N |
+| `plugin.inline_triggers` | Tabelle von Triggern (Lua-Patterns), auf die der Bot bei Inline-Querys reagiert | N |
 | `plugin:init`     | Optionale Funkion, die beim Start geladen wird     | N |
 | `plugin:cron`     | Wird jede Minute ausgeführt         | N |
 | `plugin.command`  | Einfaches Kommando mit Syntax. Wird bei `/hilfe` gelistet   | N |
