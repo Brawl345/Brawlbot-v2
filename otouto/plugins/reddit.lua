@@ -66,7 +66,7 @@ function reddit:action(msg, config)
 	end
 	local jstr, res = https.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
+		utilities.send_reply(self, msg, config.errors.results)
 	else
 		local jdat = JSON.decode(jstr)
 		if #jdat.data.children == 0 then
