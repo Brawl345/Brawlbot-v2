@@ -497,6 +497,13 @@ function utilities.markdown_escape(text)
 	return text
 end
 
+function utilities.markdown_escape_simple(text)
+	text = text:gsub('_', '\\_')
+	text = text:gsub('%*', '\\*')
+	text = text:gsub('`', '\\`')
+	return text
+end
+
 utilities.md_escape = utilities.markdown_escape
 
 utilities.triggers_meta = {}
