@@ -5,7 +5,7 @@ local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '2.2.0'
+bot.version = '2.2.1'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -96,6 +96,10 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 
 	msg = utilities.enrich_message(msg)
+
+	if msg.reply_to_message then
+		msg.reply_to_message.text = msg.reply_to_message.text or msg.reply_to_message.caption or ''
+	end
 
 	-- Support deep linking.
 	if msg.text:match('^'..config.cmd_pat..'start .+') then
