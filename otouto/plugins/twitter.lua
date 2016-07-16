@@ -27,7 +27,8 @@ function twitter:init(config)
 	end
 	
 	twitter.triggers = {
-		'twitter.com/[^/]+/statuse?s?/([0-9]+)'
+		'twitter.com/[^/]+/statuse?s?/([0-9]+)',
+		'twitter.com/statuse?s?/([0-9]+)'
 	}
 	twitter.doc = [[*Twitter-Link*: Postet Tweet]]
 end
@@ -46,12 +47,13 @@ local client = OAuth.new(consumer_key, consumer_secret, {
     OAuthTokenSecret = access_token_secret
 })
 
-function twitter:action(msg)
+function twitter:action(msg, config, matches)
   
-  if not msg.text:match('twitter.com/[^/]+/statuse?s?/([0-9]+)') then
-    return
+  if not matches[2] then
+    id = matches[1]
+  else
+    id = matches[2]
   end
-  local id = msg.text:match('twitter.com/[^/]+/statuse?s?/([0-9]+)')
 
   local twitter_url = "https://api.twitter.com/1.1/statuses/show/" .. id.. ".json"
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
