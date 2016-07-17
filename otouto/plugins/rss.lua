@@ -344,7 +344,7 @@ function rss:cron(self_plz)
 		 else
 		   content = ''
 		 end
-		 text = text..'\n#RSS: *'..title..'*\n'..utilities.trim(utilities.markdown_escape_simple(content))..' [Weiterlesen]('..link..')\n'
+		 text = text..'\n#RSS: *'..title..'*\n'..utilities.trim(utilities.md_escape(content))..' [Weiterlesen]('..link..')\n'
       end
       if text ~= '' then
          local newlast = newentr[1].id
