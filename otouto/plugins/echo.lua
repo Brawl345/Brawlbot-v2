@@ -7,7 +7,8 @@ echo.command = 'echo <Text>'
 function echo:init(config)
 	echo.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('echo', true).table
 	echo.inline_triggers = {
-	  "^e (.*)"
+	  "^e (.+)",
+	  "^bold (.+)"
 	}
 	echo.doc = [[*
 ]]..config.cmd_pat..[[echo* _<Text>_: Gibt den Text aus]]

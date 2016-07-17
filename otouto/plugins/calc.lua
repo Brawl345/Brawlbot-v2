@@ -15,7 +15,7 @@ function calc:init(config)
 end
 
 function calc:mathjs(exp)
-  local exp = string.gsub(exp, ",", "%.")
+  local exp = string.gsub(exp, ",", ".")
   local url = 'http://api.mathjs.org/v1/'
   url = url..'?expr='..URL.escape(exp)
   local b,c = http.request(url)
