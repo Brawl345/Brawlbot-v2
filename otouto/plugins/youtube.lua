@@ -98,7 +98,7 @@ function get_yt_thumbnail(data)
 end
 
 function send_youtube_data(data, msg, self, link, sendpic)
-  local title = utilities.markdown_escape_simple(data.snippet.localized.title)
+  local title = utilities.md_escape(data.snippet.localized.title)
   -- local description = data.snippet.localized.description
   local uploader = data.snippet.channelTitle
   local upload_date = makeOurDate(data.snippet.publishedAt)
