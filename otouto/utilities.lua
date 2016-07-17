@@ -490,8 +490,7 @@ end
 
 function utilities.markdown_escape(text)
 	text = text:gsub('_', '\\_')
-	text = text:gsub('%[', '[[')
-	text = text:gsub('%]', ']]')
+	text = text:gsub('%[', '\\[')
 	text = text:gsub('%*', '\\*')
 	text = text:gsub('`', '\\`')
 	return text

@@ -34,6 +34,13 @@ local makeOurDate = function(dateString)
   return day..'.'..month..'.'..year
 end
 
+function markdown_escape_simple(text)
+	text = text:gsub('_', '\\_')
+	text = text:gsub('%*', '\\*')
+	text = text:gsub('`', '\\`')
+	return text
+end
+
 function get_yt_data (yt_code)
   local apikey = cred_data.google_apikey
   local url = BASE_URL..'/videos?part=snippet,statistics,contentDetails&key='..apikey..'&id='..yt_code..'&fields=items(snippet(publishedAt,channelTitle,localized(title,description),thumbnails),statistics(viewCount,likeCount,dislikeCount,commentCount),contentDetails(duration,regionRestriction(blocked)))'
@@ -98,7 +105,7 @@ function get_yt_thumbnail(data)
 end
 
 function send_youtube_data(data, msg, self, link, sendpic)
-  local title = utilities.md_escape(data.snippet.localized.title)
+  local title = markdown_escape_simple(data.snippet.localized.title)
   -- local description = data.snippet.localized.description
   local uploader = data.snippet.channelTitle
   local upload_date = makeOurDate(data.snippet.publishedAt)
