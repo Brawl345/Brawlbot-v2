@@ -38,12 +38,13 @@ respond.command = 'lod, /lf, /nbc, /wat'
 function respond:inline_callback(inline_query, config, matches)
   local text = matches[1]
   if string.match(text, "[Ll][Oo][Dd]") then
-	results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"ಠ_ಠ","input_message_content":{"message_text":"ಠ_ಠ"}}]'
+	face = 'ಠ_ಠ'
   elseif string.match(text, "[Ll][Ff]") then
-	results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"( ͡° ͜ʖ ͡°)","input_message_content":{"message_text":"( ͡° ͜ʖ ͡°)"}}]'
+	face = '( ͡° ͜ʖ ͡°)'
   elseif string.match(text, "[Nn][Bb][Cc]") or string.match(text, "[Ii][Dd][Cc]") or string.match(text, "[Kk][Aa]") or string.match(text, "[Ii][Dd][Kk]")  then
-    results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"¯\\\\\\_(ツ)_/¯","input_message_content":{"message_text":"¯\\\\\\_(ツ)_/¯"}}]'
+	face = '¯\\\\\\_(ツ)_/¯'
   end
+  results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..face..'","input_message_content":{"message_text":"'..face..'"}}]'
   utilities.answer_inline_query(self, inline_query, results, 9999)
 end
 
