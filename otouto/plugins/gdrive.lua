@@ -45,18 +45,19 @@ function gdrive:send_drive_document_data(data, self, msg)
     if data.exportLinks.png then
       local image_url = data.exportLinks.png
 	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
-      local file = download_to_file(image_url)
+      local file = download_to_file(image_url, 'photo.png')
       utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
 	  return
 	else
       local pdf_url = data.exportLinks.pdf
 	  utilities.send_typing(self, msg.chat.id, 'upload_document')
-	  local file = download_to_file(pdf_url)
+	  local file = download_to_file(pdf_url, 'document.pdf')
       utilities.send_document(self, msg.chat.id, file, text, msg.message_id)
 	  return
 	end
   else
-    local get_file_url = 'https://drive.google.com/uc?id='..id
+	local get_file_url = 'https://drive.google.com/uc?id='..id
+	local keyboard = '{"inline_keyboard":[[{"text":"Direktlink","url":"'..get_file_url..'"}]]}'
 	local ext = data.fileExtension
     if mimetype == "png" or mimetype == "jpg" or mimetype == "jpeg" or mimetype == "gif" or mimetype == "webp" then
 	  local respbody = {}
@@ -71,18 +72,18 @@ function gdrive:send_drive_document_data(data, self, msg)
 	  local file_url = headers.location
 	  if ext == "jpg"  or ext == "jpeg" or ext == "png" then
 	    utilities.send_typing(self, msg.chat.id, 'upload_photo')
-        local file = download_to_file(file_url)
-        utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+        local file = download_to_file(file_url, 'photo.'..ext)
+        utilities.send_photo(self, msg.chat.id, file, text, msg.message_id, keyboard)
 		return
 	  else
 	    utilities.send_typing(self, msg.chat.id, 'upload_document')
-	    local file = download_to_file(file_url)
-        utilities.send_document(self, msg.chat.id, file, text, msg.message_id)
+	    local file = download_to_file(file_url, 'document.'..ext)
+        utilities.send_document(self, msg.chat.id, file, text, msg.message_id, keyboard)
 		return
 	  end
 	else
-	  local text = '*'..title..'*, freigegeben von _'..owner..'_\n[Direktlink]('..get_file_url..')'
-	  utilities.send_reply(self, msg, text, true)
+	  local text = '*'..title..'*, freigegeben von _'..owner..'_'
+	  utilities.send_reply(self, msg, text, true, keyboard)
 	  return
 	end
   end

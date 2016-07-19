@@ -10,7 +10,7 @@ function set:init(config)
 	set.doc = [[*
 ]]..config.cmd_pat..[[set* _<Variable>_ _<Wert>_: Speichert eine Variable mit einem Wert
 *]]..config.cmd_pat..[[set* _<Variable>_ _nil_: Löscht Variable
-Nutze `!get <Variable>` zum Abrufen]]
+Nutze `/get <Variable>` zum Abrufen]]
 end
 
 function set:save_value(msg, name, value)
