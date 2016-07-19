@@ -22,9 +22,30 @@ function respond:init(config)
 	"^%(([Ii][Nn][Ll][Oo][Vv][Ee])%)$",
 	"^/[Ww][Aa][Tt]$"
 	}
+	
+	respond.inline_triggers = {
+	"^([Ll][Oo][Dd])$",
+	"^([Ll][Ff])$",
+	"^([Kk][Aa])$",
+	"^([Ii][Dd][Kk])$",
+	"^([Nn][Bb][Cc])$",
+	"^([Ii][Dd][Cc])$",
+	}
 end
 
 respond.command = 'lod, /lf, /nbc, /wat'
+
+function respond:inline_callback(inline_query, config, matches)
+  local text = matches[1]
+  if string.match(text, "[Ll][Oo][Dd]") then
+	results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"ಠ_ಠ","input_message_content":{"message_text":"ಠ_ಠ"}}]'
+  elseif string.match(text, "[Ll][Ff]") then
+	results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"( ͡° ͜ʖ ͡°)","input_message_content":{"message_text":"( ͡° ͜ʖ ͡°)"}}]'
+  elseif string.match(text, "[Nn][Bb][Cc]") or string.match(text, "[Ii][Dd][Cc]") or string.match(text, "[Kk][Aa]") or string.match(text, "[Ii][Dd][Kk]")  then
+    results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"¯\\\\\\_(ツ)_/¯","input_message_content":{"message_text":"¯\\\\\\_(ツ)_/¯"}}]'
+  end
+  utilities.answer_inline_query(self, inline_query, results, 9999)
+end
 
 function respond:action(msg, config, matches)
   local user_name = get_name(msg)
