@@ -22,13 +22,13 @@ end
 
 local apikey = cred_data.google_apikey
 
-local BASE_URL = 'https://www.googleapis.com/drive/v2'
+local BASE_URL = 'https://www.googleapis.com/drive/v3'
+local apikey = cred_data.google_apikey
 
 function gdrive:get_drive_document_data (docid)
-  local apikey = cred_data.google_apikey
-  local url = BASE_URL..'/files/'..docid..'?key='..apikey..'&fields=id,title,mimeType,ownerNames,exportLinks,fileExtension'
-  local res,code  = https.request(url)
-  local res = string.gsub(res, 'image/', '')
+  local url = BASE_URL..'/files/'..docid..'?key='..apikey..'&fields=id,name,mimeType,owners,fullFileExtension'
+  local res, code  = https.request(url)
+  local res = string.gsub(res, 'image/', '') -- snip mimetype
   local res = string.gsub(res, 'application/', '')
   if code ~= 200 then return nil end
   local data = json.decode(res)
@@ -36,29 +36,29 @@ function gdrive:get_drive_document_data (docid)
 end
 
 function gdrive:send_drive_document_data(data, self, msg)
-  local title = data.title
+  local title = data.name
   local mimetype = data.mimeType
   local id = data.id
-  local owner = data.ownerNames[1]
+  local owner = data.owners[1].displayName
   local text = '"'..title..'", freigegeben von '..owner
-  if data.exportLinks then
-    if data.exportLinks.png then
-      local image_url = data.exportLinks.png
+  if mimetype:match('google') then -- if document is Google document (like a Spreadsheet)
+    if mimetype:match('drawing') then -- Drawing
+	  local image_url = BASE_URL..'/files/'..id..'/export?key='..apikey..'&mimeType=image/png'
 	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
-      local file = download_to_file(image_url, 'photo.png')
-      utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+	  local file = download_to_file(image_url, 'export.png')
+	  utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
 	  return
 	else
-      local pdf_url = data.exportLinks.pdf
+	  local pdf_url = BASE_URL..'/files/'..id..'/export?key='..apikey..'&mimeType=application/pdf'
 	  utilities.send_typing(self, msg.chat.id, 'upload_document')
 	  local file = download_to_file(pdf_url, 'document.pdf')
-      utilities.send_document(self, msg.chat.id, file, text, msg.message_id)
+	  utilities.send_document(self, msg.chat.id, file, text, msg.message_id)
 	  return
 	end
   else
 	local get_file_url = 'https://drive.google.com/uc?id='..id
 	local keyboard = '{"inline_keyboard":[[{"text":"Direktlink","url":"'..get_file_url..'"}]]}'
-	local ext = data.fileExtension
+	local ext = data.fullFileExtension
     if mimetype == "png" or mimetype == "jpg" or mimetype == "jpeg" or mimetype == "gif" or mimetype == "webp" then
 	  local respbody = {}
       local options = {
