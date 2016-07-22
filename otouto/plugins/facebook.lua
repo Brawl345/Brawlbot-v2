@@ -91,7 +91,7 @@ function facebook:send_facebook_video(video_id)
   local data = json.decode(res)
 
   local from = '*'..data.from.name..'*'
-  local description = data.description
+  local description = data.description or ''
   local source = data.source
   return from..' hat ein Video gepostet:\n'..description, source, data.title
 end
