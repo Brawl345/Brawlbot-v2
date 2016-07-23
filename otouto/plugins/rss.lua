@@ -329,17 +329,21 @@ function rss:cron(self_plz)
       for k2, v2 in pairs(newentr) do
          local title = v2.title or 'Kein Titel'
          local link = v2.link or v2.id or 'Kein Link'
-		 if v2.content then 
+		 if v2.content then
+		   content = v2.content:gsub("%b<>", "")
 		   if string.len(v2.content) > 250 then
-		     content = string.sub(unescape_for_rss(v2.content:gsub("%b<>", "")), 1, 250) .. '...'
+			 content = unescape_for_rss(content)
+		     content = string.sub(content, 1, 250)..'...'
 		   else
-		     content = unescape_for_rss(v2.content:gsub("%b<>", ""))
+		     content = unescape_for_rss(content)
 		  end
 		 elseif v2.summary then
+		   content = v2.summary:gsub("%b<>", "")
 		   if string.len(v2.summary) > 250 then
-		     content = string.sub(unescape_for_rss(v2.summary:gsub("%b<>", "")), 1, 250) .. '...'
+		     content = unescape_for_rss(content)
+		     content = string.sub(content, 1, 250)..'...'
 		   else
-		     content = unescape_for_rss(v2.summary:gsub("%b<>", ""))
+		     content = unescape_for_rss(content)
 		   end
 		 else
 		   content = ''
