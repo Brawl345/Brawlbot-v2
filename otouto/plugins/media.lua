@@ -29,10 +29,19 @@ media.triggers = {
 function media:action(msg)
   local url = matches[1]
   local ext = matches[2]
-  local receiver = msg.chat.id
-
-  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, 'upload_document', self)
   local mime_type = mimetype.get_content_type_no_sub(ext)
+  local receiver = msg.chat.id
+  
+  if mime_type == 'audio' then
+    chat_action = 'upload_audio'
+  elseif mime_type == 'video' then
+    chat_action = 'upload_video'
+  else
+    chat_action = 'upload_document'
+  end
+
+  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, chat_action, self)
+  if not file then return end
 
   if ext == 'gif' then
     print('send gif')

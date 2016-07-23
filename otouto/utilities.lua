@@ -776,7 +776,7 @@ function cache_file(result, url, last_modified)
   redis:expire(hash..':'..url, 5259600) -- 2 months
 end
 
-function get_last_modified_header(url)
+function get_http_header(url)
   local doer = HTTP
   local do_redir = true
   if url:match('^https') then
@@ -789,12 +789,7 @@ function get_last_modified_header(url)
 	redirect = do_redir
   }
   if not header then return end
-  if header["last-modified"] then
-    last_modified = header["last-modified"]
-  elseif header["Last-Modified"] then
-    last_modified = header["Last-Modified"]
-  end
-  return last_modified, code
+  return header, code
 end
 
 -- only url is needed!
@@ -803,13 +798,32 @@ function get_cached_file(url, file_name, receiver, chat_action, self)
   local cached_file_id = redis:hget(hash..':'..url, 'file_id')
   local cached_last_modified = redis:hget(hash..':'..url, 'last_modified')
 
-  -- get last-modified header
-  local last_modified, code = get_last_modified_header(url)
+  -- get last-modified and Content-Length header
+  local header, code = get_http_header(url)
   if code ~= 200 then
     if cached_file_id then
       redis:del(hash..':'..url)
 	end
     return
+  end
+
+  -- file size limit is 50 MB
+  if header["Content-Length"] then
+    if tonumber(header["Content-Length"]) > 52420000 then
+	  print('file is too large, won\'t send!')
+	  return nil
+	end
+  elseif header["content-length"] then
+	if tonumber(header["content-length"]) > 52420000 then
+	  print('file is too large, won\'t send!')
+	  return nil
+	end
+  end
+
+  if header["last-modified"] then
+    last_modified = header["last-modified"]
+  elseif header["Last-Modified"] then
+    last_modified = header["Last-Modified"]
   end
   
   if not last_modified then
