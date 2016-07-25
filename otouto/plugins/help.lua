@@ -12,7 +12,6 @@ function help:init(config)
 end
 
 function help:action(msg, config)
-
 	local commandlist = {}
 	help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
 
@@ -20,11 +19,10 @@ function help:action(msg, config)
 		if plugin.command then
 		    
 			table.insert(commandlist, plugin.command)
-			--help_text = help_text .. '\n• '..config.cmd_pat .. plugin.command:gsub('%[', '\\[')
 		end
 	end
 
-	table.insert(commandlist, 'hilfe [Plugin]')
+	table.insert(commandlist, 'hilfe [Befehl]')
 	table.sort(commandlist)
 	help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
 
@@ -52,7 +50,6 @@ function help:action(msg, config)
 	end
 
 	utilities.send_reply(self, msg, 'Für diesen Befehl gibt es keine Hilfe.')
-
 end
 
 return help

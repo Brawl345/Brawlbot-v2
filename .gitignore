@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 config.lua
+=======
+otouto/plugins/mokubot*
+otouto/plugins/oubot*
+>>>>>>> upstream/master
 *.db
 tg

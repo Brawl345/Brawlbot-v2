@@ -31,21 +31,6 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	if not self.database then
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
-	
-	-- MIGRATION CODE 2.0 -> 2.1
-	if self.database.users and self.database.version ~= '2.1' then
-		self.database.userdata = {}
-		for id, user in pairs(self.database.users) do
-			self.database.userdata[id] = {}
-			self.database.userdata[id].nickname = user.nickname
-			self.database.userdata[id].lastfm = user.lastfm
-			user.nickname = nil
-			user.lastfm = nil
-			user.id_str = nil
-			user.name = nil
-		end
-	end
-	-- END MIGRATION CODE
 
 	-- Table to cache user info (usernames, IDs, etc).
 	self.database.users = self.database.users or {}
