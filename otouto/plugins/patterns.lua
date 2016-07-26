@@ -25,8 +25,8 @@ function patterns:action(msg)
 		utilities.send_reply(self, msg, 'Falsches Pattern!')
 	else
 		output = output:sub(1, 4000)
-		output = 'Du meintest wohl:\n"' .. output .. '"'
-		utilities.send_reply(self, msg.reply_to_message, output)
+		output = '*Du meintest wohl*:\n"'..utilities.md_escape(utilities.trim(output))..'"'
+		utilities.send_reply(self, msg.reply_to_message, output, true)
 	end
 end
 
