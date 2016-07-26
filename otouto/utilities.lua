@@ -13,6 +13,8 @@ local serpent = require("serpent")
 local bindings = require('otouto.bindings')
 local redis = (loadfile "./otouto/redis.lua")()
 local mimetype = (loadfile "./otouto/mimetype.lua")()
+local OAuth = require "OAuth"
+local helpers = require "OAuth.helpers"
 
 HTTP.timeout = 10
 
@@ -628,6 +630,36 @@ function is_sudo(msg, config)
   return var
 end
 
+-- http://stackoverflow.com/a/6081639/3146627
+function serializeTable(val, name, skipnewlines, depth)
+    skipnewlines = skipnewlines or false
+    depth = depth or 0
+
+    local tmp = string.rep(" ", depth)
+
+    if name then tmp = tmp .. name .. " = " end
+
+    if type(val) == "table" then
+        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
+
+        for k, v in pairs(val) do
+            tmp =  tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+        end
+
+        tmp = tmp .. string.rep(" ", depth) .. "}"
+    elseif type(val) == "number" then
+        tmp = tmp .. tostring(val)
+    elseif type(val) == "string" then
+        tmp = tmp .. string.format("%q", val)
+    elseif type(val) == "boolean" then
+        tmp = tmp .. (val and "true" or "false")
+    else
+        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+    end
+
+    return tmp
+end
+
 function post_petition(url, arguments, headers)
    local url, h = string.gsub(url, "http://", "")
    local url, hs = string.gsub(url, "https://", "")
@@ -646,9 +678,9 @@ function post_petition(url, arguments, headers)
 
    local source = arguments
    if type(arguments) == "table" then
-      local source = helpers.url_encode_arguments(arguments)
+      source = helpers.url_encode_arguments(arguments)
    end
-   
+
    if not headers then
      request_constructor.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF8"
      request_constructor.headers["X-Accept"] = "application/json"

@@ -239,6 +239,7 @@ function match_plugins(self, msg, config, plugin)
 		end
 	  end
 	  print(plugin.name..' triggered')
+	  plugin_name = plugin.name
 	  return plugin.action(self, msg, config, matches)
 	end)
 	if not success then
@@ -250,9 +251,20 @@ function match_plugins(self, msg, config, plugin)
 	elseif plugin.error == nil then
 	  utilities.send_reply(self, msg, config.errors.generic, true)
 	end
-	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
-	  return
+	utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	return
 	end
+
+	-- Analytics
+	if config.enable_analytics and config.botan_token ~= '' then
+	  for _,plugin in ipairs(self.plugins) do
+	    if plugin.name == 'botan' then
+		  print('Analytics')
+		  plugin.action(self, msg, config, nil, plugin_name)
+		end
+	  end
+	end
+	
 	-- If the action returns a table, make that table the new msg.
 	if type(result) == 'table' then
 	  msg = result
