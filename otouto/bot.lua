@@ -259,7 +259,6 @@ function match_plugins(self, msg, config, plugin)
 	if config.enable_analytics and config.botan_token ~= '' then
 	  for _,plugin in ipairs(self.plugins) do
 	    if plugin.name == 'botan' then
-		  print('Analytics')
 		  plugin.action(self, msg, config, nil, plugin_name)
 		end
 	  end
