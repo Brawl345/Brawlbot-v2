@@ -209,7 +209,7 @@ function wikipedia:action(msg, config, matches)
     lang = nil
   end
   if term == "" then
-    utilities.send_reply(msg, self, wikipedia.doc)
+    utilities.send_reply(self, msg, wikipedia.doc)
     return
   end
 

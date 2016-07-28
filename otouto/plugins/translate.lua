@@ -10,6 +10,11 @@ require("./otouto/plugins/pasteee")
 translate.command = 'translate [Text]'
 
 function translate:init(config)
+	if not cred_data.bing_key then
+		print('Missing config value: bing_key.')
+		print('translate.lua will not be enabled.')
+		return
+	end
 	translate.triggers = {
     "^/translate ([%w]+),([%a]+) (.+)",
     "^/translate (to%:)([%w]+) (.+)",
