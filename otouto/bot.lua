@@ -5,7 +5,7 @@ local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '2.2.2'
+bot.version = '2.2.3'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
@@ -253,15 +253,6 @@ function match_plugins(self, msg, config, plugin)
 	end
 	utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 	return
-	end
-
-	-- Analytics
-	if config.enable_analytics and config.botan_token ~= '' then
-	  for _,plugin in ipairs(self.plugins) do
-	    if plugin.name == 'botan' then
-		  plugin.action(self, msg, config, nil, plugin_name)
-		end
-	  end
 	end
 	
 	-- If the action returns a table, make that table the new msg.
