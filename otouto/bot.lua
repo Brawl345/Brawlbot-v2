@@ -239,7 +239,6 @@ function match_plugins(self, msg, config, plugin)
 		end
 	  end
 	  print(plugin.name..' triggered')
-	  plugin_name = plugin.name
 	  return plugin.action(self, msg, config, matches)
 	end)
 	if not success then
