@@ -81,16 +81,7 @@ function afk:pre_process(msg, self)
 	local current_timestamp = msg.date
 	local afk_time = current_timestamp - timestamp
 	local seconds = afk_time % 60
-    local minutes = math.floor(afk_time / 60)
-	local minutes = minutes % 60
-	local hours = math.floor(afk_time / 3600)
-	if minutes == 00 and hours == 00 then
-	  duration = seconds..' Sekunden'
-	elseif hours == 00 and minutes ~= 00 then
-	  duration = string.format("%02d:%02d", minutes, seconds)..' Minuten'
-	elseif hours ~= 00 then
-      duration = string.format("%02d:%02d:%02d", hours,  minutes, seconds)..' Stunden'
-	end
+    local duration = makeHumanTime(seconds)
    
 	redis:hset(hash, 'afk', false)
     if afk_text then
