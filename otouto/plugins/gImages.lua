@@ -94,7 +94,7 @@ function gImages:callback(callback, msg, self, config, input)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true)
 	return
   end
   
@@ -223,7 +223,7 @@ function gImages:action(msg, config, matches)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
+    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true)
 	return
   end
   
