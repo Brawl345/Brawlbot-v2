@@ -80,8 +80,7 @@ function afk:pre_process(msg, self)
 	local timestamp = redis:hget(hash, 'time')
 	local current_timestamp = msg.date
 	local afk_time = current_timestamp - timestamp
-	local seconds = afk_time % 60
-    local duration = makeHumanTime(seconds)
+    local duration = makeHumanTime(afk_time)
    
 	redis:hset(hash, 'afk', false)
     if afk_text then

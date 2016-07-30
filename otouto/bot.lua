@@ -5,7 +5,7 @@ local bindings -- Load Telegram bindings.
 local utilities -- Load miscellaneous and cross-plugin functions.
 local redis = (loadfile "./otouto/redis.lua")()
 
-bot.version = '2.2.3.1'
+bot.version = '2.2.3.2'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 
