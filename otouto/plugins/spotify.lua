@@ -1,9 +1,5 @@
 local spotify = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 spotify.triggers = {
   "open.spotify.com/track/([A-Za-z0-9-]+)",
   "play.spotify.com/track/([A-Za-z0-9-]+)"

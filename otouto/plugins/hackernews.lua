@@ -1,10 +1,5 @@
 local hackernews = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 hackernews.triggers = {
   "news.ycombinator.com/item%?id=(%d+)"
 }

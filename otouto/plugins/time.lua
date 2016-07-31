@@ -1,9 +1,5 @@
 local time = {}
 
-local HTTPS = require('ssl.https')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-
 time.command = 'time <Ort>'
 
 function time:init(config)
@@ -67,13 +63,13 @@ function time:action(msg, config)
   local utc = os.time(os.date("!*t", now))
 
   local url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' .. coords.lat ..','.. coords.lon .. '&timestamp='..utc..'&language=de'
-  local jstr, res = HTTPS.request(url)
+  local jstr, res = https.request(url)
   if res ~= 200 then
     utilities.send_reply(self, msg, config.errors.connection)
     return
   end
   
-  local jdat = JSON.decode(jstr)
+  local jdat = json.decode(jstr)
   local timezoneid = '*'..string.gsub(jdat.timeZoneId, '_', ' ' )..'*'
   local timestamp = now + jdat.rawOffset + jdat.dstOffset
   local utcoff = (jdat.rawOffset + jdat.dstOffset) / 3600

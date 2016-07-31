@@ -1,12 +1,5 @@
 local tagesschau_eil = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local url = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 tagesschau_eil.command = 'eil <sub/del>'
 
 function tagesschau_eil:init(config)

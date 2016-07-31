@@ -1,10 +1,5 @@
 local flickr = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function flickr:init(config)
 	if not cred_data.flickr_apikey then
 		print('Missing config value: flickr_apikey.')

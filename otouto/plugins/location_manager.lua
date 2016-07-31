@@ -1,8 +1,5 @@
 local loc_manager = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function loc_manager:init(config)
     loc_manager.triggers = {
 	  "^/location (set) (.*)$",

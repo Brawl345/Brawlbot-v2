@@ -1,7 +1,5 @@
 local muschel = {}
 
-local utilities = require('otouto.utilities')
-
 muschel.triggers = {
 	"^[Mm][Aa][Gg][Ii][Ss][Cc][Hh][Ee] [Mm][Ii][Ee][Ss][Mm][Uu][Ss][Cc][Hh][Ee][Ll], (.*)$"
 }

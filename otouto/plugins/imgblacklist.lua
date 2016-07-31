@@ -1,8 +1,5 @@
 local imgblacklist = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 imgblacklist.command = 'imgblacklist'
 
 function imgblacklist:init(config)

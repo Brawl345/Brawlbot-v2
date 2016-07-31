@@ -1,8 +1,5 @@
 local tex = {}
 
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 tex.command = 'tex <LaTeX>'
 
 function tex:init(config)

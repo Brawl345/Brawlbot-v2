@@ -1,8 +1,5 @@
 local expand = {}
 
-local http = require('socket.http')
-local utilities = require('otouto.utilities')
-
 function expand:init(config)
   expand.triggers = {
     "^/expand (https?://[%w-_%.%?%.:/%+=&]+)$"

@@ -1,9 +1,5 @@
 local soundcloud = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 soundcloud.triggers = {
   "soundcloud.com/([A-Za-z0-9-/-_-.]+)"
 }

@@ -1,11 +1,6 @@
-require("./otouto/plugins/youtube")
-
 local yt_search = {}
 
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
+require("./otouto/plugins/youtube")
 
 yt_search.command = 'yt <Suchbegriff>'
 
@@ -40,7 +35,7 @@ end
 function httpsRequest(url)
   local res,code  = https.request(url)
   if code ~= 200 then return nil end
-  return JSON.decode(res)
+  return json.decode(res)
 end
 
 function yt_search:action(msg)

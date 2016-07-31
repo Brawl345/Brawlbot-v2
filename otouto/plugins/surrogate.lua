@@ -1,7 +1,5 @@
 local surrogate = {}
 
-local utilities = require('otouto.utilities')
-
 surrogate.triggers = {
   "^/s (%-%d+) +(.+)$",
   "^/s (%d+) +(.+)$"

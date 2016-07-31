@@ -1,9 +1,5 @@
 local id = {}
 
-local redis = (loadfile "./otouto/redis.lua")()
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-
 id.command = 'id'
 
 function id:init(config)

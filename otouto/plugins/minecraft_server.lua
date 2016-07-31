@@ -1,11 +1,5 @@
 local mc_server = {}
 
-local http = require('socket.http')
-local ltn12 = require('ltn12')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function mc_server:init(config)
 	mc_server.triggers = {
 	"^/mine (.*)$"

@@ -1,11 +1,5 @@
 local pocket = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function pocket:init(config)
   if not cred_data.pocket_consumer_key then
 	print('Missing config value: pocket_consumer_key.')

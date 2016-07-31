@@ -1,9 +1,5 @@
 local youtube_playlist = {}
 
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local JSON = require('dkjson')
-
 function youtube_playlist:init(config)
 	if not cred_data.google_apikey then
 		print('Missing config value: google_apikey.')
@@ -29,7 +25,7 @@ function youtube_playlist:get_pl_data (pl_code)
   local url = BASE_URL..'/playlists?part=snippet,contentDetails&key='..apikey..'&id='..pl_code..'&fields=items(snippet(publishedAt,channelTitle,localized(title,description)),contentDetails(itemCount))'
   local res,code  = https.request(url)
   if code ~= 200 then return "HTTP-FEHLER" end
-  local data = JSON.decode(res).items[1]
+  local data = json.decode(res).items[1]
   return data
 end
 

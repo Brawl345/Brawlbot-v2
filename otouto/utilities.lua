@@ -3,20 +3,20 @@
 
 local utilities = {}
 
-local HTTP = require('socket.http')
-local ltn12 = require('ltn12')
-local HTTPS = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local http = require('socket.http')
-local serpent = require("serpent")
-local bindings = require('otouto.bindings')
-local redis = (loadfile "./otouto/redis.lua")()
-local mimetype = (loadfile "./otouto/mimetype.lua")()
-local OAuth = require "OAuth"
-local helpers = require "OAuth.helpers"
+ltn12 = require('ltn12')
+http = require('socket.http')
+https = require('ssl.https')
+URL = require('socket.url')
+json = require('dkjson')
+serpent = require("serpent")
+bindings = require('otouto.bindings')
+redis = (loadfile "./otouto/redis.lua")()
+mimetype = (loadfile "./otouto/mimetype.lua")()
+OAuth = require "OAuth"
+helpers = require "OAuth.helpers"
 
-HTTP.timeout = 10
+http.timeout = 5
+https.timeout = 5
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -301,10 +301,10 @@ function download_to_file(url, file_name)
 	    file_name = '/tmp/' .. file_name
 	end
 	local body = {}
-	local doer = HTTP
+	local doer = http
 	local do_redir = true
 	if url:match('^https') then
-		doer = HTTPS
+		doer = https
 		do_redir = false
 	end
 	local _, res = doer.request{
@@ -332,13 +332,13 @@ function utilities.load_data(filename)
 	end
 	local s = f:read('*all')
 	f:close()
-	local data = JSON.decode(s)
+	local data = json.decode(s)
 	return data
 end
 
  -- Saves a table to a JSON file.
 function utilities.save_data(filename, data)
-	local s = JSON.encode(data)
+	local s = json.encode(data)
 	local f = io.open(filename, 'w')
 	f:write(s)
 	f:close()
@@ -349,12 +349,12 @@ function utilities.get_coords(input, config)
 
 	local url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
 
-	local jstr, res = HTTPS.request(url)
+	local jstr, res = https.request(url)
 	if res ~= 200 then
 		return config.errors.connection
 	end
 
-	local jdat = JSON.decode(jstr)
+	local jdat = json.decode(jstr)
 	if jdat.status == 'ZERO_RESULTS' then
 		return config.errors.results
 	end
@@ -522,10 +522,10 @@ function utilities.triggers(username, cmd_pat, trigger_table)
 end
 
 function utilities.with_http_timeout(timeout, fun)
-	local original = HTTP.TIMEOUT
-	HTTP.TIMEOUT = timeout
+	local original = http.TIMEOUT
+	http.TIMEOUT = timeout
 	fun()
-	HTTP.TIMEOUT = original
+	http.TIMEOUT = original
 end
 
 function utilities.enrich_user(user)
@@ -662,14 +662,14 @@ function post_petition(url, arguments, headers)
    if post_prot == "http" then
      ok, response_code, response_headers, response_status_line = http.request(request_constructor)
    else
-     ok, response_code, response_headers, response_status_line = HTTPS.request(request_constructor)
+     ok, response_code, response_headers, response_status_line = https.request(request_constructor)
    end
 
    if not ok then
       return nil
    end
 
-   response_body = JSON.decode(table.concat(response_body))
+   response_body = json.decode(table.concat(response_body))
 
    return response_body, response_headers
 end
@@ -782,7 +782,7 @@ function get_http_header(url)
   local doer = HTTP
   local do_redir = true
   if url:match('^https') then
-	doer = HTTPS
+	doer = https
 	do_redir = false
   end
   local _, code, header = doer.request {

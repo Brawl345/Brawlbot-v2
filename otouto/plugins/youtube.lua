@@ -1,11 +1,5 @@
 local youtube = {}
 
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local bindings = require('otouto.bindings')
-
 function youtube:init(config)
 	if not cred_data.google_apikey then
 		print('Missing config value: google_apikey.')
@@ -46,7 +40,7 @@ function get_yt_data (yt_code)
   local url = BASE_URL..'/videos?part=snippet,statistics,contentDetails&key='..apikey..'&id='..yt_code..'&fields=items(snippet(publishedAt,channelTitle,localized(title,description),thumbnails),statistics(viewCount,likeCount,dislikeCount,commentCount),contentDetails(duration,regionRestriction(blocked)))'
   local res,code  = https.request(url)
   if code ~= 200 then return "HTTP-FEHLER" end
-  local data = JSON.decode(res).items[1]
+  local data = json.decode(res).items[1]
   return data
 end
 
@@ -162,7 +156,7 @@ function youtube:inline_callback(inline_query, config, matches)
   local res,code  = https.request(url)
   if code ~= 200 then return end
 
-  local data = JSON.decode(res)
+  local data = json.decode(res)
   if not data.items[1] then return end
   
   local video_ids = ""
@@ -179,7 +173,7 @@ function youtube:inline_callback(inline_query, config, matches)
   local res,code  = https.request(url)
   if code ~= 200 then return end
 
-  local video_results = JSON.decode(res)
+  local video_results = json.decode(res)
   if not video_results.items[1] then return end
 
   local results = '['

@@ -1,9 +1,5 @@
 local respond = {}
 
-local https = require('ssl.https')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function respond:init(config)
     respond.triggers = {
 	"([Ff][Gg][Tt].? [Ss][Ww][Ii][Ff][Tt])",

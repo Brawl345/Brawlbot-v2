@@ -1,10 +1,5 @@
 local reddit_post = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 reddit_post.triggers = {
   "reddit.com/r/([A-Za-z0-9-/-_-.]+)/comments/([A-Za-z0-9-/-_-.]+)"
 }

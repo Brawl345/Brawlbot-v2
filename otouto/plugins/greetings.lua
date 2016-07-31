@@ -4,8 +4,6 @@
 
 local greetings = {}
 
-local utilities = require('otouto.utilities')
-
 function greetings:init(config)
 	config.greetings = config.greetings or {
 		['Hello, #NAME.'] = {

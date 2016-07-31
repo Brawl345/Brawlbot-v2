@@ -1,10 +1,5 @@
 local cleverbot = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-local json = require('dkjson')
-
 function cleverbot:init(config)
 	cleverbot.triggers = {
 	"^/cbot (.*)$"

@@ -1,9 +1,5 @@
 local channels = {}
 
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 channels.command = 'channel <nur für Superuser>'
 
 function channels:init(config)

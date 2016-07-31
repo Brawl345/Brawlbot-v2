@@ -1,12 +1,5 @@
 local twitter_user = {}
 
-local utilities = require('otouto.utilities')
-local http = require('socket.http')
-local https = require('ssl.https')
-local json = require('dkjson')
-local OAuth = (require "OAuth")
-local bindings = require('otouto.bindings')
-
 function twitter_user:init(config)
 	if not cred_data.tw_consumer_key then
 		print('Missing config value: tw_consumer_key.')

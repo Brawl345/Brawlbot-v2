@@ -1,10 +1,5 @@
 local pixabay = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function pixabay:init(config)
   if not cred_data.pixabay_apikey then
 	print('Missing config value: pixabay_apikey.')

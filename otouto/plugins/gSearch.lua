@@ -1,10 +1,5 @@
 local gSearch = {}
 
-local HTTPS = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-
 gSearch.command = 'google <Suchbegriff>'
 
 function gSearch:init(config)
@@ -23,7 +18,7 @@ function gSearch:googlethat(query, config)
   local api        = BASE_URL.."/?key="..apikey.."&cx="..cseid.."&gl=de&num="..number.."&safe=medium&fields=searchInformation%28formattedSearchTime,formattedTotalResults%29,items%28title,link,displayLink%29&"
   local parameters = "q=".. (URL.escape(query) or "")
   -- Do the request
-  local res, code = HTTPS.request(api..parameters)
+  local res, code = https.request(api..parameters)
   if code == 403 then
     return '403'
   end

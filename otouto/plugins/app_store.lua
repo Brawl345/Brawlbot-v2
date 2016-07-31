@@ -1,10 +1,5 @@
 local app_store = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 app_store.triggers = {
 	"itunes.apple.com/(.*)/app/(.*)/id(%d+)",
 	"^/itunes (%d+)$",

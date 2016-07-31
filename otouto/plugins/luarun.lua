@@ -1,9 +1,5 @@
 local luarun = {}
 
-local utilities = require('otouto.utilities')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-
 function luarun:init(config)
 	luarun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('lua', true):t('return', true).table
 end
@@ -28,17 +24,17 @@ function luarun:action(msg, config)
 		local bot = require('otouto.bot')
 		local bindings = require('otouto.bindings')
 		local utilities = require('otouto.utilities')
-		local JSON = require('dkjson')
+		local json = require('dkjson')
 		local URL = require('socket.url')
-		local HTTP = require('socket.http')
-		local HTTPS = require('ssl.https')
+		local http = require('socket.http')
+		local https = require('ssl.https')
 		return function (self, msg, config) ]] .. input .. [[ end
 	]] )()(self, msg, config)
 	if output == nil then
 		output = 'Done!'
 	else
 		if type(output) == 'table' then
-			local s = JSON.encode(output, {indent=true})
+			local s = json.encode(output, {indent=true})
 			if URL.escape(s):len() < 4000 then
 				output = s
 			end

@@ -1,10 +1,5 @@
 local clypit = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 clypit.triggers = {
   "clyp.it/([A-Za-z0-9-_-]+)"
 }

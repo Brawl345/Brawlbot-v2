@@ -1,10 +1,5 @@
 local giphy = {}
 
-local http = require('socket.http')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function giphy:init(config)
   giphy.triggers = {
     "/nil"
@@ -26,7 +21,7 @@ function giphy:get_gifs(query)
   end
   local res, code = http.request(url)
   if code ~= 200 then return nil end
-  return JSON.decode(res).data
+  return json.decode(res).data
 end
 
 function giphy:inline_callback(inline_query, config, matches)

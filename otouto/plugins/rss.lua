@@ -1,11 +1,5 @@
 local rss = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local url = require('socket.url')
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
 local feedparser = require("feedparser")
 
 rss.command = 'rss <sub/del>'

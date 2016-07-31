@@ -1,8 +1,5 @@
 local leave_group = {}
 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 leave_group.triggers = {
   '/nil'
 }

@@ -1,9 +1,5 @@
 local vine = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 vine.triggers = {
   "vine.co/v/([A-Za-z0-9-_-]+)"
 }

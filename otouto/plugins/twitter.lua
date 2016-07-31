@@ -1,12 +1,5 @@
 local twitter = {}
 
-local utilities = require('otouto.utilities')
-local HTTPS = require('ssl.https')
-local JSON = require('dkjson')
-local redis = (loadfile "./otouto/redis.lua")()
-local OAuth = (require "OAuth")
-local bindings = require('otouto.bindings')
-
 function twitter:init(config)
 	if not cred_data.tw_consumer_key then
 		print('Missing config value: tw_consumer_key.')
@@ -57,7 +50,7 @@ function twitter:action(msg, config, matches)
 
   local twitter_url = "https://api.twitter.com/1.1/statuses/show/" .. id.. ".json"
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
-  local response = JSON.decode(response_body)
+  local response = json.decode(response_body)
   
   local full_name = response.user.name
   local user_name = response.user.screen_name

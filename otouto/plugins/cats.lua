@@ -1,9 +1,5 @@
 local cats = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 cats.command = 'cat [gif]'
 
 function cats:init(config)

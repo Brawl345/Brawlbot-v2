@@ -1,11 +1,5 @@
 local br = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 br.triggers = {
       "br.de/nachrichten/(.*).html$"
   }

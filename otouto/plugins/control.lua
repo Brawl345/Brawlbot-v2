@@ -1,8 +1,6 @@
 local control = {}
 
 local bot = require('otouto.bot')
-local utilities = require('otouto.utilities')
-
 local cmd_pat -- Prevents the command from being uncallable.
 
 function control:init(config)

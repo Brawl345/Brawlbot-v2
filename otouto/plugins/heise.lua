@@ -1,11 +1,5 @@
 local heise = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 heise.triggers = {
       "heise.de/newsticker/meldung/(.*).html$"
   }

@@ -1,8 +1,5 @@
 local gps = {}
 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 gps.command = 'gps <Breitengrad>,<Längengrad>'
 
 function gps:init(config)

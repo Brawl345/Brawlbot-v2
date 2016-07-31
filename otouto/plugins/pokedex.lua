@@ -1,10 +1,5 @@
 local pokedex = {}
 
-local HTTP = require('socket.http')
-local JSON = require('dkjson')
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-
 pokedex.command = 'pokedex <query>'
 
 function pokedex:init(config)
@@ -33,22 +28,22 @@ function pokedex:action(msg, config)
 	local url = 'http://pokeapi.co'
 
 	local dex_url = url .. '/api/v1/pokemon/' .. input
-	local dex_jstr, res = HTTP.request(dex_url)
+	local dex_jstr, res = http.request(dex_url)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	local dex_jdat = JSON.decode(dex_jstr)
+	local dex_jdat = json.decode(dex_jstr)
 
 	local desc_url = url .. dex_jdat.descriptions[math.random(#dex_jdat.descriptions)].resource_uri
-	local desc_jstr, _ = HTTP.request(desc_url)
+	local desc_jstr, _ = http.request(desc_url)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	local desc_jdat = JSON.decode(desc_jstr)
+	local desc_jdat = json.decode(desc_jstr)
 
 	local poke_type
 	for _,v in ipairs(dex_jdat.types) do

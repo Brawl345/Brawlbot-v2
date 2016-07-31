@@ -1,10 +1,6 @@
 local games = {}
 
-local http = require('socket.http')
-local URL = require('socket.url')
 local xml = require("xml") 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
 
 games.command = 'game <Spiel>'
 

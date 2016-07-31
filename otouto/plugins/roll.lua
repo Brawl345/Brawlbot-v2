@@ -1,7 +1,5 @@
 local roll = {}
 
-local utilities = require('otouto.utilities')
-
 roll.command = 'roll'
 
 function roll:init(config)

@@ -1,12 +1,5 @@
 local webshot = {}
 
-local helpers = require('OAuth.helpers')
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local ltn12 = require('ltn12')
-local json = require('dkjson')
-local bindings = require('otouto.bindings')
-
 local base = 'https://screenshotmachine.com/'
 local url = base .. 'processor.php'
 

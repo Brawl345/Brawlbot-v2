@@ -1,10 +1,5 @@
 local wikia = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 wikia.triggers = {
   "https?://(.+).wikia.com/wiki/(.+)"
 }

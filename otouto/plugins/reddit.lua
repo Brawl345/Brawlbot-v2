@@ -1,10 +1,5 @@
 local reddit = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-
 reddit.command = 'reddit [r/subreddit | Suchbegriff]'
 
 function reddit:init(config)
@@ -68,7 +63,7 @@ function reddit:action(msg, config)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.results)
 	else
-		local jdat = JSON.decode(jstr)
+		local jdat = json.decode(jstr)
 		if #jdat.data.children == 0 then
 			utilities.send_reply(self, msg, config.errors.results)
 		else

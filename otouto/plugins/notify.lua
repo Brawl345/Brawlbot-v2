@@ -3,9 +3,6 @@
 
 local notify = {}
 
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-
 function notify:init(config)
   notify.triggers = {
     "^/notify (del)$",

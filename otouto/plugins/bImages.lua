@@ -1,13 +1,5 @@
 local bImages = {}
 
-local HTTPS = require('ssl.https')
-HTTPS.timeout = 10
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function bImages:init(config)
   if not cred_data.bing_search_key then
 	print('Missing config value: bing_search_key.')
@@ -36,9 +28,9 @@ function bImages:getImages(query)
 	    ["Ocp-Apim-Subscription-Key"] = apikey
 	  }
    }
-  local ok, response_code, response_headers = HTTPS.request(request_constructor)
+  local ok, response_code, response_headers = https.request(request_constructor)
   if not ok then return end
-  local images = JSON.decode(table.concat(response_body)).value
+  local images = json.decode(table.concat(response_body)).value
   if not images[1] then return end
   
   

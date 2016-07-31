@@ -1,9 +1,5 @@
 local qr = {}
 
-local http = require('socket.http')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 function qr:init(config)
 	qr.triggers = {
     '^/qr "(%w+)" "(%w+)" (.+)$',

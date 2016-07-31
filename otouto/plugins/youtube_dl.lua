@@ -1,7 +1,5 @@
 local youtube_dl = {}
 
-local utilities = require('otouto.utilities')
-
 function youtube_dl:init(config)
   youtube_dl.triggers = {
 	"^/(mp4) (https?://[%w-_%.%?%.:/%+=&]+)$",

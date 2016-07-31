@@ -1,8 +1,5 @@
 local get = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 get.command = 'get <Variable>'
 
 function get:init(config)

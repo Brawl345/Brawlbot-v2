@@ -1,9 +1,5 @@
 local deviantart = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 deviantart.triggers = {
   "http://(.*).deviantart.com/art/(.*)"
 }

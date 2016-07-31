@@ -1,6 +1,5 @@
 local images = {}
 
-local utilities = require('otouto.utilities')
 images.triggers = {
   "(https?://[%w-_%%%.%?%.:,/%+=~&%[%]]+%.[Pp][Nn][Gg])$",
   "(https?://[%w-_%%%.%?%.:,/%+=~&%[%]]+%.[Jj][Pp][Ee]?[Gg])$"

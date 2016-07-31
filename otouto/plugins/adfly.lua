@@ -1,9 +1,5 @@
 local adfly = {}
 
-local utilities = require('otouto.utilities')
-local HTTPS = require('ssl.https')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function adfly:init(config)
 	adfly.triggers = {
 		'adf.ly/([A-Za-z0-9-_-]+)'
@@ -15,7 +11,7 @@ end
 function adfly:expand_adfly_link(adfly_code)
   local BASE_URL = 'https://andibi.tk/dl/adfly.php'
   local url = BASE_URL..'/?url=http://adf.ly/'..adfly_code
-  local res,code  = HTTPS.request(url)
+  local res,code  = https.request(url)
   if code ~= 200 then return nil end
   if res == 'Fehler: Keine Adf.ly-URL gefunden!' then return 'NOTFOUND' end
   cache_data('adfly', adfly_code, res, 31536000, 'key')

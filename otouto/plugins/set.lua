@@ -1,8 +1,5 @@
 local set = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 set.command = 'set <Variable> <Wert>'
 
 function set:init(config)

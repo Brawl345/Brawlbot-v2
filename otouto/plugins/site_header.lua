@@ -1,7 +1,5 @@
 local site_header = {}
 
-local utilities = require('otouto.utilities')
-
 function site_header:init(config)
 	site_header.triggers = {
     "^/(head) ([%w-_%.%?%.:,/%+=&#!]+)$",

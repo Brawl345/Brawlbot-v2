@@ -1,17 +1,11 @@
 local bot = {}
 
--- Requires are moved to init to allow for reloads.
-local bindings -- Load Telegram bindings.
-local utilities -- Load miscellaneous and cross-plugin functions.
-local redis = (loadfile "./otouto/redis.lua")()
+bindings = require('otouto.bindings')
+utilities = require('otouto.utilities')
 
 bot.version = '2.2.3.2'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
-
-	bindings = require('otouto.bindings')
-	utilities = require('otouto.utilities')
-	redis = (loadfile "./otouto/redis.lua")()
 	cred_data = load_cred()
 
 	assert(

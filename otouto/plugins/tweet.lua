@@ -1,12 +1,5 @@
 local tweet = {}
 
-local utilities = require('otouto.utilities')
-local HTTPS = require('ssl.https')
-local JSON = require('dkjson')
-local redis = (loadfile "./otouto/redis.lua")()
-local OAuth = (require "OAuth")
-local bindings = require('otouto.bindings')
-
 function tweet:init(config)
 	if not cred_data.tw_consumer_key then
 		print('Missing config value: tw_consumer_key.')
@@ -145,7 +138,7 @@ function tweet:getTweet(self, msg, base, all)
       return "Konnte nicht verbinden, evtl. existiert der User nicht?"
    end
 
-   local response = JSON.decode(response_body)
+   local response = json.decode(response_body)
    if #response == 0 then
       return "Konnte keinen Tweet bekommen, sorry"
    end

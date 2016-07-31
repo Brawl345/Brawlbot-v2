@@ -1,8 +1,5 @@
 local channel = {}
 
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-
 channel.command = 'ch <Kanal> \\n <Nachricht>'
 channel.doc = [[*
 /ch*_ <Kanal>_|_[Inline-Keyboard]_

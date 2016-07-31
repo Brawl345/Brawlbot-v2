@@ -1,14 +1,5 @@
 local twitter_send = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local OAuth = require "OAuth"
-local redis = (loadfile "./otouto/redis.lua")()
-
 function twitter_send:init(config)
 	if not cred_data.tw_consumer_key then
 		print('Missing config value: tw_consumer_key.')

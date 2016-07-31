@@ -1,12 +1,5 @@
 local forecast = {}
 
-local HTTPS = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function forecast:init(config)
 	if not cred_data.forecastio_apikey then
 		print('Missing config value: forecastio_apikey.')
@@ -46,9 +39,9 @@ function get_city_name(lat, lng)
   local city = redis:hget('telegram:cache:weather:pretty_names', lat..','..lng)
   if city then return city end
   local url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='..lat..','..lng..'&result_type=political&language=de&key='..google_apikey
-  local res, code = HTTPS.request(url)
+  local res, code = https.request(url)
   if code ~= 200 then return 'Unbekannte Stadt' end
-  local data = JSON.decode(res).results[1]
+  local data = json.decode(res).results[1]
   local city = data.formatted_address
   print('Setting '..lat..','..lng..' in redis hash telegram:cache:weather:pretty_names to "'..city..'"')
   redis:hset('telegram:cache:weather:pretty_names', lat..','..lng, city)
@@ -107,9 +100,9 @@ function forecast:get_forecast(lat, lng)
       method = "GET",
       sink = ltn12.sink.table(response_body)
    }
-  local ok, response_code, response_headers, response_status_line = HTTPS.request(request_constructor)
+  local ok, response_code, response_headers, response_status_line = https.request(request_constructor)
   if not ok then return nil end
-  local data = JSON.decode(table.concat(response_body))
+  local data = json.decode(table.concat(response_body))
   local ttl = string.sub(response_headers["cache-control"], 9)
 
   
@@ -153,9 +146,9 @@ function forecast:get_forecast_hourly(lat, lng)
       method = "GET",
       sink = ltn12.sink.table(response_body)
    }
-  local ok, response_code, response_headers, response_status_line = HTTPS.request(request_constructor)
+  local ok, response_code, response_headers, response_status_line = https.request(request_constructor)
   if not ok then return nil end
-  local data = JSON.decode(table.concat(response_body))
+  local data = json.decode(table.concat(response_body))
   local ttl = string.sub(response_headers["cache-control"], 9)
 
   

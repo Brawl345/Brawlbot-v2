@@ -1,11 +1,5 @@
 local wikipedia = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local socket = require('socket')
-local utilities = require('otouto.utilities')
-
 wikipedia.command = 'wiki <Begriff>'
 
 function wikipedia:init(config)
@@ -101,7 +95,7 @@ function wikipedia:loadPage(text, lang, intro, plain, is_search)
 
   local content = table.concat(sink)
   if content ~= "" then
-    local ok, result = pcall(JSON.decode, content)
+    local ok, result = pcall(json.decode, content)
     if ok and result then
       return result
     else
@@ -174,7 +168,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
   local url = 'https://'..lang..'.wikipedia.org/w/api.php?action=query&list=search&srsearch='..URL.escape(query)..'&format=json&prop=extracts&srprop=snippet'
   local res, code = https.request(url)
   if code ~= 200 then return end
-  local data = JSON.decode(res).query
+  local data = json.decode(res).query
 
   if data.searchinfo.totalhits == 0 then return end
 

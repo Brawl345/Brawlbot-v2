@@ -1,9 +1,5 @@
 local vimeo = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 vimeo.triggers = {
   "vimeo.com/(%d+)"
 }

@@ -1,7 +1,5 @@
 local speedtest = {}
 
-local utilities = require('otouto.utilities')
-
 speedtest.triggers = {
   "speedtest.net/my%-result/(%d+)",
   "speedtest.net/my%-result/i/(%d+)"

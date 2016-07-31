@@ -1,9 +1,5 @@
 local wiimmfi = {}
 
-local http = require('socket.http')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function wiimmfi:init(config)
     wiimmfi.triggers = {
       "^/(mkw)$",

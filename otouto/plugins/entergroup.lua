@@ -1,8 +1,5 @@
 local entergroup = {}
 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 entergroup.triggers = {
   '/nil'
 }

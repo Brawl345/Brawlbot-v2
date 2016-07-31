@@ -1,8 +1,5 @@
 local creds_manager = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function creds_manager:init(config)
     creds_manager.triggers = {
       "^(/creds)$",

@@ -1,13 +1,5 @@
 local github = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function github:init(config)
     github.triggers = {
       "github.com/([A-Za-z0-9-_-.-._.]+)/([A-Za-z0-9-_-.-._.]+)/commit/([a-z0-9-]+)",

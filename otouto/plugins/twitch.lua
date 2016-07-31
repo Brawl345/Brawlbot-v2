@@ -1,9 +1,5 @@
 local twitch = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 twitch.triggers = {
   "twitch.tv/([A-Za-z0-9-_-]+)"
 }

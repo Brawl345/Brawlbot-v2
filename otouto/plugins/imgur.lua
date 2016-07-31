@@ -1,9 +1,5 @@
 local imgur = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function imgur:init(config)
 	if not cred_data.imgur_client_id then
 		print('Missing config value: imgur_client_id.')

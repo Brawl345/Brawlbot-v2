@@ -3,14 +3,6 @@
 
 local gImages = {}
 
-local HTTPS = require('ssl.https')
-HTTPS.timeout = 10
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function gImages:init(config)
 	if not cred_data.google_apikey then
 		print('Missing config value: google_apikey.')
@@ -115,8 +107,8 @@ function gImages:get_image(input)
   local cseid = cred_data.google_cse_id
   local BASE_URL = 'https://www.googleapis.com/customsearch/v1'
   local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=items(link,mime,image(contextLink))'
-  local jstr, res = HTTPS.request(url)
-  local jdat = JSON.decode(jstr).items
+  local jstr, res = https.request(url)
+  local jdat = json.decode(jstr).items
   
   if not jdat then
 	return 'NORESULTS'

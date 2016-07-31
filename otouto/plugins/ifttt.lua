@@ -1,11 +1,5 @@
 local ifttt = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function ifttt:init(config)
   ifttt.triggers = {
     "^/ifttt (!set) (.*)$",

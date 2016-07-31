@@ -1,11 +1,5 @@
 local btc = {}
 
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function btc:init(config)
 	btc.triggers = {
 	  "^/btc$"

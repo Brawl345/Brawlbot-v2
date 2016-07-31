@@ -1,9 +1,6 @@
 local plugin_manager = {}
 
 local bot = require('otouto.bot')
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
 
 function plugin_manager:init(config)
 	plugin_manager.triggers = {

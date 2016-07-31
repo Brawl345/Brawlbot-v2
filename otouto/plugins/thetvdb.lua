@@ -1,9 +1,6 @@
 local tv = {}
 
-local http = require('socket.http')
-local URL = require('socket.url')
 local xml = require("xml") 
-local utilities = require('otouto.utilities')
 
 tv.command = 'tv <TV-Serie>'
 

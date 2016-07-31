@@ -1,7 +1,5 @@
 local fun = {}
 
-local utilities = require('otouto.utilities')
-
 function fun:init(config)
 	fun.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('random', true).table
 	fun.doc = [[*

@@ -1,7 +1,5 @@
 local remind = {}
 
-local utilities = require('otouto.utilities')
-
 remind.command = 'remind <Länge> <Nachricht>'
 
 function remind:init(config)

@@ -1,13 +1,5 @@
 local facebook = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function facebook:init(config)
 	if not cred_data.fb_access_token then
 		print('Missing config value: fb_access_token.')

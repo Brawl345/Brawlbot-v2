@@ -1,11 +1,5 @@
 local ninegag = {}
 
-local HTTP = require('socket.http')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 ninegag.command = '9gag'
 
 function ninegag:init(config)
@@ -20,9 +14,9 @@ end
 local url = "http://api-9gag.herokuapp.com/"
 
 function ninegag:get_9GAG()
-  local b,c = HTTP.request(url)
+  local b,c = http.request(url)
   if c ~= 200 then return nil end
-  local gag = JSON.decode(b)
+  local gag = json.decode(b)
   -- random max json table size
   local i = math.random(#gag)
   
@@ -33,9 +27,9 @@ function ninegag:get_9GAG()
 end
 
 function ninegag:inline_callback(inline_query, config)
-  local res, code = HTTP.request(url)
+  local res, code = http.request(url)
   if code ~= 200 then return end
-  local gag = JSON.decode(res)
+  local gag = json.decode(res)
   
   local results = '['
   for n in pairs(gag) do

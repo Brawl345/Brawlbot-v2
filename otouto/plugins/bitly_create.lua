@@ -1,14 +1,5 @@
 local bitly_create = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local OAuth = require "OAuth"
-local redis = (loadfile "./otouto/redis.lua")()
-
 function bitly_create:init(config)
 	if not cred_data.bitly_client_id then
 		print('Missing config value: bitly_client_id.')

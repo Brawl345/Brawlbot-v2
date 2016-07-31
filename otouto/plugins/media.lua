@@ -1,11 +1,5 @@
 local media = {}
 
-local HTTP = require('socket.http')
-local HTTPS = require('ssl.https')
-local redis = (loadfile "./otouto/redis.lua")()
-local utilities = require('otouto.utilities')
-local mimetype = (loadfile "./otouto/mimetype.lua")()
-
 media.triggers = {
     	"(https?://[%w-_%.%?%.:,/%+=&%[%]]+%.(gif))$",
     	"^(https?://[%w-_%.%?%.:,/%+=&%[%]]+%.(mp4))$",

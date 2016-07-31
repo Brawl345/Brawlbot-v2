@@ -1,9 +1,5 @@
 local banhammer = {}
 
-local bindings = require('otouto.bindings')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 banhammer.command = 'banhammer <nur für Superuser>'
 
 function banhammer:init(config)

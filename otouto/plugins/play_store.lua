@@ -1,9 +1,5 @@
 local play_store = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function play_store:init(config)
   if not cred_data.x_mashape_key then
 	print('Missing config value: x_mashape_key.')

@@ -1,8 +1,5 @@
 local quotes = {}
 
-local bot = require('otouto.bot')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
 require("./otouto/plugins/pasteee")
 
 function quotes:init(config)

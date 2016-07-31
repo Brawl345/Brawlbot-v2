@@ -1,9 +1,5 @@
 local fefe = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 fefe.triggers = {
   "blog.fefe.de/%?ts=%w%w%w%w%w%w%w%w"
 }

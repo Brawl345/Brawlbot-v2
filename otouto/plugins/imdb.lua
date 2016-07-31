@@ -1,11 +1,5 @@
 local imdb = {}
 
-local HTTP = require('socket.http')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 imdb.command = 'imdb <query>'
 
 function imdb:init(config)
@@ -29,13 +23,13 @@ function imdb:action(msg, config)
 
 	local url = 'http://www.omdbapi.com/?t=' .. URL.escape(input)
 
-	local jstr, res = HTTP.request(url)
+	local jstr, res = http.request(url)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	local jdat = JSON.decode(jstr)
+	local jdat = json.decode(jstr)
 
 	if jdat.Response ~= 'True' then
 		utilities.send_reply(self, msg, config.errors.results)

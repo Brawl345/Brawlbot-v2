@@ -2,10 +2,6 @@
 
 local gfycat = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 gfycat.triggers = {
 	"gfycat.com/([A-Za-z0-9-_-]+)"
 }

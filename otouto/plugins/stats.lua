@@ -1,8 +1,5 @@
 local stats = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function stats:init(config)
 	stats.triggers = {
     "^/([Ss]tats)$",

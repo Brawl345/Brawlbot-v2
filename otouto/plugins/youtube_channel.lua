@@ -1,9 +1,5 @@
 local youtube_channel = {}
 
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local JSON = require('dkjson')
-
 function youtube_channel:init(config)
 	if not cred_data.google_apikey then
 		print('Missing config value: google_apikey.')
@@ -30,12 +26,12 @@ function youtube_channel:get_yt_channel_data(channel_name)
   local url = BASE_URL..'/channels?part=snippet,statistics&key='..apikey..'&forUsername='..channel_name..'&fields=items%28snippet%28publishedAt,localized%28title,description%29%29,statistics%28viewCount,subscriberCount,videoCount%29%29'
   local res,code  = https.request(url)
   if code ~= 200 then return "HTTP-FEHLER" end
-  local data = JSON.decode(res).items[1]
+  local data = json.decode(res).items[1]
   if data == nil then
     local url = BASE_URL..'/channels?part=snippet,statistics&key='..apikey..'&id='..channel_name..'&fields=items%28snippet%28publishedAt,localized%28title,description%29%29,statistics%28viewCount,subscriberCount,videoCount%29%29'
     local res,code  = https.request(url)
 	if code ~= 200 then return "HTTP-FEHLER" end
-    return JSON.decode(res).items[1]
+    return json.decode(res).items[1]
   end
   return data
 end

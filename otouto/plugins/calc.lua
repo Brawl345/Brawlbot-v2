@@ -1,9 +1,5 @@
 local calc = {}
 
-local URL = require('socket.url')
-local http = require('socket.http')
-local utilities = require('otouto.utilities')
-
 calc.command = 'calc <Ausdruck>'
 
 function calc:init(config)

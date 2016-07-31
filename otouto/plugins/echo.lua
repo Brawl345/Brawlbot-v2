@@ -1,7 +1,5 @@
 local echo = {}
 
-local utilities = require('otouto.utilities')
-
 echo.command = 'echo <Text>'
 
 function echo:init(config)
@@ -35,6 +33,8 @@ function echo:action(msg)
 	local output
 	if msg.chat.type == 'supergroup' then
 	  output = '*Echo:*\n"' .. utilities.md_escape(input) .. '"'
+	  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	  return 
 	end
   utilities.send_message(self, msg.chat.id, input, true, nil, true)
   end

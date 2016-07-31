@@ -1,7 +1,5 @@
 local mc_skin = {}
 
-local utilities = require('otouto.utilities')
-
 function mc_skin:init(config)
   mc_skin.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('skin', true).table
   mc_skin.doc = [[*

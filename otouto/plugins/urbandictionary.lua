@@ -1,10 +1,5 @@
 local urbandictionary = {}
 
-local HTTP = require('socket.http')
-local URL = require('socket.url')
-local JSON = require('dkjson')
-local utilities = require('otouto.utilities')
-
 urbandictionary.command = 'urbandictionary <query>'
 
 function urbandictionary:init(config)
@@ -31,13 +26,13 @@ function urbandictionary:action(msg, config)
 
 	local url = 'http://api.urbandictionary.com/v0/define?term=' .. URL.escape(input)
 
-	local jstr, res = HTTP.request(url)
+	local jstr, res = http.request(url)
 	if res ~= 200 then
 		utilities.send_reply(self, msg, config.errors.connection)
 		return
 	end
 
-	local jdat = JSON.decode(jstr)
+	local jdat = json.decode(jstr)
 	if jdat.result_type == "no_results" then
 		utilities.send_reply(self, msg, config.errors.results)
 		return

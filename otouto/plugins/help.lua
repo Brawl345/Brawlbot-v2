@@ -3,8 +3,6 @@
 
 local help = {}
 
-local utilities = require('otouto.utilities')
-
 local help_text
 
 function help:init(config)

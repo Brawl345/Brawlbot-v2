@@ -1,9 +1,5 @@
 local xkcd = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 xkcd.command = 'xkcd [i]'
 
 function xkcd:init(config)

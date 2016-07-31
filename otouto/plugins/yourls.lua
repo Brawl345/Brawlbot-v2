@@ -1,9 +1,5 @@
 local yourls = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
-local utilities = require('otouto.utilities')
-
 function yourls:init(config)
   if not cred_data.yourls_site_url then
     print('Missing config value: yourls_site_url.')

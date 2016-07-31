@@ -1,10 +1,6 @@
 local isup = {}
 
-local http = require('socket.http')
-local https = require('ssl.https')
 local socket = require('socket')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
 
 function isup:init(config)
   isup.triggers = {

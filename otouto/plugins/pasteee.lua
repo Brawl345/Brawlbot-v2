@@ -1,8 +1,5 @@
 local pasteee = {}
 
-local bot = require('otouto.bot')
-local utilities = require('otouto.utilities')
-
 function pasteee:init(config)
 	if not cred_data.pasteee_key then
 		print('Missing config value: pasteee_key.')

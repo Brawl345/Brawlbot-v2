@@ -1,10 +1,5 @@
 local ip_info = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 function ip_info:init(config)
   ip_info.triggers = {
 	"^/ip (.*)$",

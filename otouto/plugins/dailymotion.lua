@@ -1,9 +1,5 @@
 local dailymotion = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 dailymotion.triggers = {
   "dailymotion.com/video/([A-Za-z0-9-_-]+)"
 }

@@ -1,10 +1,5 @@
 local golem = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-
 function golem:init(config)
 	if not cred_data.golem_apikey then
 		print('Missing config value: golem_apikey.')

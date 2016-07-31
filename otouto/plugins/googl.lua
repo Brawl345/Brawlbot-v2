@@ -1,9 +1,5 @@
 local googl = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function googl:init(config)
   if not cred_data.google_apikey then
     print('Missing config value: google_apikey.')

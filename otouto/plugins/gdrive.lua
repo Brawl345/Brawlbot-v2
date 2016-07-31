@@ -1,11 +1,5 @@
 local gdrive = {}
 
-local utilities = require('otouto.utilities')
-local https = require('ssl.https')
-local ltn12 = require('ltn12')
-local json = require('dkjson')
-local bindings = require('otouto.bindings')
-
 function gdrive:init(config)
 	if not cred_data.google_apikey then
 		print('Missing config value: google_apikey.')

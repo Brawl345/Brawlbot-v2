@@ -1,10 +1,5 @@
 local steam = {}
 
-local utilities = require('otouto.utilities')
-local http = require('socket.http')
-local json = require('dkjson')
-local bindings = require('otouto.bindings')
-
 steam.triggers = {
   "store.steampowered.com/app/([0-9]+)",
   "steamcommunity.com/app/([0-9]+)"

@@ -2,10 +2,6 @@
 
 local dropbox = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 dropbox.triggers = {
   "dropbox.com/s/([a-z0-9]+)/(.*)"
 }

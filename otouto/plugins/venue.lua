@@ -1,9 +1,5 @@
 local venue = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 venue.triggers = {
   '/nil'
 }

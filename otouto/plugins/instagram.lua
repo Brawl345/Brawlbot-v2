@@ -1,10 +1,5 @@
 local instagram = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 function instagram:init(config)
   if not cred_data.instagram_access_token then
 	print('Missing config value: instagram_access_token.')

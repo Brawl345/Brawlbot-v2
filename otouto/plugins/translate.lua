@@ -1,9 +1,4 @@
 local translate = {}
-
-local https = require('ssl.https')
-local URL = require('socket.url')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
 local mime = require("mime")
 require("./otouto/plugins/pasteee")
 

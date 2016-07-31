@@ -1,7 +1,6 @@
 local about = {}
 
 local bot = require('otouto.bot')
-local utilities = require('otouto.utilities')
 
 about.command = 'about'
 about.doc = '`Sendet Informationen über den Bot.`'

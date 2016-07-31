@@ -1,8 +1,5 @@
 local preview = {}
 
-local HTTP = require('socket.http')
-local utilities = require('otouto.utilities')
-
 preview.command = 'preview <link>'
 
 function preview:init(config)
@@ -27,7 +24,7 @@ function preview:action(msg)
 		input = 'http://' .. input
 	end
 
-	local res = HTTP.request(input)
+	local res = http.request(input)
 	if not res then
 		utilities.send_reply(self, msg, 'Please provide a valid link.')
 		return

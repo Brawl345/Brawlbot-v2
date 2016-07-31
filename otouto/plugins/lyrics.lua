@@ -1,9 +1,5 @@
 local lyrics = {}
 
-local http = require('socket.http')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function lyrics:init(config)
 	if not cred_data.lyricsnmusic_apikey then
 		print('Missing config value: lyricsnmusic_apikey.')

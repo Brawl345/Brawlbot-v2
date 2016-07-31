@@ -1,8 +1,5 @@
 local gMaps = {}
 
-local URL = require('socket.url')
-local utilities = require('otouto.utilities')
-
 gMaps.command = 'loc <Ort>'
 
 function gMaps:init(config)

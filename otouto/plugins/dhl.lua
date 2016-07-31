@@ -1,9 +1,5 @@
 local dhl = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-
 function dhl:init(config)
 	dhl.triggers = {
 	"/dhl (%d+)$"

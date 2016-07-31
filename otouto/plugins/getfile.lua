@@ -4,12 +4,6 @@
 
 local media_download = {}
 
-local utilities = require('otouto.utilities')
-local bindings = require('otouto.bindings')
-local ltn12 = require('ltn12')
-local HTTPS = require('ssl.https')
-local redis = (loadfile "./otouto/redis.lua")()
-
 media_download.triggers = {
   '/nil'
 }
@@ -22,7 +16,7 @@ function media_download:download_to_file_permanently(url, file_name)
     redirect = false
   }
   local response = nil
-  response = {HTTPS.request(options)}
+  response = {https.request(options)}
  
   local code = response[2]
   local headers = response[3]

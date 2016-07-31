@@ -1,10 +1,5 @@
 local bitly = {}
 
-local https = require('ssl.https')
-local json = require('dkjson')
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function bitly:init(config)
   if not cred_data.bitly_access_token then
     print('Missing config value: bitly_access_token.')

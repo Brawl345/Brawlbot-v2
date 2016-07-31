@@ -3,9 +3,6 @@
 
 local afk = {}
 
-local utilities = require('otouto.utilities')
-local redis = (loadfile "./otouto/redis.lua")()
-
 function afk:init(config)
 	afk.triggers = {
 	  "^/([A|a][F|f][K|k])$",

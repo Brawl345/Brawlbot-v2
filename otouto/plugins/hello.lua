@@ -1,7 +1,5 @@
 local hello = {}
 
-local utilities = require('otouto.utilities')
-
 hello.triggers = {
   "^[Ss][Aa][Gg] [Hh][Aa][Ll][Ll][Oo] [Zz][Uu] (.*)$"
 }

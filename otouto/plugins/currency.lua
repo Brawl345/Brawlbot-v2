@@ -1,8 +1,5 @@
 local currency = {}
 
-local HTTPS = require('ssl.https')
-local utilities = require('otouto.utilities')
-
 currency.command = 'cash [Menge] <von> <zu>'
 
 function currency:init(config)
@@ -42,7 +39,7 @@ function currency:action(msg, config)
   end
   
   local url = BASE_URL..'?from='..from..'&to='..to..'&a='..amount
-  local str, res = HTTPS.request(url)
+  local str, res = https.request(url)
   if res ~= 200 then
     utilities.send_reply(self, msg, config.errors.connection)
     return
