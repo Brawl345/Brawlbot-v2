@@ -1,7 +1,5 @@
 local isup = {}
 
-local socket = require('socket')
-
 function isup:init(config)
   isup.triggers = {
     "^/isup (.*)$",

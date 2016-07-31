@@ -6,6 +6,7 @@ local utilities = {}
 ltn12 = require('ltn12')
 http = require('socket.http')
 https = require('ssl.https')
+socket = require('socket')
 URL = require('socket.url')
 json = require('dkjson')
 serpent = require("serpent")
