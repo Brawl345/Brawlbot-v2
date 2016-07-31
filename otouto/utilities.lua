@@ -780,7 +780,7 @@ function cache_file(result, url, last_modified)
 end
 
 function get_http_header(url)
-  local doer = HTTP
+  local doer = http
   local do_redir = true
   if url:match('^https') then
 	doer = https
