@@ -90,6 +90,7 @@ function twitter:action(msg, config, matches)
     for k, v in pairs(response.entities.urls) do 
         local short = v.url
         local long = v.expanded_url
+		local long = long:gsub('%%', '%%%%')
         text = text:gsub(short, long)
     end
   end
