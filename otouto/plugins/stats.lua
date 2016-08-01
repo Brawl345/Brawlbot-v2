@@ -80,9 +80,9 @@ end
 
 function stats:pre_process(msg, self)
   -- Ignore service msg
-  if msg.service then -- check how Bot API handles service msgs, will update this
+  if is_service_msg(msg) then
     print('Service message')
-    return
+    return msg
   end
 
   if msg.left_chat_member then

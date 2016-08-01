@@ -93,6 +93,10 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 	msg = pre_process_msg(self, msg, config)
 	
+	if is_service_msg(msg) then
+	  msg = service_modify_msg(msg)
+	end
+
 	for _, plugin in ipairs(self.plugins) do
 	  match_plugins(self, msg, config, plugin)
 	end

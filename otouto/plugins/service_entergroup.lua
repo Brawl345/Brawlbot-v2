@@ -1,7 +1,8 @@
 local entergroup = {}
 
 entergroup.triggers = {
-  '/nil'
+  '^//tgservice (new_chat_member)$',
+  '^//tgservice (left_chat_member)$'
 }
 
 function entergroup:chat_new_user(msg, self)
@@ -38,17 +39,14 @@ function entergroup:chat_del_user(msg, self)
   utilities.send_reply(self, msg, text, true)
 end
 
-function entergroup:pre_process(msg, self)
-  if msg.new_chat_member then
+function entergroup:action(msg, config, matches)
+  if not is_service_msg(msg) then return end -- Bad attempt at trolling!
+  
+  if matches[1] == 'new_chat_member' then
     entergroup:chat_new_user(msg, self)
-  elseif msg.left_chat_member then
+  elseif matches[1] == 'left_chat_member'then
     entergroup:chat_del_user(msg, self)
   end
-
-  return msg
-end
-
-function entergroup:action(msg)
 end
 
 return entergroup

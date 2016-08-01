@@ -631,6 +631,62 @@ function is_sudo(msg, config)
   return var
 end
 
+function service_modify_msg(msg)
+  if msg.new_chat_member then
+	msg.text = '//tgservice new_chat_member'
+	msg.text_lower = msg.text
+  elseif msg.left_chat_member then
+	msg.text = '//tgservice left_chat_member'
+	msg.text_lower = msg.text
+  elseif msg.new_chat_title then
+	msg.text = '//tgservice new_chat_title'
+	msg.text_lower = msg.text
+  elseif msg.new_chat_photo then
+	msg.text = '//tgservice new_chat_photo'
+	msg.text_lower = msg.text
+  elseif msg.group_chat_created then
+	msg.text = '//tgservice group_chat_created'
+	msg.text_lower = msg.text
+  elseif msg.supergroup_chat_created then
+	msg.text = '//tgservice supergroup_chat_created'
+	msg.text_lower = msg.text
+  elseif msg.channel_chat_created then
+	msg.text = '//tgservice channel_chat_created'
+	msg.text_lower = msg.text
+  elseif msg.migrate_to_chat_id then
+	msg.text = '//tgservice migrate_to_chat_id'
+	msg.text_lower = msg.text
+  elseif msg.migrate_from_chat_id then
+	msg.text = '//tgservice migrate_from_chat_id'
+	msg.text_lower = msg.text
+  end
+  return msg
+end
+
+function is_service_msg(msg)
+  local var = false
+  if msg.new_chat_member then
+    var = true
+  elseif msg.left_chat_member then
+    var = true
+  elseif msg.new_chat_title then
+    var = true
+  elseif msg.new_chat_photo then
+    var = true
+  elseif msg.group_chat_created then
+    var = true
+  elseif msg.supergroup_chat_created then
+    var = true
+  elseif msg.channel_chat_created then
+    var = true
+  elseif msg.migrate_to_chat_id then
+    var = true
+  elseif msg.migrate_from_chat_id then
+    var = true
+  end
+  return var
+end
+
 function post_petition(url, arguments, headers)
    local url, h = string.gsub(url, "http://", "")
    local url, hs = string.gsub(url, "https://", "")

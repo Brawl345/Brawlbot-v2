@@ -5,9 +5,7 @@ local xml = require("xml")
 games.command = 'game <Spiel>'
 
 function games:init(config)
-  games.triggers = {
-	"^/game (.+)$"
-	}
+  games.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('game', true).table
   games.doc = [[*
 ]]..config.cmd_pat..[[game*_ <Spiel>_: Sendet Infos zum Spiel]]
 end
@@ -129,8 +127,17 @@ function games:send_game_data(game_id, self, msg)
 end
 
 
-function games:action(msg, config, matches)
-  local game = URL.escape(matches[1])
+function games:action(msg, config)
+  local game = utilities.input(msg.text)
+  if not game then
+    if msg.reply_to_message and msg.reply_to_message.text then
+      game = msg.reply_to_message.text
+    else
+	  utilities.send_message(self, msg.chat.id, fun.doc, true, msg.message_id, true)
+	  return
+	end
+  end
+
   local game_id = games:get_game_id(game)
   if not game_id then
     utilities.send_reply(self, msg, 'Spiel nicht gefunden!')
