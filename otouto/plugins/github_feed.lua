@@ -72,7 +72,7 @@ function gh_feed_check_modified(repo, cur_etag, last_date)
 	}
   }
   local ok, response_code, response_headers = https.request(request_constructor)
-  if not response_headers return nil end
+  if not response_headers then return nil end
   local data = json.decode(table.concat(response_body))
   return false, data, response_headers.etag
 end
