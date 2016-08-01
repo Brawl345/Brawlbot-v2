@@ -46,7 +46,7 @@ function notify:pre_process(msg, self)
 		    local from = string.gsub(msg.from.name, "%_", " ")
 			local chat_name = string.gsub(msg.chat.title, "%_", " ")
 		    local text = from..' am '..send_date..' in "'..chat_name..'":\n\n'..msg.text
-			utilities.send_message(self, id, text)
+			utilities.send_message(self, id, text, true)
 		  end
 	    end
 	  end
