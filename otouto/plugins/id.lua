@@ -103,7 +103,7 @@ function id:action(msg)
 	  end
     end
 	local result = id:get_member_count(self, msg, chat_id)
-	local member_count = result.result - 1 -- minus the bot
+	local member_count = result.result
 	if member_count == 1 then
 	  member_count = 'ist *1 Mitglied'
 	else
@@ -119,7 +119,7 @@ function id:action(msg)
         text = text..'*'..user.name..'* `['..user.id..']`\n'
 	  end
     end
-	utilities.send_reply(self, msg, text, true)
+	utilities.send_reply(self, msg, text..'_(Bots sind nicht gelistet)_', true)
   end
 end
 
