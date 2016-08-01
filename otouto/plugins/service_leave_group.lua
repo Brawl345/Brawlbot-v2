@@ -23,7 +23,7 @@ function leave_group:check_for_admin(msg, self, config)
   end
 end
 
-function leave_group:action(msg)
+function leave_group:action(msg, config)
   if not is_service_msg(msg) then return end -- Bad attempt at trolling!
   local admin_in_group = leave_group:check_for_admin(msg, self, config)
   if not admin_in_group then

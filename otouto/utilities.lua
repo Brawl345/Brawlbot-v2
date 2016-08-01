@@ -254,7 +254,7 @@ function utilities.trim(str)
 	return s
 end
 
--- Retruns true if the string is empty
+-- Returns true if the string is empty
 function string:isempty()
   return self == nil or self == ''
 end

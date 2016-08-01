@@ -26,7 +26,7 @@ function gSearch:googlethat(query, config)
     utilities.send_reply(self, msg, config.errors.connection)
 	return
   end
-  local data = JSON.decode(res)
+  local data = json.decode(res)
   if data.searchInformation.formattedTotalResults == "0" then return nil end
   
   local results={}
