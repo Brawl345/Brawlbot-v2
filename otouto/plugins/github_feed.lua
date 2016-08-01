@@ -72,6 +72,7 @@ function gh_feed_check_modified(repo, cur_etag, last_date)
 	}
   }
   local ok, response_code, response_headers = https.request(request_constructor)
+  if not response_headers return nil end
   local data = json.decode(table.concat(response_body))
   return false, data, response_headers.etag
 end
@@ -271,7 +272,7 @@ function gh_feed:cron(self_plz)
 	 local last_date = redis:get(gh_feed_get_base_redis(repo, "date"))
 	 local was_not_modified, data, last_etag = gh_feed_check_modified(repo, cur_etag, last_date)
 	 if not was_not_modified then
-	   if not data then return end
+	   if not data or not last_etag then return end
 	   -- When there are new commits
 	   local last_commit = redis:get(gh_feed_get_base_redis(repo, "last_commit")) 
 	   text = ''
