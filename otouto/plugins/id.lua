@@ -114,7 +114,7 @@ function id:action(msg)
 	  if table.contains(admins, tostring(user.id)) then
 	    text = text..'*'..user.name..'* `['..user.id..']` _Administrator_\n'
 	  elseif tostring(creator_id) == user.id then
-	    text = text..'*'..user.name..'* `['..user.id..']` _Gruppenersteller_\n'
+	    text = text..'*'..user.name..'* `['..user.id..']` _Gründer_\n'
 	  else
         text = text..'*'..user.name..'* `['..user.id..']`\n'
 	  end
