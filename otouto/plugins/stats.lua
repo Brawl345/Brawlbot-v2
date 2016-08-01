@@ -53,6 +53,13 @@ function stats:chat_stats(chat_id)
     local user_info = stats:get_msgs_user_chat(user_id, chat_id)
     table.insert(users_info, user_info)
   end
+  
+  -- Get total message count
+  local all_msgs = 0
+  for n, user in pairs(users_info) do
+    local msg_num = users_info[n].msgs
+	all_msgs = all_msgs + msg_num
+  end
 
   -- Sort users by msgs number
   table.sort(users_info, function(a, b) 
@@ -63,10 +70,11 @@ function stats:chat_stats(chat_id)
 
   local text = ''
   for k,user in pairs(users_info) do
-    text = text..user.name..': '..user.msgs..'\n'
+    text = text..user.name..': '..comma_value(user.msgs)..'\n'
 	text = string.gsub(text, "%_", " ") -- Bot API doesn't use underscores anymore! Yippie!
   end
   if text:isempty() then return 'Keine Stats für diesen Chat verfügbar!'end
+  local text = utilities.md_escape(text)..'\n*TOTAL*: '..comma_value(all_msgs)
   return text
 end
 
@@ -121,7 +129,7 @@ function stats:action(msg, config, matches)
         return
       else
         local chat_id = msg.chat.id
-		utilities.send_reply(self, msg, stats:chat_stats(chat_id))
+		utilities.send_reply(self, msg, stats:chat_stats(chat_id), true)
         return
       end
     end
@@ -131,7 +139,7 @@ function stats:action(msg, config, matches)
         utilities.send_reply(self, msg, config.errors.sudo)
 	    return
       else
-	    utilities.send_reply(self, msg, stats:chat_stats(matches[3]))
+	    utilities.send_reply(self, msg, stats:chat_stats(matches[3]), true)
         return
       end
     end

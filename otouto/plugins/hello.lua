@@ -5,7 +5,7 @@ hello.triggers = {
 }
 
 function hello:action(msg, config, matches)
-  utilities.send_reply(self, msg, 'Hallo, '..matches[1]..'!')
+  utilities.send_message(self, msg.chat.id, 'Hallo, '..matches[1]..'!')
 end
 
 return hello
