@@ -918,11 +918,23 @@ function makeHumanTime(totalseconds)
   local minutes = minutes % 60
   local hours = math.floor(totalseconds / 3600)
   if minutes == 00 and hours == 00 then
-    return seconds..' Sekunden'
+    if seconds == 1 then
+	  return seconds..' Sekunde'
+	else
+      return seconds..' Sekunden'
+	end
   elseif hours == 00 and minutes ~= 00 then
-    return string.format("%02d:%02d", minutes, seconds)..' Minuten'
+    if minutes == 1 then
+	  return string.format("%02d:%02d", minutes, seconds)..' Minute'
+	else
+      return string.format("%02d:%02d", minutes, seconds)..' Minuten'
+	end
   elseif hours ~= 00 then
-    return string.format("%02d:%02d:%02d", hours,  minutes, seconds)..' Stunden'
+    if hours == 1 then
+	  return string.format("%02d:%02d:%02d", hours,  minutes, seconds)..' Stunde'
+	else
+      return string.format("%02d:%02d:%02d", hours,  minutes, seconds)..' Stunden'
+	end
   end
 end
 
