@@ -8,7 +8,8 @@ http = require('socket.http')
 https = require('ssl.https')
 socket = require('socket')
 URL = require('socket.url')
-json = require "cjson"
+json = require("dkjson")
+pcall(json.use_lpeg)
 serpent = require("serpent")
 bindings = require('otouto.bindings')
 redis = (loadfile "./otouto/redis.lua")()
@@ -259,7 +260,7 @@ function string:isempty()
   return self == nil or self == ''
 end
 
--- Retruns true if the string is blank
+-- Returns true if the string is blank
 function string:isblank()
   self = self:trim()
   return self:isempty()
