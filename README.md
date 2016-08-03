@@ -29,7 +29,7 @@ Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **Lu
 * luasocket
 * luasec
 * multipart-post
-* dkjson
+* lua-cjson
 * lpeg
 * redis-lua
 * fakeredis

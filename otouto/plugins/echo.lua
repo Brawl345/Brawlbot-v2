@@ -13,7 +13,7 @@ function echo:init(config)
 end
 
 function echo:inline_callback(inline_query, config, matches)
-  local text = matches[1]  
+  local text = matches[1]
   local results = '['
 
   -- enable custom markdown button
