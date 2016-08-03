@@ -851,20 +851,62 @@ function get_http_header(url)
   return header, code
 end
 
+-- checks with If-Modified-Since header, if url has been changed
+-- URL and Last-Modified heder are required
+function was_modified_since(url, last_modified)
+  local doer = http
+  local do_redir = true
+  if url:match('^https') then
+	doer = https
+	do_redir = false
+  end
+  local _, code, header = doer.request {
+      url = url,
+      method = "HEAD",
+	  redirect = do_redir,
+      headers = {
+		["If-Modified-Since"] = last_modified
+	  }
+   }
+  if code == 304 then
+    return false, nil, code
+  else
+	if header["last-modified"] then
+	  new_last_modified = header["last-modified"]
+	elseif header["Last-Modified"] then
+	  new_last_modified = header["Last-Modified"]
+	end
+    return true, new_last_modified, code
+  end
+end
+
 -- only url is needed!
 function get_cached_file(url, file_name, receiver, chat_action, self)
   local hash = 'telegram:cache:sent_file'
   local cached_file_id = redis:hget(hash..':'..url, 'file_id')
   local cached_last_modified = redis:hget(hash..':'..url, 'last_modified')
 
+  if cached_last_modified then
+    was_modified, new_last_modified, code = was_modified_since(url, cached_last_modified)
+	if not was_modified then
+	  print('File wasn\'t modified, skipping download...')
+	  return cached_file_id, nil, true
+	else
+	  if code ~= 200 then
+		redis:del(hash..':'..url)
+		return
+	  end
+	  print('File was modified, redownloading...')
+	  if receiver and chat_action and self then
+	    utilities.send_typing(self, receiver, chat_action)
+	  end
+	  file = download_to_file(url, file_name)
+	  return file, new_last_modified, false
+	end
+  end
+
   -- get last-modified and Content-Length header
   local header, code = get_http_header(url)
-  if code ~= 200 then
-    if cached_file_id then
-      redis:del(hash..':'..url)
-	end
-    return
-  end
 
   -- file size limit is 50 MB
   if header["Content-Length"] then
@@ -878,7 +920,7 @@ function get_cached_file(url, file_name, receiver, chat_action, self)
 	  return nil
 	end
   end
-
+  
   if header["last-modified"] then
     last_modified = header["last-modified"]
   elseif header["Last-Modified"] then
@@ -896,14 +938,7 @@ function get_cached_file(url, file_name, receiver, chat_action, self)
   end
   
   if not nocache then
-    if last_modified == cached_last_modified then
-      print('File not modified and already cached')
-      nocache = true
-	  file = cached_file_id
-    else
-	  print('File cached, but modified or not already cached. (Re)downloading...')
-      file = download_to_file(url, file_name)
-    end
+    file = download_to_file(url, file_name)
   else
     print('No Last-Modified header!')
     file = download_to_file(url, file_name)

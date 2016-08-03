@@ -40,19 +40,14 @@ function media:action(msg)
   if not file then return end
 
   if ext == 'gif' then
-    print('send gif')
     result = utilities.send_document(self, receiver, file, nil, msg.message_id)
   elseif ext == 'ogg' then
-    print('send ogg')
 	result = utilities.send_voice(self, receiver, file, nil, msg.message_id)
   elseif mime_type == 'audio' then
-    print('send_audio')
     result = utilities.send_audio(self, receiver, file, nil, msg.message_id)
   elseif mime_type == 'video' then
-    print('send_video')
 	result = utilities.send_video(self, receiver, file, nil, msg.message_id)
   else
-    print('send_file')
     result = utilities.send_document(self, receiver, file, nil, msg.message_id)
   end
   
