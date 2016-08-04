@@ -122,16 +122,6 @@ function get_new_entries(last, nentries)
    return entries
 end
 
-function print_subs(id, chat_name)
-   local uhash = get_base_redis(id)
-   local subs = redis:smembers(uhash)
-   local text = '"'..chat_name..'" hat abonniert:\n---------\n'
-   for k,v in pairs(subs) do
-      text = text .. k .. ") " .. v .. '\n'
-   end
-   return text
-end
-
 function rss:subscribe(id, url)
    local baseurl, protocol = prot_url(url)
 
@@ -141,7 +131,7 @@ function rss:subscribe(id, url)
    local uhash = get_base_redis(id)
 
    if redis:sismember(uhash, baseurl) then
-      return "Du hast `"..url.."` bereits abonniert."
+      return "Du hast <code>"..url.."</code> bereits abonniert."
    end
 
    local parsed, err = get_rss(url, protocol)
@@ -161,7 +151,7 @@ function rss:subscribe(id, url)
    redis:sadd(lhash, id)
    redis:sadd(uhash, baseurl)
 
-   return "_"..name.."_ abonniert!"
+   return "<i>"..name.."</i> abonniert!"
 end
 
 function rss:unsubscribe(id, n)
@@ -189,18 +179,18 @@ function rss:unsubscribe(id, n)
       redis:del(lasthash)
    end
 
-   return "Du hast `"..sub.."` deabonniert."
+   return "Du hast <code>"..sub.."</code> deabonniert."
 end
 
 function rss:print_subs(id, chat_name)
    local uhash = get_base_redis(id)
    local subs = redis:smembers(uhash)
    if not subs[1] then
-     return 'Keine Feeds abonniert!'
+     return '<b>Keine Feeds abonniert!</b>'
    end
    local keyboard = '{"keyboard":[['
    local keyboard_buttons = ''
-   local text = '*'..chat_name..'* hat abonniert:\n---------\n'
+   local text = '<b>'..chat_name..'</b> hat abonniert:\n---------\n'
    for k,v in pairs(subs) do
       text = text .. k .. ") " .. v .. '\n'
 	  if k == #subs then
@@ -232,7 +222,7 @@ function rss:action(msg, config, matches)
 	  return
 	end
 	local output = rss:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] and matches[3] then
     if msg.from.id ~= config.admin then
@@ -246,7 +236,7 @@ function rss:action(msg, config, matches)
 	  return
 	end
 	local output = rss:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, 'HTML')
 	return
   elseif matches[1] == 'rss' and matches[2] then
     local id = '@'..matches[2]
@@ -257,7 +247,7 @@ function rss:action(msg, config, matches)
 	end
 	local chat_name = result.result.title
     local output = rss:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, 'HTML')
 	return
   end
   
@@ -273,7 +263,7 @@ function rss:action(msg, config, matches)
 	  return
     end
 	local output = rss:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(self, msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] then
     if msg.from.id ~= config.admin then
@@ -281,11 +271,11 @@ function rss:action(msg, config, matches)
 	  return
     end
 	local output = rss:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true, '{"hide_keyboard":true}')
+	utilities.send_reply(self, msg, output, 'HTML', '{"hide_keyboard":true}')
 	return
   elseif matches[1] == 'del' and not matches[2] then
     local list_subs, keyboard = rss:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, list_subs, true, keyboard)
+	utilities.send_reply(self, msg, list_subs, 'HTML', keyboard)
     return
   elseif matches[1] == 'sync' then
     if msg.from.id ~= config.admin then
@@ -297,7 +287,7 @@ function rss:action(msg, config, matches)
   end
   
   local output = rss:print_subs(id, chat_name)
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(self, msg, output, 'HTML')
   return
 end
 
@@ -342,7 +332,7 @@ function rss:cron(self_plz)
 		 else
 		   content = ''
 		 end
-		 text = text..'\n#RSS: *'..title..'*\n'..utilities.trim(utilities.md_escape(content))..' [Weiterlesen]('..link..')\n'
+		 text = text..'\n#RSS: <b>'..title..'</b>\n'..utilities.trim(content)..' <a href="'..link..'">Weiterlesen</a>\n'
       end
       if text ~= '' then
          local newlast = newentr[1].id
@@ -350,7 +340,7 @@ function rss:cron(self_plz)
          for k2, receiver in pairs(redis:smembers(v)) do
 		   local receiver = string.gsub(receiver, 'chat%#id', '')
 		   local receiver = string.gsub(receiver, 'user%#id', '')
-		   utilities.send_message(self, receiver, text, true, nil, true)
+		   utilities.send_message(self, receiver, text, true, nil, 'HTML')
          end
       end
    end

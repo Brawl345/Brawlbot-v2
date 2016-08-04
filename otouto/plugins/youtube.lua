@@ -28,13 +28,6 @@ local makeOurDate = function(dateString)
   return day..'.'..month..'.'..year
 end
 
-function markdown_escape_simple(text)
-	text = text:gsub('_', '\\_')
-	text = text:gsub('%*', '\\*')
-	text = text:gsub('`', '\\`')
-	return text
-end
-
 function get_yt_data (yt_code)
   local apikey = cred_data.google_apikey
   local url = BASE_URL..'/videos?part=snippet,statistics,contentDetails&key='..apikey..'&id='..yt_code..'&fields=items(snippet(publishedAt,channelTitle,localized(title,description),thumbnails),statistics(viewCount,likeCount,dislikeCount,commentCount),contentDetails(duration,regionRestriction(blocked)))'
@@ -99,7 +92,7 @@ function get_yt_thumbnail(data)
 end
 
 function send_youtube_data(data, msg, self, link, sendpic)
-  local title = markdown_escape_simple(data.snippet.localized.title)
+  local title = data.snippet.localized.title
   -- local description = data.snippet.localized.description
   local uploader = data.snippet.channelTitle
   local upload_date = makeOurDate(data.snippet.publishedAt)
@@ -127,13 +120,13 @@ function send_youtube_data(data, msg, self, link, sendpic)
     blocked = false
   end
   
-  text = '*'..title..'*\n_('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..likeCount..dislikeCount..commentCount..')_\n'
+  text = '<b>'..title..'</b>\n<i>('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..likeCount..dislikeCount..commentCount..')</i>\n'
   if link then
     text = link..'\n'..text
   end
   
   if blocked then
-    text = text..'\n*ACHTUNG, Video ist in Deutschland gesperrt!*'
+    text = text..'\n<b>ACHTUNG, Video ist in Deutschland gesperrt!</b>'
   end
   
   if sendpic then
@@ -146,7 +139,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
     local file = download_to_file(image_url)
 	utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
   else
-    utilities.send_reply(self, msg, text, true)
+    utilities.send_reply(self, msg, text, 'HTML')
   end
 end
 

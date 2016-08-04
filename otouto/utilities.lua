@@ -23,18 +23,28 @@ https.timeout = 5
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
 function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)
+    if use_markdown == true then
+	  use_markdown = 'Markdown'
+	elseif not use_markdown then
+	  use_markdown = nil
+	end
 	return bindings.request(self, 'sendMessage', {
 		chat_id = chat_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
 		reply_to_message_id = reply_to_message_id,
-		parse_mode = use_markdown and 'Markdown' or nil,
+		parse_mode = use_markdown,
 		reply_markup = reply_markup
 	} )
 end
 
 -- https://core.telegram.org/bots/api#editmessagetext
 function utilities:edit_message(chat_id, message_id, text, disable_web_page_preview, use_markdown, reply_markup)
+    if use_markdown == true then
+	  use_markdown = 'Markdown'
+	elseif not use_markdown then
+	  use_markdown = nil
+	end
 	return bindings.request(self, 'editMessageText', {
 		chat_id = chat_id,
 		message_id = message_id,
@@ -46,12 +56,17 @@ function utilities:edit_message(chat_id, message_id, text, disable_web_page_prev
 end
 
 function utilities:send_reply(old_msg, text, use_markdown, reply_markup)
+    if use_markdown == true then
+	  use_markdown = 'Markdown'
+	elseif not use_markdown then
+	  use_markdown = nil
+	end
 	return bindings.request(self, 'sendMessage', {
 		chat_id = old_msg.chat.id,
 		text = text,
 		disable_web_page_preview = true,
 		reply_to_message_id = old_msg.message_id,
-		parse_mode = use_markdown and 'Markdown' or nil,
+		parse_mode = use_markdown,
 		reply_markup = reply_markup
 	} )
 end

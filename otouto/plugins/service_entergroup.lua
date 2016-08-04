@@ -21,8 +21,8 @@ function entergroup:chat_new_user(msg, self)
   if msg.new_chat_member.id == self.info.id then -- don't say hello to ourselves
     return
   end
-  local text = 'Hallo '..user_name..', willkommen bei *'..chat_title..'*!'..added_by
-  utilities.send_reply(self, msg, text, true)
+  local text = 'Hallo '..user_name..', willkommen bei <b>'..chat_title..'</b>!'..added_by
+  utilities.send_reply(self, msg, text, 'HTML')
 end
 
 function entergroup:chat_del_user(msg, self)
@@ -35,8 +35,8 @@ function entergroup:chat_del_user(msg, self)
   else
     at_name = ''
   end
-  local text = user_name..' wurde von '..msg.from.first_name..at_name..' aus der Gruppe gekickt.'
-  utilities.send_reply(self, msg, text, true)
+  local text = '<b>'..user_name..'</b> wurde von <b>'..msg.from.first_name..'</b>'..at_name..' aus der Gruppe gekickt.'
+  utilities.send_reply(self, msg, text, 'HTML')
 end
 
 function entergroup:action(msg, config, matches)

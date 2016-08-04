@@ -45,7 +45,7 @@ function facebook:fb_post (id, story_id)
   local message = data.message
   local name = data.name
   if data.link then
-    link = '\n'..data.name..':\n'..utilities.md_escape(data.link)
+    link = '\n<a href="'..data.link..'">'..data.name..'</a>'
   else
     link = ""
   end
@@ -56,7 +56,7 @@ function facebook:fb_post (id, story_id)
     story = ""
   end
   
-  local text = '*'..from..'*'..story..':\n'..message..'\n'..link
+  local text = '<b>'..from..'</b>'..story..':\n'..message..'\n'..link
   return text
 end
 
@@ -66,9 +66,9 @@ function facebook:send_facebook_photo(photo_id, receiver)
   if code ~= 200 then return nil end
   local data = json.decode(res)
   
-  local from = '*'..data.from.name..'*'
+  local from = '<b>'..data.from.name..'</b>'
   if data.name then
-    text = from..' hat ein Bild gepostet:\n'..utilities.md_escape(data.name)
+    text = from..' hat ein Bild gepostet:\n'..data.name
   else
     text = from..' hat ein Bild gepostet:'
   end
@@ -82,7 +82,7 @@ function facebook:send_facebook_video(video_id)
   if code ~= 200 then return nil end
   local data = json.decode(res)
 
-  local from = '*'..data.from.name..'*'
+  local from = '<b>'..data.from.name..'</b>'
   local description = data.description or ''
   local source = data.source
   return from..' hat ein Video gepostet:\n'..description, source, data.title
@@ -123,7 +123,7 @@ function facebook:facebook_info(name)
     birth = ""
   end
   
-  local text = '*'..name..'* ('..category..')_'..about..'_'..general_info..birth
+  local text = '<b>'..name..'</b> ('..category..')<i>'..about..'</i>'..general_info..birth
   return text
 end
 
@@ -135,7 +135,7 @@ function facebook:action(msg, config, matches)
 	else
 	  id = matches[4]
 	end
-	utilities.send_reply(self, msg, facebook:fb_post(id, story_id), true)
+	utilities.send_reply(self, msg, facebook:fb_post(id, story_id), 'HTML')
     return
   elseif matches[1] == 'photo' or matches[2] == 'photos' then
     if not matches[4] then
@@ -147,7 +147,7 @@ function facebook:action(msg, config, matches)
 	if not image_url then return end
 	utilities.send_typing(self, msg.chat.id, 'upload_photo')
 	local file = download_to_file(image_url, 'photo.jpg')
-	utilities.send_reply(self, msg, text, true)
+	utilities.send_reply(self, msg, text, 'HTML')
 	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
 	return
   elseif matches[1] == 'video' or matches[2] == 'videos' then
@@ -163,10 +163,10 @@ function facebook:action(msg, config, matches)
 	  title = 'VIDEO: '..title
 	end
 	if not video_url then return end
-	utilities.send_reply(self, msg, output, true, '{"inline_keyboard":[[{"text":"'..utilities.md_escape(title)..'","url":"'..video_url..'"}]]}')
+	utilities.send_reply(self, msg, output, 'HTML', '{"inline_keyboard":[[{"text":"'..utilities.md_escape(title)..'","url":"'..video_url..'"}]]}')
 	return
   else
-    utilities.send_reply(self, msg, facebook:facebook_info(matches[1]), true)
+    utilities.send_reply(self, msg, facebook:facebook_info(matches[1]), 'HTML')
     return
   end
 end

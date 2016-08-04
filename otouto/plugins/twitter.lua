@@ -59,8 +59,7 @@ function twitter:action(msg, config, matches)
   else
     verified = ''
   end
-  -- MD: local header = 'Tweet von '..full_name..' ([@' ..user_name.. '](https://twitter.com/'..user_name..')'..verified..')\n'
-  local header = 'Tweet von '..full_name..' (@' ..user_name..verified..')\n'
+  local header = '<b>Tweet von '..full_name..'</b> (<a href="https://twitter.com/'..user_name..'">@' ..user_name..'</a>'..verified..'):'
   
   local text = response.text
   
@@ -76,11 +75,11 @@ function twitter:action(msg, config, matches)
     favorites = response.favorite_count..'x favorisiert'
   end
   if retweets == "" and favorites ~= "" then
-    footer = favorites
+    footer = '<i>'..favorites..'</i>'
   elseif retweets ~= "" and favorites == "" then
-    footer = retweets
+    footer = '<i>'..retweets..'</i>'
   elseif retweets ~= "" and favorites ~= "" then
-    footer = retweets..' - '..favorites
+    footer = '<i>'..retweets..' - '..favorites..'</i>'
   else
     footer = ""
   end
@@ -126,14 +125,13 @@ function twitter:action(msg, config, matches)
     else
 	  quoted_verified = ''
 	end
-	-- MD:	quote = 'Als Antwort auf '..quoted_name..' ([@' ..quoted_screen_name.. '](https://twitter.com/'..quoted_screen_name..')'..quoted_verified..'):\n'..quoted_text
-	quote = 'Als Antwort auf '..quoted_name..' (@' ..quoted_screen_name..quoted_verified..'):\n'..quoted_text
+	quote = '<b>Als Antwort auf '..quoted_name..'</b> (<a href="https://twitter.com/'..quoted_screen_name..'">@' ..quoted_screen_name..'</a>'..quoted_verified..'):\n'..quoted_text
 	text = text..'\n\n'..quote..'\n'
   end
   
   -- send the parts 
   local text = unescape(text)
-  utilities.send_reply(self, msg, header .. "\n" .. text.."\n"..footer)
+  utilities.send_reply(self, msg, header .. "\n" .. text.."\n"..footer, 'HTML')
   for k, v in pairs(images) do
     local file = download_to_file(v)
 	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)

@@ -82,11 +82,9 @@ function afk:pre_process(msg, self)
 	redis:hset(hash, 'afk', false)
     if afk_text then
 	  redis:hset(hash, 'afk_text', false)
-	  local afk_text = afk_text:gsub("%*","")
-	  local afk_text = afk_text:gsub("_","")
-	  utilities.send_reply(self, msg, user_name..' ist wieder da (war: *'..afk_text..'* für '..duration..')!', true, '{"hide_keyboard":true,"selective":true}')
+	  utilities.send_reply(self, msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
 	else
-	  utilities.send_reply(self, msg, user_name..' ist wieder da (war '..duration..' weg)!', false, '{"hide_keyboard":true,"selective":true}')
+	  utilities.send_reply(self, msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
 	end
   end
   

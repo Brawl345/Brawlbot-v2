@@ -5,28 +5,27 @@ function shell:init(config)
 end
 
 function shell:action(msg, config)
+  if not is_sudo(msg, config) then
+	utilities.send_reply(self, msg, config.errors.sudo)
+	return
+  end
 
-	if msg.from.id ~= config.admin then
-		utilities.send_reply(self, msg, config.errors.sudo)
-		return
-	end
+  local input = utilities.input(msg.text)
+  if not input then
+	utilities.send_reply(self, msg, 'Bitte gib ein Kommando ein.')
+	return
+  end
+  input = input:gsub('—', '--')
 
-	local input = utilities.input(msg.text)
-	input = input:gsub('—', '--')
-
-	if not input then
-		utilities.send_reply(self, msg, 'Bitte gebe ein Kommando ein.')
-		return
-	end
-
-	local output = io.popen(input):read('*all')
-	if output:len() == 0 then
-		output = 'Ausgeführt.'
-	else
-		output = '```\n' .. output .. '\n```'
-	end
-	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
-
+  local output = run_command(input)
+  if output:len() == 0 then
+	output = 'Ausgeführt.'
+  else
+	output = '<pre>\n' .. output .. '\n</pre>'
+  end
+  output = output:gsub('<pre>%\n', '<pre>')
+  output = output:gsub('%\n%\n</pre>', '</pre>')
+  utilities.send_message(self, msg.chat.id, output, true, msg.message_id, 'HTML')
 end
 
 return shell

@@ -86,17 +86,17 @@ function tagesschau_eil:cron(self_plz)
   if not data then return end
   if data.breakingnews[1] then
     if data.breakingnews[1].date ~= last_eil then
-      local title = '#EIL: *'..data.breakingnews[1].headline..'*'
+      local title = '#EIL: <b>'..data.breakingnews[1].headline..'</b>'
       local news = data.breakingnews[1].shorttext
       local posted_at = makeOurDate(data.breakingnews[1].date)..' Uhr'
 	  local post_url = string.gsub(data.breakingnews[1].details, '/api/', '/')
 	  local post_url = string.gsub(post_url, '.json', '.html')
-      local eil = title..'\n_'..posted_at..'_\n'..news
+      local eil = title..'\n<i>'..posted_at..'</i>\n'..news
       redis:set(hash..':last_entry', data.breakingnews[1].date)
 	  for _,user in pairs(redis:smembers(hash..':subs')) do
 	    local user = string.gsub(user, 'chat%#id', '')
 		local user = string.gsub(user, 'user%#id', '')
-	    utilities.send_message(self, user, eil, true, nil, true, '{"inline_keyboard":[[{"text":"Eilmeldung aufrufen","url":"'..post_url..'"}]]}')
+	    utilities.send_message(self, user, eil, true, nil, 'HTML', '{"inline_keyboard":[[{"text":"Eilmeldung aufrufen","url":"'..post_url..'"}]]}')
       end
     end
   end

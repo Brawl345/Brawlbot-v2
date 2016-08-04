@@ -30,7 +30,7 @@ function tagesschau:get_tagesschau_article(article)
   local news = data.shorttext
   local posted_at = makeOurDate(data.date)..' Uhr'
   
-  local text = '*'..title..'*\n_'..posted_at..'_\n'..news
+  local text = '<b>'..title..'</b>\n<i>'..posted_at..'</i>\n'..news
   if data.banner[1] then
     return text, data.banner[1].variants[1].modPremium, data.shortheadline, data.shorttext
   else
@@ -55,7 +55,7 @@ function tagesschau:inline_callback(inline_query, config, matches)
   end
   
   local text = text:gsub('\n', '\\n')
-  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"Markdown"}}]'
+  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}}]'
   utilities.answer_inline_query(self, inline_query, results, 7200)
 end
 
@@ -67,7 +67,7 @@ function tagesschau:action(msg, config, matches)
     local file = download_to_file(image_url)
     utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
   end
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(self, msg, text, 'HTML')
 end
 
 return tagesschau

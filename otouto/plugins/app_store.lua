@@ -68,8 +68,8 @@ function app_store:send_appstore_data(data)
   end
   
   
-  local header = '*'..name..'* v'..version..' von *'..author..'* ('..price..'):'
-  local body = '\n'..description..'\n_Benötigt mind. iOS '..min_ios_ver..'_\nGröße: '..size..' MB\nErstveröffentlicht am '..release..game_center..category
+  local header = '<b>'..name..'</b> v'..version..' von <b>'..author..'</b> ('..price..'):'
+  local body = '\n'..description..'\n<i>Benötigt mind. iOS '..min_ios_ver..'</i>\nGröße: '..size..' MB\nErstveröffentlicht am '..release..game_center..category
   local footer = '\n'..avg_rating..ratings
   local text = header..body..footer
   
@@ -96,11 +96,11 @@ function app_store:action(msg, config, matches)
   local data = app_store:get_appstore_data()
   if data == nil then print('Das Appstore-Plugin unterstützt nur Apps!') end
   if data == 'HTTP-FEHLER' or data == 'NOTFOUND' then
-    utilities.send_reply(self, msg, '*App nicht gefunden!*', true)
+    utilities.send_reply(self, msg, '<b>App nicht gefunden!</b>', 'HTML')
     return
   else
     local output, image_url = app_store:send_appstore_data(data)
-    utilities.send_reply(self, msg, output, true)
+    utilities.send_reply(self, msg, output, 'HTML')
 	if image_url then
 	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
 	  local file = download_to_file(image_url)
