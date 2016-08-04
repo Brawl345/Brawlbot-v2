@@ -50,7 +50,7 @@ function utilities:edit_message(chat_id, message_id, text, disable_web_page_prev
 		message_id = message_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
-		parse_mode = use_markdown and 'Markdown' or nil,
+		parse_mode = use_markdown,
 		reply_markup = reply_markup
 	} )
 end
