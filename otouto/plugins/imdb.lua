@@ -39,9 +39,15 @@ function imdb:inline_callback(inline_query, config, matches)
 	local movie_info = imdb:get_imdb_info(imdb_id)
     local title = movie_info.Title
 	local year = movie_info.Year
-	local description = movie_info.Plot
-	local text = '<b>'..movie_info.Title.. ' ('..movie_info.Year..')</b> von '..movie_info.Director..'\\n'..string.gsub(movie_info.imdbRating, '%.', ',')..'/10 | '..movie_info.Runtime..' | '.. movie_info.Genre..'\\n<i>' .. movie_info.Plot .. '</i>'
+	local text = '<b>'..movie_info.Title.. ' ('..movie_info.Year..')</b> von '..movie_info.Director..'\\n'..string.gsub(movie_info.imdbRating, '%.', ',')..'/10 | '..movie_info.Runtime..' | '.. movie_info.Genre
+	if movie_info.Plot then
+	  text = text..'\\n<i>'..movie_info.Plot..'</i>'
+	  description = movie_info.Plot
+	else
+	  description = 'Keine Beschreibung verfügbar'
+	end
 	local text = text:gsub('"', '\\"')
+	local text = text:gsub("'", "\'")
 
 	if movie_info.Poster == "N/A" then
 	  img_url = 'https://anditest.perseus.uberspace.de/inlineQuerys/imdb/logo.jpg'
@@ -53,7 +59,7 @@ function imdb:inline_callback(inline_query, config, matches)
   
   local results = results:sub(0, -2)
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 10000)
+  utilities.answer_inline_query(self, inline_query, results, 1)
 end
 
 function imdb:action(msg, config)
