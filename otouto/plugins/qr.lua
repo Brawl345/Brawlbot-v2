@@ -71,9 +71,9 @@ end
 
 function qr:inline_callback(inline_query, config, matches)
   local text = matches[1]
-  if string.len(text) > 200 then return end
+  if string.len(text) > 200 then utilities.answer_inline_query(self, inline_query) return end
   local image_url = qr:qr(text, nil, nil, 'jpg')
-  if not image_url then return end
+  if not image_url then utilities.answer_inline_query(self, inline_query) return end
  
   local results = '[{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"},'
   

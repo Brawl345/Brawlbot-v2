@@ -167,15 +167,15 @@ function wikipedia:inline_callback(inline_query, config, matches)
   end
   local url = 'https://'..lang..'.wikipedia.org/w/api.php?action=query&list=search&srsearch='..URL.escape(query)..'&format=json&prop=extracts&srprop=snippet'
   local res, code = https.request(url)
-  if code ~= 200 then return end
+  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
   local data = json.decode(res).query
 
-  if data.searchinfo.totalhits == 0 then return end
+  if data.searchinfo.totalhits == 0 then utilities.answer_inline_query(self, inline_query) return end
 
   local results = '['
   for num in pairs(data.search) do
     local title = data.search[num].title
-    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"input_message_content":{"message_text":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","disable_web_page_preview":true}}'
+    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"input_message_content":{"message_text":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","disable_web_page_preview":true}}'
 	if num < #data.search then
 	 results = results..','
 	end

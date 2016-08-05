@@ -147,10 +147,10 @@ function youtube:inline_callback(inline_query, config, matches)
   local query = matches[1]
   local url = BASE_URL..'/search?part=snippet&key='..apikey..'&maxResults=10&type=video&q='..URL.escape(query)..'&fields=items(id(videoId),snippet(publishedAt,title,thumbnails,channelTitle))'
   local res,code  = https.request(url)
-  if code ~= 200 then return end
+  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
 
   local data = json.decode(res)
-  if not data.items[1] then return end
+  if not data.items[1] then utilities.answer_inline_query(self, inline_query) return end
   
   local video_ids = ""
   -- We get all videoIds from search...

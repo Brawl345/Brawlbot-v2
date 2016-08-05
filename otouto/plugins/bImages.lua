@@ -57,7 +57,7 @@ function bImages:inline_callback(inline_query, config, matches)
     results = bImages:getImages(query)
   end
 
-  if not results then return end 
+  if not results then utilities.answer_inline_query(self, inline_query) return end 
   utilities.answer_inline_query(self, inline_query, results, 3600)
 end
 

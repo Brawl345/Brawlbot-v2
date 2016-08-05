@@ -30,8 +30,8 @@ function giphy:inline_callback(inline_query, config, matches)
   else
     data = giphy:get_gifs(matches[2])
   end
-  if not data then return end
-  if not data[1] then return end
+  if not data then utilities.answer_inline_query(self, inline_query) return end
+  if not data[1] then utilities.answer_inline_query(self, inline_query) return end
   local results = '['
   
   for n in pairs(data) do

@@ -138,7 +138,7 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
 
   if not config.enable_inline_for_everyone then
     local is_whitelisted = redis:get('whitelist:user#id'..inline_query.from.id)
-    if not is_whitelisted then return end
+    if not is_whitelisted then utilities.answer_inline_query(self, inline_query) return end
   end
 
   if inline_query.query:match('"') then
@@ -147,6 +147,7 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   for _, plugin in ipairs(self.plugins) do
     match_inline_plugins(self, inline_query, config, plugin)
   end
+  utilities.answer_inline_query(self, inline_query)
 end
 
 function bot:run(config)
@@ -219,8 +220,8 @@ function match_inline_plugins(self, inline_query, config, plugin)
 	if not success then
 	  print(result)
 	end
+	end
   end
-   end
 end
 
 function match_plugins(self, msg, config, plugin)

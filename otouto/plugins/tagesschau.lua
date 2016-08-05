@@ -42,7 +42,7 @@ function tagesschau:inline_callback(inline_query, config, matches)
   local article = matches[1]
   local full_url = 'http://www.tagesschau.de/'..article..'.html'
   local text, img_url, headline, shorttext = tagesschau:get_tagesschau_article(article)
-  if text == 'HTTP-Fehler' or text == 'Artikel nicht gefunden!' then return end
+  if text == 'HTTP-Fehler' or text == 'Artikel nicht gefunden!' then utilities.answer_inline_query(self, inline_query) return end
 
   if text:match('"') then
     text = text:gsub('"', '\\"')

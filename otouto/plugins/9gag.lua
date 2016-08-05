@@ -28,7 +28,7 @@ end
 
 function ninegag:inline_callback(inline_query, config)
   local res, code = http.request(url)
-  if code ~= 200 then return end
+  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
   local gag = json.decode(res)
   
   local results = '['
