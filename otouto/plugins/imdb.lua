@@ -59,7 +59,7 @@ function imdb:inline_callback(inline_query, config, matches)
   
   local results = results:sub(0, -2)
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 1)
+  utilities.answer_inline_query(self, inline_query, results, 10000)
 end
 
 function imdb:action(msg, config)
