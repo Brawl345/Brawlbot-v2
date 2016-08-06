@@ -125,12 +125,12 @@ function wikipedia:wikintro(text, lang, is_inline)
 	  local title = page.title
 	  local title_enc = URL.escape(title)
 	  if is_inline then
-	    local result = '*'..title.."*:\n"..utilities.md_escape(page.extract)
+	    local result = '<b>'..title..'</b>:\n'..page.extract
 		local result = result:gsub('\n', '\\n')
 		local result = result:gsub('"', '\\"')
         return title, result, '{"inline_keyboard":[[{"text":"Wikipedia aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
 	  else
-        return '*'..title.."*:\n"..utilities.md_escape(page.extract), '{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
+        return '*'..title..'*:\n'..utilities.md_escape(page.extract), '{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
 	  end
     else
 	  if is_inline then
@@ -191,13 +191,14 @@ function wikipedia:inline_callback(inline_query, config, matches)
   for num in pairs(data.search) do
 	local title, result, keyboard = wikipedia:wikintro(data.search[num].title, lang, true)
 	if not title or not result or not keyboard then utilities.answer_inline_query(self, inline_query) return end
-	results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"Markdown"}}'
+	results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"HTML"}}'
 	if num < #data.search then
 	 results = results..','
 	end
   end
   local results = results..']'
-  local res, err = utilities.answer_inline_query(self, inline_query, results, 3600)
+  local res, err = utilities.answer_inline_query(self, inline_query, results, 10)
+  print(results)
 end
 
 function wikipedia:action(msg, config, matches)
