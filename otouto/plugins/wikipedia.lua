@@ -107,7 +107,7 @@ function wikipedia:loadPage(text, lang, intro, plain, is_search)
 end
 
 -- extract intro passage in wiki page
-function wikipedia:wikintro(text, lang)
+function wikipedia:wikintro(text, lang, is_inline)
   local text = decodetext(text)
   local result = self:loadPage(text, lang, true, true)
 
@@ -124,13 +124,28 @@ function wikipedia:wikintro(text, lang)
 	  local lang = lang or "de"
 	  local title = page.title
 	  local title_enc = URL.escape(title)
-      return '*'..title.."*:\n"..utilities.md_escape(page.extract), '{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
+	  if is_inline then
+	    local result = '*'..title.."*:\n"..utilities.md_escape(page.extract)
+		local result = result:gsub('\n', '\\n')
+		local result = result:gsub('"', '\\"')
+        return title, result, '{"inline_keyboard":[[{"text":"Wikipedia aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
+	  else
+        return '*'..title.."*:\n"..utilities.md_escape(page.extract), '{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"https://'..lang..'.wikipedia.org/wiki/'..title_enc..'"}]]}'
+	  end
     else
-      local text = text.." nicht gefunden"
-      return text
+	  if is_inline then
+	    return nil
+	  else
+        local text = text.." nicht gefunden"
+        return text
+	  end
     end
   else
-    return "Ein Fehler ist aufgetreten."
+    if is_inline then
+	  return nil
+	else
+      return "Ein Fehler ist aufgetreten."
+	end
   end
 end
 
@@ -165,23 +180,24 @@ function wikipedia:inline_callback(inline_query, config, matches)
     lang = 'de'
 	query = matches[1]
   end
-  local url = 'https://'..lang..'.wikipedia.org/w/api.php?action=query&list=search&srsearch='..URL.escape(query)..'&format=json&prop=extracts&srprop=snippet'
-  local res, code = https.request(url)
+  
+  local search_url = 'https://'..lang..'.wikipedia.org/w/api.php?action=query&list=search&srsearch='..URL.escape(query)..'&format=json&prop=extracts&srprop=snippet&&srlimit=5'
+  local res, code = https.request(search_url)
   if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
   local data = json.decode(res).query
 
-  if data.searchinfo.totalhits == 0 then utilities.answer_inline_query(self, inline_query) return end
 
   local results = '['
   for num in pairs(data.search) do
-    local title = data.search[num].title
-    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"input_message_content":{"message_text":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","disable_web_page_preview":true}}'
+	local title, result, keyboard = wikipedia:wikintro(data.search[num].title, lang, true)
+	if not title or not result or not keyboard then utilities.answer_inline_query(self, inline_query) return end
+	results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"Markdown"}}'
 	if num < #data.search then
 	 results = results..','
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 3600)
+  local res, err = utilities.answer_inline_query(self, inline_query, results, 3600)
 end
 
 function wikipedia:action(msg, config, matches)
