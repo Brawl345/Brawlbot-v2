@@ -147,7 +147,6 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   for _, plugin in ipairs(self.plugins) do
     match_inline_plugins(self, inline_query, config, plugin)
   end
-  utilities.answer_inline_query(self, inline_query)
 end
 
 function bot:run(config)
