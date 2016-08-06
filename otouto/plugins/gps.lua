@@ -10,8 +10,24 @@ function gps:init(config)
 	"google.de/maps/place/@([^,]*)[,%s]([^,]*)",
 	"google.com/maps/place/@([^,]*)[,%s]([^,]*)"
 	}
+	gps.inline_triggers = {
+    "^gps ([^,]*)[,%s]([^,]*)$",
+	"google.de/maps/@([^,]*)[,%s]([^,]*)",
+	"google.com/maps/@([^,]*)[,%s]([^,]*)",
+	"google.de/maps/place/@([^,]*)[,%s]([^,]*)",
+	"google.com/maps/place/@([^,]*)[,%s]([^,]*)"
+	}
 	gps.doc = [[*
 ]]..config.cmd_pat..[[gps* _<Breitengrad>_,_<Längengrad>_: Sendet Karte mit diesen Koordinaten]]
+end
+
+function gps:inline_callback(inline_query, config)
+  local lat = matches[1]
+  local lon = matches[2]
+  
+  local results = '[{"type":"location","id":"'..math.random(100000000000000000)..'","latitude":'..lat..',"longitude":'..lon..',"title":"Standort"}]'
+
+  utilities.answer_inline_query(self, inline_query, results, 10000)
 end
 
 function gps:action(msg, config, matches)

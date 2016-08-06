@@ -363,24 +363,22 @@ end
 
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
 function utilities.get_coords(input, config)
+  local url = 'https://maps.googleapis.com/maps/api/geocode/json?address='..URL.escape(input)..'&language=de'
+  local jstr, res = https.request(url)
+  if res ~= 200 then
+    return config.errors.connection
+  end
 
-	local url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' .. URL.escape(input)
+  local jdat = json.decode(jstr)
+  if jdat.status == 'ZERO_RESULTS' then
+    return config.errors.results
+  end
 
-	local jstr, res = https.request(url)
-	if res ~= 200 then
-		return config.errors.connection
-	end
-
-	local jdat = json.decode(jstr)
-	if jdat.status == 'ZERO_RESULTS' then
-		return config.errors.results
-	end
-
-	return {
-		lat = jdat.results[1].geometry.location.lat,
-		lon = jdat.results[1].geometry.location.lng
-	}
-
+  return {
+	lat = jdat.results[1].geometry.location.lat,
+	lon = jdat.results[1].geometry.location.lng,
+	addr = jdat.results[1].formatted_address
+  }
 end
 
  -- Get the number of values in a key/value table.
