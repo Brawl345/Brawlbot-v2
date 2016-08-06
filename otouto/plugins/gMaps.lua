@@ -5,7 +5,7 @@ gMaps.command = 'loc <Ort>'
 function gMaps:init(config)
 	gMaps.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('loc', true).table
 	gMaps.inline_triggers = {
-	  "^loc (.*)"
+	  "^loc (.+)"
 	}
 	gMaps.doc = [[*
 ]]..config.cmd_pat..[[loc* _<Ort>_: Sendet Ort via Google Maps]]

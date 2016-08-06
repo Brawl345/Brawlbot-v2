@@ -7,6 +7,26 @@ local help_text
 
 function help:init(config)
   help.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hilfe', true):t('help', true).table
+  help.inline_triggers = {
+    "^hilfe (.+)",
+	"^help (.+)"
+  }
+end
+
+function help:inline_callback(inline_query, config)
+  local query = matches[1]
+  
+  for _,plugin in ipairs(self.plugins) do
+	if plugin.command and utilities.get_word(plugin.command, 1) == query and plugin.doc then
+	  local doc = plugin.doc
+	  local doc = doc:gsub('"', '\\"')
+	  local doc = doc:gsub('\\n', '\\\n')
+	  local chosen_plugin = utilities.get_word(plugin.command, 1)
+	  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"Hilfe für '..chosen_plugin..'","description":"Hilfe für das Plugin \\"'..chosen_plugin..'\\" wird gepostet.","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/help/hilfe.jpg","input_message_content":{"message_text":"'..doc..'","parse_mode":"Markdown"}}]'
+	  local results, err = utilities.answer_inline_query(self, inline_query, results, 600)
+	end
+  end
+  utilities.answer_inline_query(self, inline_query)
 end
 
 function help:action(msg, config)
