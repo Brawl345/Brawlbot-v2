@@ -48,6 +48,8 @@ function imdb:inline_callback(inline_query, config, matches)
 	end
 	local text = text:gsub('"', '\\"')
 	local text = text:gsub("'", "\'")
+	local description = description:gsub('"', '\\"')
+	local description = description:gsub("'", "\'")
 
 	if movie_info.Poster == "N/A" then
 	  img_url = 'https://anditest.perseus.uberspace.de/inlineQuerys/imdb/logo.jpg'
