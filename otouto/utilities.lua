@@ -11,7 +11,6 @@ URL = require('socket.url')
 json = require("dkjson")
 pcall(json.use_lpeg)
 serpent = require("serpent")
-bindings = require('otouto.bindings')
 redis = (loadfile "./otouto/redis.lua")()
 mimetype = (loadfile "./otouto/mimetype.lua")()
 OAuth = require "OAuth"
@@ -608,7 +607,7 @@ function plugins_names()
   for k, v in pairs(scandir("otouto/plugins")) do
     -- Ends with .lua
     if (v:match(".lua$")) then
-      table.insert(files, v)
+	  files[#files+1] = v
     end 
   end
   return files

@@ -128,7 +128,7 @@ end
 function gImages:cache_result(results, text)
   local cache = {}
   for v in pairs(results) do
-    table.insert(cache, results[v].link)
+    cache[v] = results[v].link
   end
   for n, link in pairs(cache) do
    redis:hset('telegram:cache:gImages:'..link, 'mime', results[n].mime)

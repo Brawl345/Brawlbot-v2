@@ -26,22 +26,12 @@ function bot:init(config) -- The function run when the bot is started or reloade
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
 
-	-- Table to cache user info (usernames, IDs, etc).
-	self.database.users = self.database.users or {}
-	-- Table to store userdata (nicknames, lastfm usernames, etc).
-	self.database.userdata = self.database.userdata or {}
-	-- Save the bot's version in the database to make migration simpler.
-	self.database.version = bot.version
-	-- Add updated bot info to the user info cache.
-	self.database.users = self.database.users or {} -- Table to cache userdata.
-	self.database.users[tostring(self.info.id)] = self.info
-
 	self.plugins = {} -- Load plugins.
 	enabled_plugins = load_plugins()
 	for k,v in pairs(enabled_plugins) do
 		local p = require('otouto.plugins.'..v)
 		-- print('loading plugin',v)
-		table.insert(self.plugins, p)
+		self.plugins[k] = p
 	    self.plugins[k].name = v
 		if p.init then p.init(self, config) end
 	end
@@ -61,18 +51,6 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	-- Cache user info for those involved.
 	
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
-
-	-- Cache user info for those involved.
-	self.database.users[tostring(msg.from.id)] = msg.from
-	if msg.reply_to_message then
-		self.database.users[tostring(msg.reply_to_message.from.id)] = msg.reply_to_message.from
-	elseif msg.forward_from then
-		self.database.users[tostring(msg.forward_from.id)] = msg.forward_from
-	elseif msg.new_chat_member then
-		self.database.users[tostring(msg.new_chat_member.id)] = msg.new_chat_member
-	elseif msg.left_chat_member then
-		self.database.users[tostring(msg.left_chat_member.id)] = msg.left_chat_member
-	end
 
 	msg = utilities.enrich_message(msg)
 
@@ -97,9 +75,10 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	  msg = service_modify_msg(msg)
 	end
 
-	for _, plugin in ipairs(self.plugins) do
-	  match_plugins(self, msg, config, plugin)
-	end
+  for n=1, #self.plugins do
+    local plugin = self.plugins[n]
+	match_plugins(self, msg, config, plugin)
+  end
 end
 
 function bot:on_callback_receive(callback, msg, config) -- whenever a new callback is received
@@ -123,7 +102,8 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
 
   msg = utilities.enrich_message(msg)
 
-  for _, plugin in ipairs(self.plugins) do
+  for n=1, #self.plugins do
+    local plugin = self.plugins[n]
 	if plugin.name == called_plugin then
 	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
 	  plugin:callback(callback, msg, self, config, param)
@@ -144,7 +124,9 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   if inline_query.query:match('"') then
     inline_query.query = inline_query.query:gsub('"', '\\"')
   end
-  for _, plugin in ipairs(self.plugins) do
+  
+  for n=1, #self.plugins do
+    local plugin = self.plugins[n]
     match_inline_plugins(self, inline_query, config, plugin)
   end
 end
@@ -155,7 +137,8 @@ function bot:run(config)
 	while self.is_started do -- Start a loop while the bot should be running.
 		local res = bindings.getUpdates(self, { timeout=20, offset = self.last_update+1 } )
 		if res then
-			for _,v in ipairs(res.result) do -- Go through every new message.
+		    for n=1, #res.result do  -- Go through every new message.
+			    local v = res.result[n]
 				self.last_update = v.update_id
 				if v.inline_query then
 				    bot.process_inline_query(self, v.inline_query, config)
@@ -172,7 +155,8 @@ function bot:run(config)
 		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
 			self.last_cron = os.date('%M')
 			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
-			for i,v in ipairs(self.plugins) do
+		    for n=1, #self.plugins do 
+			    local v = self.plugins[n]
 				if v.cron then -- Call each plugin's cron function, if it has one.
 					local result, err = pcall(function() v.cron(self, config) end)
 					if not result then
@@ -194,7 +178,8 @@ end
 
 -- Apply plugin.pre_process function
 function pre_process_msg(self, msg, config)
-  for _,plugin in ipairs(self.plugins) do
+  for n=1, #self.plugins do 
+	local plugin = self.plugins[n]
     if plugin.pre_process and msg then
 	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
 	  new_msg = plugin:pre_process(msg, self, config)
@@ -204,7 +189,9 @@ function pre_process_msg(self, msg, config)
 end
 
 function match_inline_plugins(self, inline_query, config, plugin)
-  for _, trigger in ipairs(plugin.inline_triggers or {}) do
+  local match_table = plugin.inline_triggers or {}
+  for n=1, #match_table do 
+    local trigger = plugin.inline_triggers[n]
     if string.match(string.lower(inline_query.query), trigger) then
 	local success, result = pcall(function()
 	  for k, pattern in pairs(plugin.inline_triggers) do
@@ -224,18 +211,16 @@ function match_inline_plugins(self, inline_query, config, plugin)
 end
 
 function match_plugins(self, msg, config, plugin)
-  for _, trigger in ipairs(plugin.triggers or {}) do
+  local match_table = plugin.triggers or {}
+  for n=1, #match_table do
+    local trigger = plugin.triggers[n]
     if string.match(msg.text_lower, trigger) then
 	-- Check if Plugin is disabled
 	if is_plugin_disabled_on_chat(plugin.name, msg) then return end
 	local success, result = pcall(function()
 	  -- trying to port matches to otouto
-	  for k, pattern in pairs(plugin.triggers) do
-	    matches = match_pattern(pattern, msg.text)
-		if matches then
-		  break;
-		end
-	  end
+	  local pattern = plugin.triggers[n]
+	  local matches = match_pattern(pattern, msg.text)
 	  print(plugin.name..' triggered')
 	  return plugin.action(self, msg, config, matches)
 	end)
@@ -251,14 +236,6 @@ function match_plugins(self, msg, config, plugin)
 	utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 	return
 	end
-	
-	-- If the action returns a table, make that table the new msg.
-	if type(result) == 'table' then
-	  msg = result
-	  -- If the action returns true, continue.
-	  elseif result ~= true then
-	    return
-	  end
 	end
   end
 end

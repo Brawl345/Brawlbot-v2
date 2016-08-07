@@ -51,11 +51,11 @@ function help:action(msg, config, matches)
 	local help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
 	for _,plugin in ipairs(self.plugins) do
 	  if plugin.command then
-		table.insert(commandlist, plugin.command)
+	    commandlist[#commandlist+1] = plugin.command
 	  end
 	end
 
-	table.insert(commandlist, 'hilfe [Befehl]')
+	commandlist[#commandlist+1] = 'hilfe [Befehl]'
 	table.sort(commandlist)
 	local help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
 	local help_text = help_text:gsub('%[', '\\[')

@@ -92,13 +92,11 @@ Ein Plugin kann zehn Komponenten haben, aber nur zwei werden benötigt:
 | `plugin.command`  | Einfaches Kommando mit Syntax. Wird bei `/hilfe` gelistet   | N |
 | `plugin.doc`      | Plugin-Hilfe. Wird mit `/help $kommando` gelistet  | N |
 | `plugin.error`    | Plugin-spezifische Fehlermeldung | N |
-| `plugin:callback` | Aktion, die ausgeführt wird, nachdem auf einen Callback-Button gedrückt wird. Siehe `gImages.lua` für ein Beispiel. Argumente: `callback` (enthält Callback-Daten), `msg`, `self`, `config`, `input` (enthält Parameter ohne `callback` | N |
+| `plugin:callback` | Aktion, die ausgeführt wird, nachdem auf einen Callback-Button gedrückt wird. Siehe `gImages.lua` für ein Beispiel. Argumente: `callback` (enthält Callback-Daten), `msg`, `self`, `config`, `input` (enthält Parameter ohne `callback`) | N |
 | `plugin:inline_callback` | Aktion, die ausgeführt wird, wenn der Bot per Inline-Query ausgelöst wird. Argumente sind `inline_query` für die Daten, `config` und `matches` | N |
 
 
 Die`bot:on_msg_receive` Funktion fügt einige nützte Variablen zur ` msg` Tabelle hinzu. Diese sind:`msg.from.id_str`, `msg.to.id_str`, `msg.chat.id_str`, `msg.text_lower`, `msg.from.name`.
-
-Rückgabewerte für `plugin:action` sind optional, aber wenn eine Tabelle zurückgegeben wird, wird diese die neue `msg`,-Tabelle und `on_msg_receive` wird damit fortfahren.
 
 Interaktionen mit der Bot-API sind sehr einfach. Siehe [Bindings](#bindings) für Details.
 

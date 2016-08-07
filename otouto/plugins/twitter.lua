@@ -104,14 +104,14 @@ function twitter:action(msg, config, matches)
 		if v.video_info then
 		  if not v.video_info.variants[3] then
 		    local vid = v.video_info.variants[1].url
-			table.insert(videos, vid)
+			videos[#videos+1] = vid
 		  else
 		    local vid = v.video_info.variants[3].url
-		    table.insert(videos, vid)
+			videos[#videos+1] = vid
 		  end
 		end
         text = text:gsub(url, "")
-        table.insert(images, pic)
+		images[#images+1] = pic
     end
   end
   

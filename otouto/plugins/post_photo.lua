@@ -10,7 +10,8 @@ post_photo.triggers = {
 function post_photo:pre_process(msg, self, config)
   if not msg.document then return msg end -- Ignore
   local mime_type = msg.document.mime_type
-  if mime_type ~= 'image/jpeg' and mime_type ~= 'image/png' and mime_type ~= 'image/bmp' then return msg end
+  local valid_mimetypes = {['image/jpeg'] = true, ['image/png'] = true, ['image/bmp'] = true}
+  if not valid_mimetypes[mime_type] then return msg end
 
   local file_id = msg.document.file_id
   local file_size = msg.document.file_size

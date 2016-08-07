@@ -89,7 +89,7 @@ function id:action(msg)
 	for i = 1, #users do
       local user_id = users[i]
       local user_info = id:get_user(user_id, chat_id)
-      table.insert(users_info, user_info)
+	  users_info[#users_info+1] = user_info
     end
 
 	-- get all administrators and the creator
@@ -97,7 +97,7 @@ function id:action(msg)
 	local admins = {}
 	for num in pairs(administrators.result) do
 	  if administrators.result[num].status ~= 'creator' then
-	    table.insert(admins, tostring(administrators.result[num].user.id))
+	    admins[#admins+1] = tostring(administrators.result[num].user.id)
 	  else
 	    creator_id = administrators.result[num].user.id
 	  end
