@@ -7,7 +7,7 @@ venue.triggers = {
 local apikey = cred_data.google_apikey
 
 function venue:pre_process(msg, self)
-  if not msg.venue then return end -- Ignore
+  if not msg.venue then return msg end -- Ignore
 
   local lat = msg.venue.location.latitude
   local lng = msg.venue.location.longitude

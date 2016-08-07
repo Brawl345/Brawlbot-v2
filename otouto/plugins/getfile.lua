@@ -1,6 +1,5 @@
 -- YOU NEED THE FOLLOWING FOLDERS: photo, document, video, voice
 -- PLEASE ADJUST YOUR PATH BELOW
--- Save your bot api key in redis set telegram:credentials!
 
 local media_download = {}
 
@@ -34,7 +33,7 @@ function media_download:download_to_file_permanently(url, file_name)
   return true
 end
 
-function media_download:pre_process(msg, self)
+function media_download:pre_process(msg, self, config)
   if msg.photo then
 	local lv = #msg.photo -- find biggest photo, always the last value
     file_id = msg.photo[lv].file_id
@@ -89,7 +88,7 @@ function media_download:pre_process(msg, self)
   end
   
   -- Construct what we want
-  local download_url = 'https://api.telegram.org/file/bot'..cred_data.bot_api_key..'/'..request.result.file_path
+  local download_url = 'https://api.telegram.org/file/bot'..config.bot_api_key..'/'..request.result.file_path
   local ok = media_download:download_to_file_permanently(download_url, file_path)
   if not ok then
     print('Download failed!')

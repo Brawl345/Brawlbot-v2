@@ -43,6 +43,7 @@ function facebook:fb_post (id, story_id)
   
   local from = data.from.name
   local message = data.message
+  if not message then return nil end
   local name = data.name
   if data.link then
     link = '\n<a href="'..data.link..'">'..data.name..'</a>'
