@@ -6,14 +6,19 @@ local help = {}
 local help_text
 
 function help:init(config)
-  help.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('hilfe', true):t('help', true).table
+  help.triggers = {
+    "^/hilfe (.+)",
+	"^/help (.+)",
+	"^/(hilfe)_(.+)",
+	"^/hilfe"
+  }
   help.inline_triggers = {
     "^hilfe (.+)",
 	"^help (.+)"
   }
 end
 
-function help:inline_callback(inline_query, config)
+function help:inline_callback(inline_query, config, matches)
   local query = matches[1]
   
   for _,plugin in ipairs(self.plugins) do
@@ -23,51 +28,56 @@ function help:inline_callback(inline_query, config)
 	  local doc = doc:gsub('\\n', '\\\n')
 	  local chosen_plugin = utilities.get_word(plugin.command, 1)
 	  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"Hilfe für '..chosen_plugin..'","description":"Hilfe für das Plugin \\"'..chosen_plugin..'\\" wird gepostet.","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/help/hilfe.jpg","input_message_content":{"message_text":"'..doc..'","parse_mode":"Markdown"}}]'
-	  local results, err = utilities.answer_inline_query(self, inline_query, results, 600)
+	  utilities.answer_inline_query(self, inline_query, results, 600, nil, nil, 'Hilfe anzeigen', 'hilfe_'..chosen_plugin)
 	end
   end
   utilities.answer_inline_query(self, inline_query)
 end
 
-function help:action(msg, config)
-	local commandlist = {}
-	help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
+function help:action(msg, config, matches)
+  if matches[2] then
+    input = matches[2]
+  elseif matches[1] ~= '/hilfe' then
+    input = matches[1]
+  else
+    input = nil
+  end
+  
 
+  -- Attempts to send the help message via PM.
+  -- If msg is from a group, it tells the group whether the PM was successful.
+  if not input then
+	local commandlist = {}
+	local help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
 	for _,plugin in ipairs(self.plugins) do
-		if plugin.command then
-		    
-			table.insert(commandlist, plugin.command)
-		end
+	  if plugin.command then
+		table.insert(commandlist, plugin.command)
+	  end
 	end
 
 	table.insert(commandlist, 'hilfe [Befehl]')
 	table.sort(commandlist)
-	help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
+	local help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
+	local help_text = help_text:gsub('%[', '\\[')
 
-	help_text = help_text:gsub('%[', '\\[')
-	local input = utilities.input(msg.text_lower)
-
-	-- Attempts to send the help message via PM.
-	-- If msg is from a group, it tells the group whether the PM was successful.
-	if not input then
-		local res = utilities.send_message(self, msg.from.id, help_text, true, nil, true)
-		if not res then
-			utilities.send_reply(self, msg, 'Bitte schreibe mir zuerst [privat](http://telegram.me/' .. self.info.username .. '?start=help) für eine Hilfe.', true)
-		elseif msg.chat.type ~= 'private' then
-			utilities.send_reply(self, msg, 'Ich habe dir die Hilfe per PN gesendet!.')
-		end
-		return
+	local res = utilities.send_message(self, msg.from.id, help_text, true, nil, true)
+	if not res then
+	  utilities.send_reply(self, msg, 'Bitte schreibe mir zuerst [privat](http://telegram.me/' .. self.info.username .. '?start=help) für eine Hilfe.', true)
+	elseif msg.chat.type ~= 'private' then
+	  utilities.send_reply(self, msg, 'Ich habe dir die Hilfe privat gesendet!.')
 	end
+	return
+  end
 
-	for _,plugin in ipairs(self.plugins) do
-		if plugin.command and utilities.get_word(plugin.command, 1) == input and plugin.doc then
-			local output = '*Hilfe für* _' .. utilities.get_word(plugin.command, 1) .. '_ *:*' .. plugin.doc
-			utilities.send_message(self, msg.chat.id, output, true, nil, true)
-			return
-		end
+  for _,plugin in ipairs(self.plugins) do
+    if plugin.command and utilities.get_word(plugin.command, 1) == input and plugin.doc then
+	  local output = '*Hilfe für* _' .. utilities.get_word(plugin.command, 1) .. '_ *:*' .. plugin.doc
+	  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	  return
 	end
+  end
 
-	utilities.send_reply(self, msg, 'Für diesen Befehl gibt es keine Hilfe.')
+  utilities.send_reply(self, msg, 'Für diesen Befehl gibt es keine Hilfe.')
 end
 
 return help

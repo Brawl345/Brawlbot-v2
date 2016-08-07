@@ -19,7 +19,7 @@ function gMaps:get_staticmap(area, lat, lon)
   return file
 end
 
-function gMaps:inline_callback(inline_query, config)
+function gMaps:inline_callback(inline_query, config, matches)
   local place = matches[1]
   local coords = utilities.get_coords(place, config)
   if type(coords) == 'string' then utilities.answer_inline_query(self, inline_query) return end
