@@ -69,7 +69,7 @@ function time:get_time(coords)
     utcoff = utilities.pretty_float(utcoff)
   end
   -- "%A, %d. %B %Y, %H:%M:%S Uhr"
-  local time_there = os.date('!%A, %d. %B %Y, %H:%M:%S Uhr',timestamp)
+  local time_there =  time:localize(os.date('!%A, %d. %B %Y, %H:%M:%S Uhr',timestamp))
   local output = timezoneid..':\n'..time_there
 
   return output..'\n_'..jdat.timeZoneName .. ' (UTC' .. utcoff .. ')_', place, time_there

@@ -3,7 +3,7 @@ local bot = {}
 bindings = require('otouto.bindings')
 utilities = require('otouto.utilities')
 
-bot.version = '2.2.5.1b'
+bot.version = '2.2.5.1c'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 	cred_data = load_cred()
