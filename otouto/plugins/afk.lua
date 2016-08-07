@@ -68,7 +68,7 @@ function afk:pre_process(msg, self)
   local user_id = msg.from.id
   local chat_id = msg.chat.id
   local hash =  'afk:'..chat_id..':'..user_id
-  
+  local uhash = 'user:'..user_id
   
   if afk:is_offline(hash) then
     local afk_text = afk:get_afk_text(hash)
@@ -80,11 +80,20 @@ function afk:pre_process(msg, self)
     local duration = makeHumanTime(afk_time)
    
 	redis:hset(hash, 'afk', false)
+	local show_afk_keyboard = redis:hget(uhash, 'afk_keyboard')
     if afk_text then
 	  redis:hset(hash, 'afk_text', false)
-	  utilities.send_reply(self, msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
+	  if show_afk_keyboard == 'true' then
+	    utilities.send_reply(self, msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
+	 else
+	   utilities.send_message(self, chat_id, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', true, nil, 'HTML')
+	 end
 	else
-	  utilities.send_reply(self, msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
+	  if show_afk_keyboard == 'true' then
+	    utilities.send_reply(self, msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
+	  else
+	    utilities.send_message(self, chat_id, user_name..' ist wieder da (war '..duration..' weg)!')
+	  end
 	end
   end
   

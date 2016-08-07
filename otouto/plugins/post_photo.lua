@@ -19,6 +19,7 @@ function post_photo:pre_process(msg, self, config)
 	return
   end
   
+  utilities.send_typing(self, msg.chat.id, 'upload_photo')
   -- Saving file to the Telegram Cloud
   local request = bindings.request(self, 'getFile', {
 		file_id = file_id
