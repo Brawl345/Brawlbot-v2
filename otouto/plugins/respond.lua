@@ -40,7 +40,7 @@ function respond:inline_callback(inline_query, config, matches)
   elseif string.match(text, "[Nn][Bb][Cc]") or string.match(text, "[Ii][Dd][Cc]") or string.match(text, "[Kk][Aa]") or string.match(text, "[Ii][Dd][Kk]")  then
 	face = '¯\\\\\\_(ツ)_/¯'
   end
-  results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..face..'","input_message_content":{"message_text":"'..face..'"}}]'
+  results = '[{"type":"article","id":"8","title":"'..face..'","input_message_content":{"message_text":"'..face..'"}}]'
   utilities.answer_inline_query(self, inline_query, results, 9999)
 end
 

@@ -24,7 +24,7 @@ function gMaps:inline_callback(inline_query, config, matches)
   local coords = utilities.get_coords(place, config)
   if type(coords) == 'string' then utilities.answer_inline_query(self, inline_query) return end
   
-  local results = '[{"type":"venue","id":"'..math.random(100000000000000000)..'","latitude":'..coords.lat..',"longitude":'..coords.lon..',"title":"Ort","address":"'..coords.addr..'"}]'
+  local results = '[{"type":"venue","id":"10","latitude":'..coords.lat..',"longitude":'..coords.lon..',"title":"Ort","address":"'..coords.addr..'"}]'
 
   utilities.answer_inline_query(self, inline_query, results, 10000)
 end

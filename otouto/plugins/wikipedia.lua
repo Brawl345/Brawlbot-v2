@@ -188,10 +188,12 @@ function wikipedia:inline_callback(inline_query, config, matches)
 
 
   local results = '['
+  local id = 700
   for num in pairs(data.search) do
 	local title, result, keyboard = wikipedia:wikintro(data.search[num].title, lang, true)
 	if not title or not result or not keyboard then utilities.answer_inline_query(self, inline_query) return end
-	results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"HTML"}}'
+	results = results..'{"type":"article","id":"'..id..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"HTML"}}'
+	id = id+1
 	if num < #data.search then
 	 results = results..','
 	end

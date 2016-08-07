@@ -33,9 +33,11 @@ function giphy:inline_callback(inline_query, config, matches)
   if not data then utilities.answer_inline_query(self, inline_query) return end
   if not data[1] then utilities.answer_inline_query(self, inline_query) return end
   local results = '['
-  
+  local id = 450
+ 
   for n in pairs(data) do
-    results = results..'{"type":"mpeg4_gif","id":"'..math.random(100000000000000000)..'","mpeg4_url":"'..data[n].images.original.mp4..'","thumb_url":"'..data[n].images.fixed_height.url..'","mpeg4_width":'..data[n].images.original.width..',"mp4_height":'..data[n].images.original.height..'}'
+    results = results..'{"type":"mpeg4_gif","id":"'..id..'","mpeg4_url":"'..data[n].images.original.mp4..'","thumb_url":"'..data[n].images.fixed_height.url..'","mpeg4_width":'..data[n].images.original.width..',"mp4_height":'..data[n].images.original.height..'}'
+	id = id+1
 	if n < #data then
 	 results = results..','
 	end

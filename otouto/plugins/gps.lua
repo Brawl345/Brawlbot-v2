@@ -25,7 +25,7 @@ function gps:inline_callback(inline_query, config, matches)
   local lat = matches[1]
   local lon = matches[2]
   
-  local results = '[{"type":"location","id":"'..math.random(100000000000000000)..'","latitude":'..lat..',"longitude":'..lon..',"title":"Standort"}]'
+  local results = '[{"type":"location","id":"8","latitude":'..lat..',"longitude":'..lon..',"title":"Standort"}]'
 
   utilities.answer_inline_query(self, inline_query, results, 10000)
 end

@@ -32,9 +32,11 @@ function ninegag:inline_callback(inline_query, config)
   local gag = json.decode(res)
   
   local results = '['
+  local id = 50
   for n in pairs(gag) do
     local title = gag[n].title:gsub('"', '\\"')
-    results = results..'{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..gag[n].src..'","thumb_url":"'..gag[n].src..'","caption":"'..title..'","reply_markup":{"inline_keyboard":[[{"text":"9GAG aufrufen","url":"'..gag[n].url..'"}]]}}'
+    results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..gag[n].src..'","thumb_url":"'..gag[n].src..'","caption":"'..title..'","reply_markup":{"inline_keyboard":[[{"text":"9GAG aufrufen","url":"'..gag[n].url..'"}]]}}'
+	id = id+1
 	if n < #gag then
 	 results = results..','
 	end

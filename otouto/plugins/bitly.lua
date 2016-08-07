@@ -40,7 +40,7 @@ function bitly:inline_callback(inline_query, config, matches)
   
   if not url then utilities.answer_inline_query(self, inline_query) return end
   
-  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"Verlängerte URL","description":"'..url..'","url":"'..url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/generic/internet.jpg","thumb_width":165,"thumb_height":150,"hide_url":true,"input_message_content":{"message_text":"'..url..'"}}]'
+  local results = '[{"type":"article","id":"2","title":"Verlängerte URL","description":"'..url..'","url":"'..url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/generic/internet.jpg","thumb_width":165,"thumb_height":150,"hide_url":true,"input_message_content":{"message_text":"'..url..'"}}]'
   utilities.answer_inline_query(self, inline_query, results, 3600)
 end
 

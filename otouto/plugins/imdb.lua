@@ -31,6 +31,7 @@ function imdb:inline_callback(inline_query, config, matches)
   if data.Response ~= "True" then utilities.answer_inline_query(self, inline_query) return end
   
   local results = '['
+  local id = 500
   for num in pairs(data.Search) do
     if num > 5 then
 	  break;
@@ -56,7 +57,8 @@ function imdb:inline_callback(inline_query, config, matches)
 	else
 	  img_url = movie_info.Poster
 	end
-    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..title..' ('..year..')","description":"'..description..'","url":"http://imdb.com/title/'..imdb_id..'","hide_url":true,"thumb_url":"'..img_url..'","reply_markup":{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'..imdb_id..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}},'
+    results = results..'{"type":"article","id":"'..id..'","title":"'..title..' ('..year..')","description":"'..description..'","url":"http://imdb.com/title/'..imdb_id..'","hide_url":true,"thumb_url":"'..img_url..'","reply_markup":{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'..imdb_id..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}},'
+	id = id+1
   end
   
   local results = results:sub(0, -2)

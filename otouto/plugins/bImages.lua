@@ -36,11 +36,13 @@ function bImages:getImages(query)
   
 
   local results = '['
+  local id = 300
   for n in pairs(images) do
     if images[n].encodingFormat == 'jpeg' then -- Inline-Querys MUST use JPEG photos!
       local photo_url = images[n].contentUrl
 	  local thumb_url = images[n].thumbnailUrl
-      results = results..'{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..photo_url..'","thumb_url":"'..thumb_url..'","photo_width":'..images[n].width..',"photo_height":'..images[n].height..',"reply_markup":{"inline_keyboard":[[{"text":"Bing aufrufen","url":"'..images[n].webSearchUrl..'"},{"text":"Bild öffnen","url":"'..photo_url..'"}]]}},'
+      results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..photo_url..'","thumb_url":"'..thumb_url..'","photo_width":'..images[n].width..',"photo_height":'..images[n].height..',"reply_markup":{"inline_keyboard":[[{"text":"Bing aufrufen","url":"'..images[n].webSearchUrl..'"},{"text":"Bild öffnen","url":"'..photo_url..'"}]]}},'
+	  id = id+1
 	end
   end
   

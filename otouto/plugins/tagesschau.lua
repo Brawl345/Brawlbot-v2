@@ -55,7 +55,7 @@ function tagesschau:inline_callback(inline_query, config, matches)
   end
   
   local text = text:gsub('\n', '\\n')
-  local results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}}]'
+  local results = '[{"type":"article","id":"11","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}}]'
   utilities.answer_inline_query(self, inline_query, results, 7200)
 end
 

@@ -79,13 +79,13 @@ function time:inline_callback(inline_query, config, matches)
   if matches[1] == 'time' then
     local desc_time = os.date("%A, %d. %B %Y, %H:%M:%S Uhr")
     local cur_time = time:localize(os.date("%A, %d. %B %Y, *%H:%M:%S Uhr*"))
-    results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"Europa/Berlin","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..cur_time..'","parse_mode":"Markdown"}}]'
+    results = '[{"type":"article","id":"12","title":"Europa/Berlin","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..cur_time..'","parse_mode":"Markdown"}}]'
   else
 	local coords = utilities.get_coords(matches[1], config)
 	if type(coords) == 'string' then utilities.answer_inline_query(self, inline_query) return end
 	local output, place, desc_time = time:get_time(coords)
 	if not output then utilities.answer_inline_query(self, inline_query) return end
-    results = '[{"type":"article","id":"'..math.random(100000000000000000)..'","title":"'..place..'","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..output..'","parse_mode":"Markdown"}}]'
+    results = '[{"type":"article","id":"13","title":"'..place..'","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..output..'","parse_mode":"Markdown"}}]'
   end
   utilities.answer_inline_query(self, inline_query, results, 1)
 end

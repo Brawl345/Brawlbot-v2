@@ -29,8 +29,10 @@ local apikey = cred_data.cat_apikey or "" -- apply for one here: http://thecatap
 function cats:inline_callback(inline_query, config, matches)
   if matches[1] == 'gif' then
     img_type = 'gif'
+	id = 100
   else
     img_type = 'jpg'
+	id = 200
   end
   local url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20xml%20where%20url%3D%27http%3A%2F%2Fthecatapi.com%2Fapi%2Fimages%2Fget%3Fformat%3Dxml%26results_per_page%3D50%26type%3D'..img_type..'%26apikey%3D'..apikey..'%27&format=json' -- no way I'm using XML, plz die
   local res, code  = https.request(url)
@@ -43,9 +45,11 @@ function cats:inline_callback(inline_query, config, matches)
   
   for n in pairs(data) do
     if img_type == 'gif' then
-	  results = results..'{"type":"gif","id":"'..math.random(100000000000000000)..'","gif_url":"'..data[n].url..'","thumb_url":"'..data[n].url..'"}'
+	  results = results..'{"type":"gif","id":"'..id..'","gif_url":"'..data[n].url..'","thumb_url":"'..data[n].url..'"}'
+	  id = id+1
 	else
-      results = results..'{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..data[n].url..'","thumb_url":"'..data[n].url..'"}'
+      results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..data[n].url..'","thumb_url":"'..data[n].url..'"}'
+	  id = id+1
 	end
 	if n < #data then
 	 results = results..','

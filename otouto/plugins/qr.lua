@@ -74,8 +74,10 @@ function qr:inline_callback(inline_query, config, matches)
   if string.len(text) > 200 then utilities.answer_inline_query(self, inline_query) return end
   local image_url = qr:qr(text, nil, nil, 'jpg')
   if not image_url then utilities.answer_inline_query(self, inline_query) return end
+  
+  local id = 600
  
-  local results = '[{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"},'
+  local results = '[{"type":"photo","id":"'..id..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"},'
   
   local i = 0
   while i < 29 do
@@ -83,7 +85,8 @@ function qr:inline_callback(inline_query, config, matches)
     local color = math.random(255)
 	local bgcolor = math.random(255)
     local image_url = qr:qr(text, color, bgcolor, 'jpg')
-    results = results..'{"type":"photo","id":"'..math.random(100000000000000000)..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"}'
+	id = id+1
+    results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..image_url..'","thumb_url":"'..image_url..'","photo_width":600,"photo_height":600,"caption":"'..text..'"}'
 	if i < 29 then
 	  results = results..','
 	end

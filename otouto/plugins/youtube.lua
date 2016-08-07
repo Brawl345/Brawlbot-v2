@@ -170,6 +170,7 @@ function youtube:inline_callback(inline_query, config, matches)
   if not video_results.items[1] then return end
 
   local results = '['
+  local id = 800
   for num in pairs(video_results.items) do
     local video_url = 'https://www.youtube.com/watch?v='..video_results.items[num].id
     local thumb_url = get_yt_thumbnail(video_results.items[num])
@@ -195,7 +196,8 @@ function youtube:inline_callback(inline_query, config, matches)
 	local uploader = video_results.items[num].snippet.channelTitle
 	local description = uploader..', '..viewCount..' Views, '..readable_dur..likeCount..dislikeCount..commentCount
 	
-    results = results..'{"type":"video","id":"'..math.random(100000000000000000)..'","video_url":"'..video_url..'","mime_type":"text/html","thumb_url":"'..thumb_url..'","title":"'..video_title..'","description":"'..description..'","video_duration":'..video_duration..',"input_message_content":{"message_text":"'..video_url..'"}}'
+    results = results..'{"type":"video","id":"'..id..'","video_url":"'..video_url..'","mime_type":"text/html","thumb_url":"'..thumb_url..'","title":"'..video_title..'","description":"'..description..'","video_duration":'..video_duration..',"input_message_content":{"message_text":"'..video_url..'"}}'
+	id = id+1
 	if num < #video_results.items then
 	 results = results..','
 	end

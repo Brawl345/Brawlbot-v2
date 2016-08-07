@@ -18,10 +18,10 @@ function echo:inline_callback(inline_query, config, matches)
 
   -- enable custom markdown button
   if text:match('%[.*%]%(.*%)') or text:match('%*.*%*') or text:match('_.*_') or text:match('`.*`') then
-    results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/custom.jpg","title":"Eigenes Markdown","description":"'..text..'","input_message_content":{"message_text":"'..text..'","parse_mode":"Markdown"}},'
+    results = results..'{"type":"article","id":"3","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/custom.jpg","title":"Eigenes Markdown","description":"'..text..'","input_message_content":{"message_text":"'..text..'","parse_mode":"Markdown"}},'
   end
 
-  local results = results..'{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fett.jpg","title":"Fett","description":"*'..text..'*","input_message_content":{"message_text":"<b>'..text..'</b>","parse_mode":"HTML"}},{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/kursiv.jpg","title":"Kursiv","description":"_'..text..'_","input_message_content":{"message_text":"<i>'..text..'</i>","parse_mode":"HTML"}},{"type":"article","id":"'..math.random(100000000000000000)..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fixedsys.jpg","title":"Feste Breite","description":"`'..text..'`","input_message_content":{"message_text":"<code>'..text..'</code>","parse_mode":"HTML"}}]'
+  local results = results..'{"type":"article","id":"4","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fett.jpg","title":"Fett","description":"*'..text..'*","input_message_content":{"message_text":"<b>'..text..'</b>","parse_mode":"HTML"}},{"type":"article","id":"5","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/kursiv.jpg","title":"Kursiv","description":"_'..text..'_","input_message_content":{"message_text":"<i>'..text..'</i>","parse_mode":"HTML"}},{"type":"article","id":"6","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fixedsys.jpg","title":"Feste Breite","description":"`'..text..'`","input_message_content":{"message_text":"<code>'..text..'</code>","parse_mode":"HTML"}}]'
   utilities.answer_inline_query(self, inline_query, results, 0)
 end
 
