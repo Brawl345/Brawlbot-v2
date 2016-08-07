@@ -10,7 +10,7 @@ function help:init(config)
     "^/hilfe (.+)",
 	"^/help (.+)",
 	"^/(hilfe)_(.+)",
-	"^/hilfe"
+	"^/hilfe$"
   }
   help.inline_triggers = {
     "^hilfe (.+)",
