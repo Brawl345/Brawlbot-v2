@@ -21,7 +21,8 @@ end
 function help:inline_callback(inline_query, config, matches)
   local query = matches[1]
   
-  for _,plugin in ipairs(self.plugins) do
+  for n=1, #self.plugins do
+    local plugin = self.plugins[n]
 	if plugin.command and utilities.get_word(plugin.command, 1) == query and plugin.doc then
 	  local doc = plugin.doc
 	  local doc = doc:gsub('"', '\\"')
@@ -49,7 +50,8 @@ function help:action(msg, config, matches)
   if not input then
 	local commandlist = {}
 	local help_text = '*Verfügbare Befehle:*\n• '..config.cmd_pat
-	for _,plugin in ipairs(self.plugins) do
+	for n=1, #self.plugins do
+      local plugin = self.plugins[n]
 	  if plugin.command then
 	    commandlist[#commandlist+1] = plugin.command
 	  end
@@ -69,7 +71,8 @@ function help:action(msg, config, matches)
 	return
   end
 
-  for _,plugin in ipairs(self.plugins) do
+  for n=1, #self.plugins do
+    local plugin = self.plugins[n]
     if plugin.command and utilities.get_word(plugin.command, 1) == input and plugin.doc then
 	  local output = '*Hilfe für* _' .. utilities.get_word(plugin.command, 1) .. '_ *:*' .. plugin.doc
 	  utilities.send_message(self, msg.chat.id, output, true, nil, true)

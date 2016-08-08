@@ -203,9 +203,6 @@ function match_inline_plugins(self, inline_query, config, plugin)
 	  print('Inline: '..plugin.name..' triggered')
 	  return plugin.inline_callback(self, inline_query, config, matches)
 	end)
-	if not success then
-	  print(result)
-	end
 	end
   end
 end
