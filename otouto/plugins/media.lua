@@ -22,7 +22,7 @@ media.triggers = {
 		"(https?://[%w-_%.%?%.:,/%+=&%[%]]+%.(webp))$"
 }
 
-function media:action(msg)
+function media:action(msg, config, matches)
   local url = matches[1]
   local ext = matches[2]
   local mime_type = mimetype.get_content_type_no_sub(ext)

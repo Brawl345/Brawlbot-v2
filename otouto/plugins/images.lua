@@ -5,7 +5,7 @@ images.triggers = {
   "(https?://[%w-_%%%.%?%.:,/%+=~&%[%]]+%.[Jj][Pp][Ee]?[Gg])$"
 }
 
-function images:action(msg)
+function images:action(msg, config, matches)
   local url = matches[1]
   local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, 'upload_photo', self)
   local result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
