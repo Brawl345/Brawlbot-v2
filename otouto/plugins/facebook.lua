@@ -14,7 +14,7 @@ function facebook:init(config)
       "facebook.com/([A-Za-z0-9-._-]+)/(photos)/a.(%d+[%d%.]*)/(%d+)",
       "facebook.com/(video).php%?v=(%d+)",
 	  "facebook.com/([A-Za-z0-9-._-]+)/(videos)/(%d+[%d%.]*)",
-	  "facebook.com/([A-Za-z0-9-._-]+)"
+	  "facebook.com/([A-Za-z0-9-._-]+)/?$"
 	}
 end
 

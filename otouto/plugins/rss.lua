@@ -12,7 +12,7 @@ function rss:init(config)
       "^/rss (sub) (https?://[%w-_%.%?%.:/%+=&%~]+)$",
       "^/rss (del) (%d+) @(.*)$",
       "^/rss (del) (%d+)$",
-	  "^/rss (del)",
+	  "^/rss (del)$",
       "^/rss (sync)$"	
 	}
 	rss.doc = [[*
