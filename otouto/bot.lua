@@ -222,16 +222,8 @@ function match_plugins(self, msg, config, plugin)
 	  return plugin.action(self, msg, config, matches)
 	end)
 	if not success then
-	-- If the plugin has an error message, send it. If it does
-	-- not, use the generic one specified in config. If it's set
-	-- to false, do nothing.
-	if plugin.error then
-	  utilities.send_reply(self, msg, plugin.error)
-	elseif plugin.error == nil then
-	  utilities.send_reply(self, msg, config.errors.generic, true)
-	end
-	utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
-	return
+	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	  return
 	end
 	end
   end

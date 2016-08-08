@@ -485,18 +485,14 @@ function utilities:user_from_message(msg, no_extra)
 end
 
 function utilities:handle_exception(err, message, config)
-
-	if not err then err = '' end
-
-	local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
-
-	if config.log_chat then
-		output = '```' .. output .. '```'
-		utilities.send_message(self, config.log_chat, output, true, nil, true)
-	else
-		print(output)
-	end
-
+  if not err then err = '' end
+  local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
+  if config.log_chat then
+	output = '```' .. output .. '```'
+	utilities.send_message(self, config.log_chat, output, true, nil, true)
+  else
+	print(output)
+  end
 end
 
 -- MOVED TO DOWNLOAD_TO_FILE
