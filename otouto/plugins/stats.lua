@@ -70,11 +70,12 @@ function stats:chat_stats(chat_id)
 
   local text = ''
   for k,user in pairs(users_info) do
-    text = text..user.name..': '..comma_value(user.msgs)..'\n'
-	text = string.gsub(text, "%_", " ") -- Bot API doesn't use underscores anymore! Yippie!
+    local msg_num = user.msgs
+    local percent = msg_num / all_msgs * 100
+    text = text..user.name..': '..comma_value(msg_num)..' <code>('..round(percent)..'%)</code>\n'
   end
   if text:isempty() then return 'Keine Stats für diesen Chat verfügbar!'end
-  local text = utilities.md_escape(text)..'\n*TOTAL*: '..comma_value(all_msgs)
+  local text = text..'\n<b>TOTAL</b>: '..comma_value(all_msgs)
   return text
 end
 
@@ -129,7 +130,7 @@ function stats:action(msg, config, matches)
         return
       else
         local chat_id = msg.chat.id
-		utilities.send_reply(self, msg, stats:chat_stats(chat_id), true)
+		utilities.send_reply(self, msg, stats:chat_stats(chat_id), 'HTML')
         return
       end
     end
@@ -139,7 +140,7 @@ function stats:action(msg, config, matches)
         utilities.send_reply(self, msg, config.errors.sudo)
 	    return
       else
-	    utilities.send_reply(self, msg, stats:chat_stats(matches[3]), true)
+	    utilities.send_reply(self, msg, stats:chat_stats(matches[3]), 'HTML')
         return
       end
     end
