@@ -1,5 +1,7 @@
 local forecast = {}
 
+require("./otouto/plugins/weather")
+
 function forecast:init(config)
 	if not cred_data.forecastio_apikey then
 		print('Missing config value: forecastio_apikey.')
@@ -21,6 +23,12 @@ function forecast:init(config)
 	"^(/forecasth)$",
 	"^(/forecasth) (.*)$"
 	}
+	forecast.inline_triggers = {
+	  "^(f) (.+)$",
+	  "^(fh) (.+)$",
+	  "^(fh)$",
+	  "^(f)$"
+	}
 	forecast.doc = [[*
 ]]..config.cmd_pat..[[f*:  Wettervorhersage für deinen Wohnort _(/location set <Ort>)_
 *]]..config.cmd_pat..[[f* _<Ort>_: Wettervorhersage für diesen Ort
@@ -35,39 +43,26 @@ local BASE_URL = "https://api.forecast.io/forecast"
 local apikey = cred_data.forecastio_apikey
 local google_apikey = cred_data.google_apikey
 
-function get_city_name(lat, lng)
-  local city = redis:hget('telegram:cache:weather:pretty_names', lat..','..lng)
-  if city then return city end
-  local url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='..lat..','..lng..'&result_type=political&language=de&key='..google_apikey
-  local res, code = https.request(url)
-  if code ~= 200 then return 'Unbekannte Stadt' end
-  local data = json.decode(res).results[1]
-  local city = data.formatted_address
-  print('Setting '..lat..','..lng..' in redis hash telegram:cache:weather:pretty_names to "'..city..'"')
-  redis:hset('telegram:cache:weather:pretty_names', lat..','..lng, city)
-  return city
-end
-
-function get_condition_symbol(weather, n)
-  if weather.data[n].icon == 'clear-day' then
+function forecast:get_condition_symbol(weather_data)
+  if weather_data.icon == 'clear-day' then
 	return '☀️'
-  elseif weather.data[n].icon == 'clear-night' then
+  elseif weather_data.icon == 'clear-night' then
     return '🌙'
-  elseif weather.data[n].icon == 'rain' then
+  elseif weather_data.icon == 'rain' then
     return '☔️'
-  elseif weather.data[n].icon == 'snow' then
+  elseif weather_data.icon == 'snow' then
 	return '❄️'
-  elseif weather.data[n].icon == 'sleet' then
+  elseif weather_data.icon == 'sleet' then
     return '🌨'
-  elseif weather.data[n].icon == 'wind' then
+  elseif weather_data.icon == 'wind' then
     return '💨'
-  elseif weather.data[n].icon == 'fog' then
+  elseif weather_data.icon == 'fog' then
     return '🌫'
-  elseif weather.data[n].icon == 'cloudy' then
+  elseif weather_data.icon == 'cloudy' then
     return '☁️☁️'
-  elseif weather.data[n].icon == 'partly-cloudy-day' then
+  elseif weather_data.icon == 'partly-cloudy-day' then
     return '🌤'
-  elseif weather.data[n].icon == 'partly-cloudy-night' then
+  elseif weather_data.icon == 'partly-cloudy-night' then
     return '🌙☁️'
   else
     return ''
@@ -75,22 +70,34 @@ function get_condition_symbol(weather, n)
 end
 
 function get_temp(weather, n, hourly)
+  local weather_data = weather.data[n]
   if hourly then
-    local temperature = string.gsub(round(weather.data[n].temperature, 1), "%.", ",")
-	local condition = weather.data[n].summary
-	return temperature..'°C | '..get_condition_symbol(weather, n)..' '..condition
+    local temperature = string.gsub(round(weather_data.temperature, 1), "%.", ",")
+	local condition = weather_data.summary
+	return temperature..'°C | '..forecast:get_condition_symbol(weather_data)..' '..condition
   else
-    local day = string.gsub(round(weather.data[n].temperatureMax, 1), "%.", ",")
-    local night = string.gsub(round(weather.data[n].temperatureMin, 1), "%.", ",")
-    local condition = weather.data[n].summary
-    return '☀️ '..day..'°C | 🌙 '..night..'°C | '..get_condition_symbol(weather, n)..' '..condition
+    local day = string.gsub(round(weather_data.temperatureMax, 1), "%.", ",")
+    local night = string.gsub(round(weather_data.temperatureMin, 1), "%.", ",")
+    local condition = weather_data.summary
+    return '☀️ '..day..'°C | 🌙 '..night..'°C | '..forecast:get_condition_symbol(weather_data)..' '..condition
   end
 end
 
-function forecast:get_forecast(lat, lng)
+function forecast:get_forecast(lat, lng, is_inline)
   print('Finde Wetter in '..lat..', '..lng)
-  local text = redis:get('telegram:cache:forecast:'..lat..','..lng)
-  if text then print('...aus dem Cache..') return text end
+  local hash = 'telegram:cache:forecast:'..lat..','..lng
+  local text = redis:hget(hash, 'text')
+  if text then
+    print('...aus dem Cache..')
+	if is_inline then
+	  local ttl = redis:ttl(hash)
+	  local city = redis:hget(hash, 'city')
+	  local summary = redis:hget(hash, 'summary')
+	  return city, summary, text, ttl
+	else
+	  return text
+	end
+  end
 
   local url = BASE_URL..'/'..apikey..'/'..lat..','..lng..'?lang=de&units=si&exclude=currently,minutely,hourly,alerts,flags'
   
@@ -100,43 +107,61 @@ function forecast:get_forecast(lat, lng)
       method = "GET",
       sink = ltn12.sink.table(response_body)
    }
-  local ok, response_code, response_headers, response_status_line = https.request(request_constructor)
+  local ok, response_code, response_headers = https.request(request_constructor)
   if not ok then return nil end
-  local data = json.decode(table.concat(response_body))
-  local ttl = string.sub(response_headers["cache-control"], 9)
-
-  
-  local weather = data.daily
+  local weather = json.decode(table.concat(response_body)).daily
+  local ttl = tonumber(string.sub(response_headers["cache-control"], 9))
   local city = get_city_name(lat, lng)
+  local weather_summary = weather.summary
   
-  local header = '*Vorhersage für '..city..':*\n_'..weather.summary..'_\n'
+  local header = '*Vorhersage für '..city..':*\n_'..weather_summary..'_\n'
   
   local text = '*Heute:* '..get_temp(weather, 1)
   local text = text..'\n*Morgen:* '..get_temp(weather, 2)
   
-  for day in pairs(weather.data) do
+  local weather_data = weather.data
+  for day in pairs(weather_data) do
 	if day > 2 then 
-	  text = text..'\n*'..convert_timestamp(weather.data[day].time, '%a, %d.%m')..'*: '..get_temp(weather, day)
+	  text = text..'\n*'..convert_timestamp(weather_data[day].time, '%a, %d.%m')..'*: '..get_temp(weather, day)
     end
   end
   
-  local text = string.gsub(text, "Mon", "Mo")
-  local text = string.gsub(text, "Tue", "Di")
-  local text = string.gsub(text, "Wed", "Mi")
-  local text = string.gsub(text, "Thu", "Do")
-  local text = string.gsub(text, "Fri", "Fr")
-  local text = string.gsub(text, "Sat", "Sa")
-  local text = string.gsub(text, "Sun", "So")
+  local text = text:gsub("Mon", "Mo")
+  local text = text:gsub("Tue", "Di")
+  local text = text:gsub("Wed", "Mi")
+  local text = text:gsub("Thu", "Do")
+  local text = text:gsub("Fri", "Fr")
+  local text = text:gsub("Sat", "Sa")
+  local text = text:gsub("Sun", "So")
   
-  cache_data('forecast', lat..','..lng, header..text, tonumber(ttl), 'key')
+  print('Caching data...')
+  redis:hset(hash, 'city', city)
+  redis:hset(hash, 'summary', weather_summary)
+  redis:hset(hash, 'text', header..text)
+  redis:expire(hash, ttl)
   
-  return header..text
+  if is_inline then
+    return city, weather_summary, header..text, ttl
+  else
+    return header..text
+  end
 end
 
-function forecast:get_forecast_hourly(lat, lng)
+function forecast:get_forecast_hourly(lat, lng, is_inline)
   print('Finde stündliches Wetter in '..lat..', '..lng)
-  local text = redis:get('telegram:cache:forecast:'..lat..','..lng..':hourly')
-  if text then print('...aus dem Cache..') return text end
+  local hash = 'telegram:cache:forecast:'..lat..','..lng..':hourly'
+  local text = redis:hget(hash, 'text')
+  if text then
+    print('...aus dem Cache..')
+	if is_inline then
+	  local ttl = redis:ttl(hash)
+	  local city = redis:hget(hash, 'city')
+	  local summary = redis:hget(hash, 'summary')
+	  return city, summary, text, ttl
+	else
+	  return text
+	end
+  end
 
   local url = BASE_URL..'/'..apikey..'/'..lat..','..lng..'?lang=de&units=si&exclude=currently,minutely,daily,alerts,flags'
   
@@ -146,32 +171,67 @@ function forecast:get_forecast_hourly(lat, lng)
       method = "GET",
       sink = ltn12.sink.table(response_body)
    }
-  local ok, response_code, response_headers, response_status_line = https.request(request_constructor)
+  local ok, response_code, response_headers = https.request(request_constructor)
   if not ok then return nil end
-  local data = json.decode(table.concat(response_body))
-  local ttl = string.sub(response_headers["cache-control"], 9)
-
-  
-  local weather = data.hourly
+  local weather = json.decode(table.concat(response_body)).hourly
+  local ttl = tonumber(string.sub(response_headers["cache-control"], 9))
   local city = get_city_name(lat, lng)
+  local weather_summary = weather.summary
   
-  local header = '*24-Stunden-Vorhersage für '..city..':*\n_'..weather.summary..'_'
+  local header = '*24-Stunden-Vorhersage für '..city..':*\n_'..weather_summary..'_'
   local text = ""
   
-  for hour in pairs(weather.data) do
+  local weather_data = weather.data
+  for hour in pairs(weather_data) do
 	if hour < 26 then 
-	  text = text..'\n*'..convert_timestamp(weather.data[hour].time, '%H:%M Uhr')..'* | '..get_temp(weather, hour, true)
+	  text = text..'\n*'..convert_timestamp(weather_data[hour].time, '%H:%M Uhr')..'* | '..get_temp(weather, hour, true)
 	end
   end
   
-  cache_data('forecast', lat..','..lng..':hourly', header..text, tonumber(ttl), 'key')
+  print('Caching data...')
+  redis:hset(hash, 'city', city)
+  redis:hset(hash, 'summary', weather_summary)
+  redis:hset(hash, 'text', header..text)
+  redis:expire(hash, ttl)
   
-  return header..text
+  if is_inline then
+    return city, weather_summary, header..text, ttl
+  else
+    return header..text
+  end
+end
+
+function forecast:inline_callback(inline_query, config, matches)
+  local user_id = inline_query.from.id
+  if matches[2] then
+    city = matches[2]
+	is_personal = false
+  else
+    local set_location = get_location(user_id)
+	is_personal = true
+	if not set_location then
+	  city = 'Berlin, Deutschland'
+	else
+	  city = set_location
+	end
+  end
+  
+  local lat, lng = get_city_coordinates(city, config)
+  if not lat and not lng then utilities.answer_inline_query(self, inline_query) return end
+  if matches[1] == 'f' then
+    title, description, text, ttl = forecast:get_forecast(lat, lng, true)
+  else
+    title, description, text, ttl = forecast:get_forecast_hourly(lat, lng, true)
+  end
+  if not title and not description and not text and not ttl then utilities.answer_inline_query(self, inline_query) return end
+
+  local text = text:gsub('\n', '\\n')
+  local results = '[{"type":"article","id":"28062013","title":"'..title..'","description":"'..description..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/weather/cloudy.jpg","thumb_width":80,"thumb_height":80,"input_message_content":{"message_text":"'..text..'", "parse_mode":"Markdown"}}]'
+  utilities.answer_inline_query(self, inline_query, results, ttl, is_personal)
 end
 
 function forecast:action(msg, config, matches)
   local user_id = msg.from.id
-  local city = get_location(user_id)
   
   if matches[2] then
     city = matches[2]
@@ -184,22 +244,11 @@ function forecast:action(msg, config, matches)
 	end
   end
   
-  local lat = redis:hget('telegram:cache:weather:'..string.lower(city), 'lat')
-  local lng = redis:hget('telegram:cache:weather:'..string.lower(city), 'lng')
+  local lat, lng = get_city_coordinates(city, config)
   if not lat and not lng then
-    print('Koordinaten nicht eingespeichert, frage Google...')
-    coords = utilities.get_coords(city, config)
-	lat = coords.lat
-	lng = coords.lon
-  end
-  
-  if not lat and not lng then
-    utilities.send_reply(self, msg, '*Diesen Ort gibt es nicht!*', true)
+	utilities.send_reply(self, msg, '*Diesen Ort gibt es nicht!*', true)
     return
   end
-
-  redis:hset('telegram:cache:weather:'..string.lower(city), 'lat', lat)
-  redis:hset('telegram:cache:weather:'..string.lower(city), 'lng', lng)
   
   if matches[1] == '/forecasth' or matches[1] == '/fh' then
     text = forecast:get_forecast_hourly(lat, lng)

@@ -46,7 +46,7 @@ function get_city_name(lat, lng)
   return city
 end
 
-function weather:get_city_coordinates(city, config)
+function get_city_coordinates(city, config)
   local lat = redis:hget('telegram:cache:weather:'..string.lower(city), 'lat')
   local lng = redis:hget('telegram:cache:weather:'..string.lower(city), 'lng')
   if not lat and not lng then
@@ -92,7 +92,7 @@ function weather:get_weather(lat, lng, is_inline)
       method = "GET",
       sink = ltn12.sink.table(response_body)
    }
-  local ok, response_code, response_headers, response_status_line = https.request(request_constructor)
+  local ok, response_code, response_headers = https.request(request_constructor)
   if not ok then return nil end
   local data = json.decode(table.concat(response_body))
   local ttl = tonumber(string.sub(response_headers["cache-control"], 9))
@@ -166,7 +166,7 @@ function weather:inline_callback(inline_query, config, matches)
 	  city = set_location
 	end
   end
-  local lat, lng = weather:get_city_coordinates(city, config)
+  local lat, lng = get_city_coordinates(city, config)
   if not lat and not lng then utilities.answer_inline_query(self, inline_query) return end
   
   local title, description, icon, text, ttl = weather:get_weather(lat, lng, true)
@@ -203,7 +203,7 @@ function weather:action(msg, config, matches)
 	end
   end
   
-  local lat, lng = weather:get_city_coordinates(city, config)
+  local lat, lng = get_city_coordinates(city, config)
   if not lat and not lng then
 	utilities.send_reply(self, msg, '*Diesen Ort gibt es nicht!*', true)
     return
