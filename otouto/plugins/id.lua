@@ -44,7 +44,7 @@ function id:get_user(user_id, chat_id)
   return user_info
 end
 
-function id:action(msg)
+function id:action(msg, config, matches)
 
   if matches[1] == "/id" then
 	if msg.reply_to_message then

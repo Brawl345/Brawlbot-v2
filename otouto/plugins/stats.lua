@@ -71,8 +71,8 @@ function stats:chat_stats(chat_id)
   local text = ''
   for k,user in pairs(users_info) do
     local msg_num = user.msgs
-    local percent = msg_num / all_msgs * 100
-    text = text..user.name..': '..comma_value(msg_num)..' <code>('..round(percent)..'%)</code>\n'
+	local percent = tostring(round(msg_num / all_msgs * 100, 1))
+    text = text..user.name..': '..comma_value(msg_num)..' <code>('..percent:gsub('%.', ',')..'%)</code>\n'
   end
   if text:isempty() then return 'Keine Stats für diesen Chat verfügbar!'end
   local text = text..'\n<b>TOTAL</b>: '..comma_value(all_msgs)
