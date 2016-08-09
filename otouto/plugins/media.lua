@@ -25,7 +25,7 @@ media.triggers = {
 function media:action(msg, config, matches)
   local url = matches[1]
   local ext = matches[2]
-  local mime_type = mimetype.get_content_type_no_sub(ext)
+  local mime_type = mimetype:get_content_type_no_sub(ext)
   local receiver = msg.chat.id
   
   if mime_type == 'audio' then
