@@ -794,8 +794,8 @@ function get_location(user_id)
   end
 end
 
-function cache_data(plugin, query, data, timeout, typ)
-  -- How to: cache_data(pluginname, query_name, data_to_cache, expire_in_seconds)
+function cache_data(plugin, query, data, timeout, typ, hash_field)
+  -- How to: cache_data(pluginname, query_name, data_to_cache, expire_in_seconds, type, hash_field (if hash))
   local hash = 'telegram:cache:'..plugin..':'..query
   if timeout then
     print('Caching "'..query..'" from plugin '..plugin..' (expires in '..timeout..' seconds)')
@@ -813,7 +813,7 @@ function cache_data(plugin, query, data, timeout, typ)
 	  redis:sadd(hash, str)
 	end
   else
-    redis:hmset(hash, data)
+    redis:hset(hash, hash_field, data)
   end
   if timeout then
     redis:expire(hash, timeout)
