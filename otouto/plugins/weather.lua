@@ -159,12 +159,11 @@ function weather:inline_callback(inline_query, config, matches)
 	is_personal = false
   else
     local set_location = get_location(user_id)
+	is_personal = true
 	if not set_location then
 	  city = 'Berlin, Deutschland'
-	  is_personal = false
 	else
 	  city = set_location
-	  is_personal = true
 	end
   end
   local lat, lng = weather:get_city_coordinates(city, config)
