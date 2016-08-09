@@ -156,12 +156,15 @@ function weather:inline_callback(inline_query, config, matches)
   local user_id = inline_query.from.id
   if matches[1] ~= 'w' then
     city = matches[1]
+	is_personal = false
   else
     local set_location = get_location(user_id)
 	if not set_location then
 	  city = 'Berlin, Deutschland'
+	  is_personal = false
 	else
 	  city = set_location
+	  is_personal = true
 	end
   end
   local lat, lng = weather:get_city_coordinates(city, config)
@@ -184,7 +187,7 @@ function weather:inline_callback(inline_query, config, matches)
     thumb_url = thumb_url..'cloudy.jpg'
   end
   local results = '[{"type":"article","id":"19122006","title":"'..title..'","description":"'..description..'","thumb_url":"'..thumb_url..'","thumb_width":80,"thumb_height":80,"input_message_content":{"message_text":"'..text..'", "parse_mode":"Markdown"}}]'
-  utilities.answer_inline_query(self, inline_query, results, ttl)
+  utilities.answer_inline_query(self, inline_query, results, ttl, is_personal)
 end
 
 function weather:action(msg, config, matches)
