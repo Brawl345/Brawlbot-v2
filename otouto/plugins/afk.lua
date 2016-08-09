@@ -5,8 +5,8 @@ local afk = {}
 
 function afk:init(config)
 	afk.triggers = {
-	  "^/([A|a][F|f][K|k])$",
-      "^/([A|a][F|f][K|k]) (.*)$"
+      "^/([A|a][F|f][K|k]) (.*)$",
+	  "^/([A|a][F|f][K|k])$"
 	}
 	afk.doc = [[*
 ]]..config.cmd_pat..[[afk* _[Text]_: Setzt Status auf AFK mit optionalem Text]]
@@ -100,7 +100,7 @@ function afk:pre_process(msg, self)
   return msg
 end
 
-function afk:action(msg)
+function afk:action(msg, config, matches)
   if msg.chat.type == "private" then
     utilities.send_reply(self, msg, "Mir ist's egal, ob du AFK bist ._.")
     return
