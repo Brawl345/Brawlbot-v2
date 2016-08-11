@@ -40,7 +40,7 @@ function banhammer:init(config)
 Alternativ kann auch auf die Nachricht des Users geantwortet werden, die Befehle sind dnn die obrigen ohne `user` bzw.`delete`.]]
 end
 
-function banhammer:kick_user(user_id, chat_id, self, onlykick, chat_type)
+function banhammer:kick_user(user_id, chat_id, self, onlykick)
   if user_id == tostring(our_id) then
     return "Ich werde mich nicht selbst kicken!"
   else
@@ -48,12 +48,6 @@ function banhammer:kick_user(user_id, chat_id, self, onlykick, chat_type)
 	  chat_id = chat_id,
 	  user_id = user_id
 	} )
-	if chat_type == 'supergroup' then -- directly unban the user if /kick
-	  bindings.request(self, 'unbanChatMember', {
-	    chat_id = chat_id,
-	    user_id = user_id
-	  } )
-	end
 	if onlykick then return end
     if not request then return 'User gebannt, aber kicken war nicht erfolgreich. Bin ich Administrator oder ist der User hier überhaupt?' end
     return 'User '..user_id..' gebannt!'
@@ -229,7 +223,7 @@ function banhammer:action(msg, config, matches)
 		end
 		user_id = msg.reply_to_message.from.id
 	  end
-      banhammer:kick_user(user_id, msg.chat.id, self, true, msg.chat.type)
+      banhammer:kick_user(user_id, msg.chat.id, self, true)
 	  return
     else
 	  utilities.send_reply(self, msg, 'Das ist keine Chat-Gruppe')
