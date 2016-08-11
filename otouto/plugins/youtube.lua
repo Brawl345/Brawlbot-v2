@@ -209,6 +209,10 @@ end
 function youtube:action(msg, config, matches)
   local yt_code = matches[1]
   local data = get_yt_data(yt_code)
+  if not data then
+    utilities.send_reply(self, msg, config.errors.results)
+	return
+  end
   send_youtube_data(data, msg, self)
   return
 end
