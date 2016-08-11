@@ -56,7 +56,7 @@ function twitter_user:resolve_url(url)
   end
 end
 
-function twitter_user:action(msg)
+function twitter_user:action(msg, config, matches)
   local twitter_url = "https://api.twitter.com/1.1/users/show/"..matches[1]..".json"
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
   local response = json.decode(response_body)
