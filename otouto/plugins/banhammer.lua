@@ -103,7 +103,7 @@ function banhammer:pre_process(msg, self, config)
     if banned then
       print('Banned user talking!')
       banhammer:ban_user(user_id, chat_id, self)
-      msg.text = ''
+      return
     end
   end
   
@@ -142,9 +142,7 @@ function banhammer:pre_process(msg, self, config)
     end
 
     if not allowed then
-      msg.text = ''
-	  msg.text_lower = ''
-	  msg.entities = ''
+      return
     end
 
  -- else 

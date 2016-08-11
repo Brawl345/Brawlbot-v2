@@ -70,6 +70,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	  msg.text_lower = msg.text:lower()
 	end
 	msg = pre_process_msg(self, msg, config)
+	if not msg then return end -- deleted by banning
 	
 	if is_service_msg(msg) then
 	  msg = service_modify_msg(msg)
