@@ -3,7 +3,7 @@ local bot = {}
 bindings = require('otouto.bindings')
 utilities = require('otouto.utilities')
 
-bot.version = '2.2.5.1c'
+bot.version = '2.2.6'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 	cred_data = load_cred()
@@ -305,11 +305,11 @@ function create_plugin_set()
     'about',
     'id',
     'echo',
+	'currency',
     'banhammer',
     'channels',
 	'plugins',
-    'help',
-    'greetings'
+    'help'
   }
   print ('enabling a few plugins - saving to redis set telegram:enabled_plugins')
   for _,plugin in pairs(enabled_plugins) do
