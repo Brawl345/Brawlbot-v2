@@ -18,11 +18,62 @@ end
 
 youtube_dl.command = 'mp3 <URL>, /mp4 <URL>'
 
-function youtube_dl:convert_video(id, chosen_res)
-  local ytdl_json = io.popen('youtube-dl -f '..chosen_res..' --max-filesize 49m -j https://www.youtube.com/watch/?v='..id):read('*all')
+function youtube_dl:get_availabe_formats(id, hash)
+  local ytdl_json = io.popen('youtube-dl -j https://www.youtube.com/watch/?v='..id):read('*all')
   if not ytdl_json then return end
   local data = json.decode(ytdl_json)
-  return data
+  
+  local available_formats = {}
+  redis:hset(hash, 'duration', data.duration)
+  
+  -- Building table with infos
+  for n=1, #data.formats do
+    local vid_format = data.formats[n].format
+	local format_num = vid_format:match('^(%d+) ')	 
+	local valid_nums = {['17'] = true, ['36'] = true, ['43'] = true, ['18'] = true, ['22'] = true}
+	if not vid_format:match('DASH') and valid_nums[format_num] then -- We don't want DASH videos!
+	  local format_info = {}
+	  format_info.format = format_num
+	  local hash = hash..':'..format_num
+	  if format_num == '17' then
+	    format_info.pretty_format = '144p'
+	  elseif format_num == '36' then
+	    format_info.pretty_format = '180p'
+	  elseif format_num == '43' then
+	    format_info.pretty_format = '360p WebM'
+	  elseif format_num == '18' then
+	    format_info.pretty_format = '360p MP4'
+	  elseif format_num == '22' then
+	    format_info.pretty_format = '720p'
+	  end
+	  format_info.ext = data.formats[n].ext
+	  local url = data.formats[n].url
+	  local headers = get_http_header(url)
+	  local full_url = headers.location
+	  local headers = get_http_header(full_url) -- first was for 302, this get's use the size
+	  if headers.location then -- There are some videos where there is a "chain" of 302... repeat this, until we get the LAST url!
+	    repeat
+		  headers = get_http_header(headers.location)
+		until not headers.location
+	  end
+
+	  format_info.url = full_url
+	  local size = tonumber(headers["content-length"])
+	  format_info.size = size
+	  format_info.pretty_size = string.gsub(tostring(round(size / 1048576, 2)), '%.', ',')..' MB' -- 1048576 = 1024*1024
+	  available_formats[#available_formats+1] = format_info
+	  redis:hset(hash, 'ext', format_info.ext)
+	  redis:hset(hash, 'format', format_info.pretty_format)
+	  redis:hset(hash, 'url', full_url)
+	  redis:hset(hash, 'size', size)
+	  redis:hset(hash, 'height', data.formats[n].height)
+	  redis:hset(hash, 'width', data.formats[n].width)
+	  redis:hset(hash, 'pretty_size', format_info.pretty_size)
+	  redis:expire(hash, 7889400)
+	end
+  end
+  
+  return available_formats
 end
 
 function youtube_dl:convert_audio(id)
@@ -34,45 +85,89 @@ function youtube_dl:convert_audio(id)
   return '/tmp/'..audio..'.mp3'
 end
 
-function youtube_dl:action(msg, config, matches)
-  local id = matches[2]
-  local hash = 'user:'..msg.from.id
-  local chosen_res = redis:hget(hash, 'yt_dl_res_ordner')
-  if not chosen_res then
-    chosen_res = '22/18/43/36/17'
+function youtube_dl:callback(callback, msg, self, config, input)
+  utilities.answer_callback_query(self, callback, 'Informationen werden verarbeitet...')
+  local video_id = input:match('(.+)@')
+  local vid_format = input:match('@(%d+)')
+  local hash = 'telegram:cache:youtube_dl:mp4:'..video_id
+  local format_hash = hash..':'..vid_format
+  if not redis:exists(format_hash) then
+    youtube_dl:get_availabe_formats(video_id, hash)
   end
+  
+  local duration = redis:hget(hash, 'duration')
+  local format_info = redis:hgetall(format_hash)
+
+  local full_url = format_info.url
+  local width = format_info.width
+  local height = format_info.height
+  local ext = format_info.ext
+  local pretty_size = format_info.pretty_size
+  local size = tonumber(format_info.size)
+  local format = format_info.format
+  
+  if size > 52420000 then
+    utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
+	return
+  end
+  
+  utilities.edit_message(self, msg.chat.id, msg.message_id, '<b>Video wird hochgeladen</b>', nil, 'HTML')
+  utilities.send_typing(self, msg.chat.id, 'upload_video')
+  
+  local file = download_to_file(full_url, video_id..'.'..ext)
+  if not file then return end
+  utilities.send_video(self, msg.chat.id, file, nil, msg.message_id, duration, width, height)
+  utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
+end
+
+function youtube_dl:action(msg, config, matches)
+  if msg.chat.type ~= 'private' then
+    utilities.send_reply(self, msg, 'Dieses Plugin kann nur im Privatchat benutzt werden')
+	return
+  end
+  local id = matches[2]
 
   if matches[1] == 'mp4' then
-    local first_msg = utilities.send_reply(self, msg, '<b>Video wird heruntergeladen...</b>', 'HTML')
-    utilities.send_typing(self, msg.chat.id, 'upload_video')
-    local data = youtube_dl:convert_video(id, chosen_res)
-	if not data then
-	  utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, config.errors.results)
-	  return
-	end
+    local hash = 'telegram:cache:youtube_dl:mp4:'..id
+    local first_msg = utilities.send_reply(self, msg, '<b>Verfügbare Videoformate werden ausgelesen...</b>', 'HTML')
+	local callback_keyboard = redis:hget(hash, 'keyboard')
+	if not callback_keyboard then
+	  utilities.send_typing(self, msg.chat.id, 'typing')
+      local available_formats = youtube_dl:get_availabe_formats(id, hash)
+	  if not available_formats then
+	    utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, config.errors.results)
+	    return
+	  end
 
-    local ext = data.ext
-    local resolution = data.resolution
-    local url = data.url
-    local headers = get_http_header(url) -- need to get full url, because first url is actually a 302
-    local full_url = headers.location
-	if not full_url then
-	  utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, config.errors.connection)
-	  return
+	  local callback_buttons = {}
+	  for n=1, #available_formats do
+        local video = available_formats[n]
+	    local format = video.format
+	    local size = video.size
+	    local pretty_size = video.pretty_size
+	    if size > 52420000 then
+	      pretty_format = video.pretty_format..' ('..pretty_size..', nur Link)'
+	    else
+	      pretty_format = video.pretty_format..' ('..pretty_size..')'
+	    end
+	    local button = '{"text":"'..pretty_format..'","callback_data":"@'..self.info.username..' youtube_dl:'..id..'@'..format..'"}'
+	    callback_buttons[#callback_buttons+1] = button
+	  end
+	
+	  local keyboard = '{"inline_keyboard":['
+	  for button in pairs(callback_buttons) do
+	    keyboard = keyboard..'['..callback_buttons[button]..']'
+		if button < #callback_buttons then
+		  keyboard = keyboard..','
+		end
+	  end
+	  
+	  callback_keyboard = keyboard..']}'
+	  redis:hset(hash, 'keyboard', callback_keyboard)
+	  redis:expire(hash, 7889400)
 	end
-
-    local headers = get_http_header(full_url) -- YES TWO FCKING HEAD REQUESTS
-    if tonumber(headers["content-length"]) > 52420000 then
-	  utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, '<b>Das Video überschreitet die Grenze von 50 MB!</b>\n<a href="'..full_url..'">Direktlink zum Video</a> ('..resolution..')', nil, 'HTML')
-	  return
-    end
-    local file = download_to_file(full_url, id..'.'..ext)
-	local width = data.width
-	local height = data.width
-	local duration = data.duration
-	utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..resolution..')', nil, 'HTML')
-	utilities.send_video(self, msg.chat.id, file, nil, msg.message_id, duration, width, height)
-    return
+	utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, 'Wähle die gewünschte Auflösung.', nil, nil, callback_keyboard)
+	return
   end
   
   if matches[1] == 'mp3' then
