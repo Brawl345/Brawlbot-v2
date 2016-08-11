@@ -3,11 +3,11 @@ local youtube_dl = {}
 function youtube_dl:init(config)
   youtube_dl.triggers = {
 	"^/(mp4) https?://w?w?w?%.?youtu.be/([A-Za-z0-9-_-]+)",
-	"^/(mp4) https?://w?w?w?%.?youtube.com/embed/([A-Za-z0-9-_-]+)",
-	"^/(mp4) https?://w?w?w?%.?youtube.com/watch%?v=([A-Za-z0-9-_-]+)",
-	"^/(mp3) https?://w?w?w?%.?youtu.be/([A-Za-z0-9-_-]+)",
-	"^/(mp3) https?://w?w?w?%.?youtube.com/embed/([A-Za-z0-9-_-]+)",
-	"^/(mp3) https?://w?w?w?%.?youtube.com/watch%?v=([A-Za-z0-9-_-]+)"
+	"^/(mp4) https?://w?w?w?m?%.?youtube.com/embed/([A-Za-z0-9-_-]+)",
+	"^/(mp4) https?://w?w?w?m?%.?youtube.com/watch%?v=([A-Za-z0-9-_-]+)",
+	"^/(mp3) https?://w?w?w?m?%.?youtu.be/([A-Za-z0-9-_-]+)",
+	"^/(mp3) https?://w?w?w?m?%.?youtube.com/embed/([A-Za-z0-9-_-]+)",
+	"^/(mp3) https?://w?w?w?m?%.?youtube.com/watch%?v=([A-Za-z0-9-_-]+)"
   }
 	
   youtube_dl.doc = [[*
