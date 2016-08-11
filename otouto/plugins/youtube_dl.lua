@@ -18,8 +18,8 @@ end
 
 youtube_dl.command = 'mp3 <URL>, /mp4 <URL>'
 
-function youtube_dl:convert_video(id)
-  local ytdl_json = io.popen('youtube-dl -f 22/43/18/36/17 --max-filesize 49m -j https://www.youtube.com/watch/?v='..id):read('*all')
+function youtube_dl:convert_video(id, chosen_res)
+  local ytdl_json = io.popen('youtube-dl -f '..chosen_res..' --max-filesize 49m -j https://www.youtube.com/watch/?v='..id):read('*all')
   if not ytdl_json then return end
   local data = json.decode(ytdl_json)
   return data
@@ -36,11 +36,16 @@ end
 
 function youtube_dl:action(msg, config, matches)
   local id = matches[2]
+  local hash = 'user:'..msg.from.id
+  local chosen_res = redis:hget(hash, 'yt_dl_res_ordner')
+  if not chosen_res then
+    chosen_res = '22/18/43/36/17'
+  end
 
   if matches[1] == 'mp4' then
     local first_msg = utilities.send_reply(self, msg, '<b>Video wird heruntergeladen...</b>', 'HTML')
     utilities.send_typing(self, msg.chat.id, 'upload_video')
-    local data = youtube_dl:convert_video(id)
+    local data = youtube_dl:convert_video(id, chosen_res)
 	if not data then
 	  utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, config.errors.results)
 	  return
