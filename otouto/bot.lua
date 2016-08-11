@@ -70,6 +70,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	  msg.text_lower = msg.text:lower()
 	end
 	msg = pre_process_msg(self, msg, config)
+	if not msg then return end -- deleted by banning
 	
 	if is_service_msg(msg) then
 	  msg = service_modify_msg(msg)
@@ -94,6 +95,41 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   if not callback.data:find(':') or not callback.data:find('@'..self.info.username..' ') then
 	return
   end
+
+  -- Check if user is blocked
+  local user_id = callback.from.id
+  local chat_id = msg.chat.id
+  if redis:get('blocked:'..user_id) then
+    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+	return
+  end
+ 
+  -- Check if user is banned
+  local banned = redis:get('banned:'..chat_id..':'..user_id)
+  if banned then
+    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+	return
+  end
+  
+  -- Check if whitelist is enabled and user/chat is whitelisted
+  local whitelist = redis:get('whitelist:enabled')
+  if whitelist and not is_sudo(msg, config) then
+	local hash = 'whitelist:user#id'..user_id
+	local allowed = redis:get(hash) or false
+	if not allowed then
+      if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
+        local allowed = redis:get('whitelist:chat#id'.. chat_id)
+	    if not allowed then
+	      utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+		  return
+	    end
+	  else
+	    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+		return
+	  end
+	end
+  end
+  
   callback.data = string.gsub(callback.data, '@'..self.info.username..' ', "")
   local called_plugin = callback.data:match('(.*):.*')
   local param = callback.data:sub(callback.data:find(':')+1)
@@ -115,10 +151,19 @@ end
 function bot:process_inline_query(inline_query, config) -- When an inline query is received
   -- remove comment to enable debugging
   -- vardump(inline_query)
+  
+  -- PLEASE READ: Blocking every single InlineQuery IS NOT POSSIBLE!
+  -- When the request is cached, the user can still send this query
+  -- but he WON'T be able to make new requests. 
+  local user_id = inline_query.from.id
+  if redis:get('blocked:'..user_id) then
+    utilities.answer_inline_query(self, inline_query, nil, 0, true)
+	return
+  end
 
   if not config.enable_inline_for_everyone then
     local is_whitelisted = redis:get('whitelist:user#id'..inline_query.from.id)
-    if not is_whitelisted then utilities.answer_inline_query(self, inline_query) return end
+    if not is_whitelisted then utilities.answer_inline_query(self, inline_query, nil, 0, true) return end
   end
 
   if inline_query.query:match('"') then
@@ -129,6 +174,9 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
     local plugin = self.plugins[n]
     match_inline_plugins(self, inline_query, config, plugin)
   end
+  
+  -- Stop the spinning circle
+  utilities.answer_inline_query(self, inline_query, nil, 0, true)
 end
 
 function bot:run(config)

@@ -199,7 +199,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 10)
+  utilities.answer_inline_query(self, inline_query, results, 3600)
 end
 
 function wikipedia:action(msg, config, matches)
