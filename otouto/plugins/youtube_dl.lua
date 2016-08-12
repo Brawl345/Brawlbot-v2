@@ -22,6 +22,7 @@ function youtube_dl:get_availabe_formats(id, hash)
   local ytdl_json = io.popen('youtube-dl -j https://www.youtube.com/watch/?v='..id):read('*all')
   if not ytdl_json then return end
   local data = json.decode(ytdl_json)
+  if not data then return nil end
   
   local available_formats = {}
   redis:hset(hash, 'duration', data.duration)
