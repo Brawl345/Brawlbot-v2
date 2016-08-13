@@ -106,6 +106,7 @@ function youtube_dl:callback(callback, msg, self, config, input)
   local pretty_size = format_info.pretty_size
   local size = tonumber(format_info.size)
   local format = format_info.format
+  local file = format_info.file_id
   
   if size > 52420000 then
     utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
@@ -115,10 +116,15 @@ function youtube_dl:callback(callback, msg, self, config, input)
   utilities.edit_message(self, msg.chat.id, msg.message_id, '<b>Video wird hochgeladen</b>', nil, 'HTML')
   utilities.send_typing(self, msg.chat.id, 'upload_video')
   
-  local file = download_to_file(full_url, video_id..'.'..ext)
+  if not file then
+    file = download_to_file(full_url, video_id..'.'..ext)
+  end
   if not file then return end
-  utilities.send_video(self, msg.chat.id, file, nil, msg.message_id, duration, width, height)
+  local result = utilities.send_video(self, msg.chat.id, file, nil, msg.message_id, duration, width, height)
   utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
+  if not result then return end
+  local file_id = result.result.video.file_id
+  redis:hset(format_hash, 'file_id', file_id)
 end
 
 function youtube_dl:action(msg, config, matches)
