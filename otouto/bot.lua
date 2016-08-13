@@ -266,13 +266,17 @@ function match_plugins(self, msg, config, plugin)
 	  -- trying to port matches to otouto
 	  local pattern = plugin.triggers[n]
 	  local matches = match_pattern(pattern, msg.text)
-	  print(plugin.name..' triggered')
-	  return plugin.action(self, msg, config, matches)
+	  if matches then
+	    print('msg matches: ', pattern, ' for "'..plugin.name..'"')
+	    return plugin.action(self, msg, config, matches)
+	  end
 	end)
 	if not success then
 	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
 	  return
 	end
+	-- if one pattern matches, end
+	return
 	end
   end
 end

@@ -12,12 +12,14 @@ function twitter_send:init(config)
 	end
 
     twitter_send.triggers = {
-	  "^/tw (auth) (%d+)",
+	  "^/tw (auth) (%d+)$",
 	  "^/tw (unauth)$",
 	  "^/tw (verify)$",
-	  "^/tw (.+)",
-	  "^/(twwhitelist add) (%d+)",
-	  "^/(twwhitelist del) (%d+)"
+	  "^/tw (.+)$",
+	  "^/(twwhitelist add) (%d+)$",
+	  "^/(twwhitelist del) (%d+)$",
+	  "^/(twwhitelist add)$",
+	  "^/(twwhitelist del)$"
 	}
 	twitter_send.doc = [[*
 ]]..config.cmd_pat..[[tw* _<Text>_: Sendet einen Tweet an den Account, der im Chat angemeldet ist
@@ -89,16 +91,18 @@ function twitter_send:get_twitter_access_token(hash, oauth_verifier, oauth_token
   redis:hset(hash, 'oauth_token', values.oauth_token)
   redis:hset(hash, 'oauth_token_secret', values.oauth_token_secret)
   
-  return 'Erfolgreich eingeloggt als "@'..values.screen_name..'" (User-ID: '..values.user_id..')'
+  local screen_name = values.screen_name
+  
+  return 'Erfolgreich eingeloggt als <a href="https://twitter.com/'..screen_name..'">@'..screen_name..'</a> (User-ID: '..values.user_id..')'
 end
 
 function twitter_send:reset_twitter_auth(hash, frominvalid)
   redis:hdel(hash, 'oauth_token')
   redis:hdel(hash, 'oauth_token_secret')
   if frominvalid then
-    return '*Authentifizierung nicht erfolgreich, wird zurückgesetzt...*'
+    return '<b>Authentifizierung nicht erfolgreich, wird zurückgesetzt...</b>'
   else
-    return '*Erfolgreich abgemeldet!* Entziehe den Zugriff endgültig in deinen [Twitter-Einstellungen](https://twitter.com/settings/applications)!'
+    return '<b>Erfolgreich abgemeldet!</b> Entziehe den Zugriff endgültig in deinen <a href="https://twitter.com/settings/applications">Twitter-Einstellungen</a>!'
   end
 end
 
@@ -215,7 +219,7 @@ function twitter_send:send_tweet(tweet, oauth_token, oauth_token_secret, hash)
   local screen_name = data.user.screen_name
   local status_id = data.id_str 
 
-  return '*Tweet #'..statusnumber..' gesendet!* [Auf Twitter ansehen](https://twitter.com/statuses/'..status_id..')'
+  return '<a href="https://twitter.com/'..screen_name..'/status/'..status_id..'">Tweet #'..statusnumber..' gesendet!</a>'
 end
 
 function twitter_send:add_to_twitter_whitelist(user_id)
@@ -243,22 +247,36 @@ function twitter_send:del_from_twitter_whitelist(user_id)
 end
 
 function twitter_send:action(msg, config, matches)
-  if matches[1] == "twwhitelist add" and matches[2] then
+  if matches[1] == "twwhitelist add" then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
 	  return
     else
-	  utilities.send_reply(self, msg, twitter_send:add_to_twitter_whitelist(matches[2]), true)
+	  local user_id = matches[2]
+	  if not user_id then
+	    if not msg.reply_to_message then
+	      return
+		end
+	    user_id = msg.reply_to_message.from.id
+	  end  
+	  utilities.send_reply(self, msg, twitter_send:add_to_twitter_whitelist(user_id), true)
       return
     end
   end
 
-  if matches[1] == "twwhitelist del" and matches[2] then
+  if matches[1] == "twwhitelist del" then
     if msg.from.id ~= config.admin then
       utilities.send_reply(self, msg, config.errors.sudo)
 	  return
     else
-	  utilities.send_reply(self, msg, twitter_send:del_from_twitter_whitelist(matches[2]), true)
+	  local user_id = matches[2]
+	  if not user_id then
+	    if not msg.reply_to_message then
+	      return
+		end
+	    user_id = msg.reply_to_message.from.id
+	  end
+	  utilities.send_reply(self, msg, twitter_send:del_from_twitter_whitelist(user_id), true)
       return
     end
   end
@@ -300,7 +318,7 @@ function twitter_send:action(msg, config, matches)
       end
 	end
     if string.len(matches[2]) > 7 then utilities.send_reply(self, msg, 'Invalide PIN!') return end
-	utilities.send_reply(self, msg, twitter_send:get_twitter_access_token(hash, matches[2], oauth_token, oauth_token_secret))
+	utilities.send_reply(self, msg, twitter_send:get_twitter_access_token(hash, matches[2], oauth_token, oauth_token_secret), 'HTML')
 	local message_id = redis:hget(hash, 'login_msg')
 	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
 	redis:hdel(hash, 'login_msg')
@@ -314,7 +332,7 @@ function twitter_send:action(msg, config, matches)
 	    return
       end
 	end
-	utilities.send_reply(self, msg, twitter_send:reset_twitter_auth(hash), true)
+	utilities.send_reply(self, msg, twitter_send:reset_twitter_auth(hash), 'HTML')
 	return
   end
   
@@ -332,11 +350,11 @@ function twitter_send:action(msg, config, matches)
 	  utilities.send_reply(self, msg, '*Du darfst keine Tweets senden.* Entweder wurdest du noch gar nicht freigeschaltet oder ausgeschlossen.', true)
 	  return 
 	else
-	  utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), true)
+	  utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
 	  return
 	end
   else
-    utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), true)
+    utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
 	return
   end
 end
