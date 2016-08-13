@@ -835,6 +835,8 @@ function cache_file(result, url, last_modified)
   elseif result.result.photo then
     local lv = #result.result.photo
     file_id = result.result.photo[lv].file_id
+  elseif result.result.sticker then
+    file_id = result.result.sticker.file_id
   end
   print('Caching File...')
   redis:hset(hash..':'..url, 'file_id', file_id)
