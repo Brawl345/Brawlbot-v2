@@ -54,7 +54,7 @@ function id:inline_callback(inline_query, config, matches)
   local name = utilities.build_name(inline_query.from.first_name, inline_query.from.last_name)
   
   local results = '[{"type":"article","id":"30","title":"Deine Telegram-ID ist:","description":"'..id..'","input_message_content":{"message_text":"<b>'..name..'</b>: <code>'..id..'</code>","parse_mode":"HTML"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 10000)
+  utilities.answer_inline_query(self, inline_query, results, 10000, true)
 end
 
 function id:action(msg, config, matches)
