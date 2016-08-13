@@ -51,12 +51,15 @@ function youtube_dl:get_availabe_formats(id, hash)
 	  local url = data.formats[n].url
 	  local headers = get_http_header(url)
 	  local full_url = headers.location
+	  
+	  if not full_url then return end
 	  local headers = get_http_header(full_url) -- first was for 302, this get's use the size
 	  if headers.location then -- There are some videos where there is a "chain" of 302... repeat this, until we get the LAST url!
 	    repeat
 		  headers = get_http_header(headers.location)
 		until not headers.location
 	  end
+	  
 
 	  format_info.url = full_url
 	  local size = tonumber(headers["content-length"])
@@ -96,10 +99,12 @@ function youtube_dl:callback(callback, msg, self, config, input)
     youtube_dl:get_availabe_formats(video_id, hash)
   end
   
+  local keyboard = redis:hget(hash, 'keyboard')
   local duration = redis:hget(hash, 'duration')
   local format_info = redis:hgetall(format_hash)
 
   local full_url = format_info.url
+
   local width = format_info.width
   local height = format_info.height
   local ext = format_info.ext
@@ -109,7 +114,7 @@ function youtube_dl:callback(callback, msg, self, config, input)
   local file = format_info.file_id
   
   if size > 52420000 then
-    utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
+    utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
 	return
   end
   
@@ -120,8 +125,8 @@ function youtube_dl:callback(callback, msg, self, config, input)
     file = download_to_file(full_url, video_id..'.'..ext)
   end
   if not file then return end
-  local result = utilities.send_video(self, msg.chat.id, file, nil, msg.message_id, duration, width, height)
-  utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML')
+  local result = utilities.send_video(self, msg.chat.id, file, '('..format..')', msg.message_id, duration, width, height)
+  utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
   if not result then return end
   local file_id = result.result.video.file_id
   redis:hset(format_hash, 'file_id', file_id)
