@@ -2,7 +2,8 @@ local cleverbot = {}
 
 function cleverbot:init(config)
 	cleverbot.triggers = {
-	"^/cbot (.*)$"
+	"^/cbot (.+)$",
+	"^[Bb]rawlbot, (.+)$",
 	}
 	
 	cleverbot.doc = [[*
@@ -14,6 +15,7 @@ cleverbot.command = 'cbot <Text>'
 function cleverbot:action(msg, config)
   local text = msg.text
   local url = "https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text="..URL.escape(text)
+  utilities.send_typing(self, msg.chat.id, 'typing')
   local query = https.request(url)
   if query == nil then utilities.send_reply(self, msg, 'Ein Fehler ist aufgetreten :(') return end
   local decode = json.decode(query)
