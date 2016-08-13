@@ -3,11 +3,16 @@ local id = {}
 id.command = 'id'
 
 function id:init(config)
-	id.triggers = {
+  id.triggers = {
     "^/id$",
     "^/ids? (chat)$"
-	}
-	id.doc = [[```
+  }
+
+  id.inline_triggers = {
+	"^id$"
+  }
+
+  id.doc = [[```
 Returns user and chat info for you or the replied-to message.
 Alias: ]]..config.cmd_pat..[[who
 ```]]
@@ -42,6 +47,14 @@ function id:get_user(user_id, chat_id)
   user_info.name = id:user_print_name(user)
   user_info.id = user_id
   return user_info
+end
+
+function id:inline_callback(inline_query, config, matches)
+  local id = tostring(inline_query.from.id)
+  local name = utilities.build_name(inline_query.from.first_name, inline_query.from.last_name)
+  
+  local results = '[{"type":"article","id":"30","title":"Deine Telegram-ID ist:","description":"'..id..'","input_message_content":{"message_text":"<b>'..name..'</b>: <code>'..id..'</code>","parse_mode":"HTML"}}]'
+  utilities.answer_inline_query(self, inline_query, results, 10000)
 end
 
 function id:action(msg, config, matches)
