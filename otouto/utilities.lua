@@ -212,6 +212,18 @@ function utilities:answer_inline_query(inline_query, results, cache_time, is_per
 	} )
 end
 
+ -- get the indexed word in a string
+function utilities.get_word(s, i)
+    s = s or ''
+    i = i or 1
+    local n = 0
+    for w in s:gmatch('%g+') do
+        n = n + 1
+        if n == i then return w end
+    end
+    return false
+end
+
  -- Returns the string after the first space.
 function utilities.input(s)
 	if not s:find(' ') then
