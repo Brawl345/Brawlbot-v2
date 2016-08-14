@@ -3,13 +3,13 @@ local bot = {}
 bindings = require('otouto.bindings')
 utilities = require('otouto.utilities')
 
-bot.version = '2.2.6'
+bot.version = '2.2.6.1'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 	cred_data = load_cred()
 
 	assert(
-		config.bot_api_key and config.bot_api_key ~= '',
+		config.bot_api_key,
     'You did not set your bot token in the config!'
 	)
 	self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
@@ -28,19 +28,22 @@ function bot:init(config) -- The function run when the bot is started or reloade
 
 	self.plugins = {} -- Load plugins.
 	enabled_plugins = load_plugins()
+	t = {}
 	for k,v in pairs(enabled_plugins) do
 		local p = require('otouto.plugins.'..v)
 		-- print('loading plugin',v)
 		self.plugins[k] = p
 	    self.plugins[k].name = v
 		if p.init then p.init(self, config) end
+		if not p.triggers then p.triggers = t end
 	end
 	
 	print('Bot started successfully as:\n@' .. self.info.username .. ', AKA ' .. self.info.first_name ..' ('..self.info.id..')')
 
-	self.last_update = self.last_update or 0 -- Set loop variables: Update offset,
-	self.last_cron = self.last_cron or os.date('%M') -- the time of the last cron job,
-	self.last_database_save = self.last_database_save or os.date('%H') -- the time of the last database save,
+	-- Set loop variables
+	self.last_update = self.last_update or 0 -- Update offset.
+	self.last_cron = self.last_cron or os.date('%M') -- Last cron job.
+	self.last_database_save = self.last_database_save or os.date('%H') -- Last db save.
 	self.is_started = true -- and whether or not the bot should be running.
 
 end
@@ -179,13 +182,15 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   utilities.answer_inline_query(self, inline_query, nil, 0, true)
 end
 
+-- main
 function bot:run(config)
-	bot.init(self, config) -- Actually start the script.
-
-	while self.is_started do -- Start a loop while the bot should be running.
-		local res = bindings.getUpdates(self, { timeout=20, offset = self.last_update+1 } )
+	bot.init(self, config)
+	while self.is_started do
+		-- Update loop
+		local res = bindings.getUpdates(self, { timeout = 20, offset = self.last_update + 1 } )
 		if res then
-		    for n=1, #res.result do  -- Go through every new message.
+			-- Iterate over every new message.
+		    for n=1, #res.result do
 			    local v = res.result[n]
 				self.last_update = v.update_id
 				if v.inline_query then
@@ -200,7 +205,8 @@ function bot:run(config)
 			print('Connection error while fetching updates.')
 		end
 
-		if self.last_cron ~= os.date('%M') then -- Run cron jobs every minute.
+		 -- Run cron jobs every minute.
+		if self.last_cron ~= os.date('%M') then
 			self.last_cron = os.date('%M')
 			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
 		    for n=1, #self.plugins do 
@@ -256,7 +262,7 @@ function match_inline_plugins(self, inline_query, config, plugin)
 end
 
 function match_plugins(self, msg, config, plugin)
-  local match_table = plugin.triggers or {}
+  local match_table = plugin.triggers
   for n=1, #match_table do
     local trigger = plugin.triggers[n]
     if string.match(msg.text_lower, trigger) then

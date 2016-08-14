@@ -5,33 +5,16 @@ local bot = require('otouto.bot')
 about.command = 'about'
 about.doc = '`Sendet Informationen über den Bot.`'
 
-about.triggers = {
+function about:init(config)
+  about.text = config.about_text..'\n[Brawlbot](https://github.com/Brawl345/Brawlbot-v2) v'..bot.version..', basierend auf [Otouto](http://github.com/topkecleon/otouto) von topkecleon.'
+  about.triggers = {
 	'/about',
 	'/start'
-}
+  }
+end
 
 function about:action(msg, config)
-
-	-- Filthy hack, but here is where we'll stop forwarded messages from hitting
-	-- other plugins.
-	-- disabled to restore old behaviour
-	-- if msg.forward_from then return end
-
-	local output = config.about_text .. '\nBrawlbot v'..bot.version..', basierend auf Otouto von topkecleon.'
-
-	if
-		(msg.new_chat_member and msg.new_chat_member.id == self.info.id)
-		or msg.text_lower:match('^'..config.cmd_pat..'about$')
-		or msg.text_lower:match('^'..config.cmd_pat..'about@'..self.info.username:lower()..'$')
-		or msg.text_lower:match('^'..config.cmd_pat..'start$')
-		or msg.text_lower:match('^'..config.cmd_pat..'start@'..self.info.username:lower()..'$')
-	then
-		utilities.send_message(self, msg.chat.id, output, true, nil, true)
-		return
-	end
-
-	return true
-
+  utilities.send_message(self, msg.chat.id, about.text, true, nil, true)
 end
 
 return about

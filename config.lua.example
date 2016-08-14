@@ -35,44 +35,20 @@ Sende /hilfe, um zu starten
 		syntax = 'Invalide Syntax.',
 		chatter_connection = 'Ich möchte gerade nicht reden',
 		chatter_response = 'Ich weiß nicht, was ich darauf antworten soll.'
-	}
+	},
+	
+    remind = {
+        persist = true,
+        max_length = 1000,
+        max_duration = 526000,
+        max_reminders_group = 10,
+        max_reminders_private = 50
+    },
 
-	plugins = { -- To enable a plugin, add its name to the list.
-		'control',
-		'blacklist',
-		'about',
-		'ping',
-		'whoami',
-		'nick',
-		'echo',
-		'imgblacklist',
-		'gImages',
-		'gSearch',
-		'gMaps',
-		'wikipedia',
-		'hackernews',
-		'imdb',
-		'calc',
-		'urbandictionary',
-		'time',
-		'dice',
-		'reddit',
-		'xkcd',
-		'slap',
-		'commit',
-		'pun',
-		'currency',
-		'shout',
-		'set',
-		'get',
-		'patterns',
-		'9gag',
-		'shell',
-		'adfly',
-		'twitter',
-		-- Put new plugins above this line.
-		'help',
-		'greetings'
-	}
+    chatter = {
+        cleverbot_api = 'https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text=',
+        connection = 'I don\'t feel like talking right now.',
+        response = 'I don\'t know what to say to that.'
+    }
 
 }

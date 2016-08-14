@@ -22,52 +22,42 @@ https.timeout = 5
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
 function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)
-    if use_markdown == true then
-	  use_markdown = 'Markdown'
-	elseif not use_markdown then
-	  use_markdown = nil
+	local parse_mode
+	if type(use_markdown) == 'string' then
+	  parse_mode = use_markdown
+	elseif use_markdown == true then
+	  parse_mode = 'Markdown'
 	end
 	return bindings.request(self, 'sendMessage', {
 		chat_id = chat_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
 		reply_to_message_id = reply_to_message_id,
-		parse_mode = use_markdown,
+		parse_mode = parse_mode,
 		reply_markup = reply_markup
 	} )
 end
 
 -- https://core.telegram.org/bots/api#editmessagetext
 function utilities:edit_message(chat_id, message_id, text, disable_web_page_preview, use_markdown, reply_markup)
-    if use_markdown == true then
-	  use_markdown = 'Markdown'
-	elseif not use_markdown then
-	  use_markdown = nil
+	local parse_mode
+	if type(use_markdown) == 'string' then
+	  parse_mode = use_markdown
+	elseif use_markdown == true then
+	  parse_mode = 'Markdown'
 	end
 	return bindings.request(self, 'editMessageText', {
 		chat_id = chat_id,
 		message_id = message_id,
 		text = text,
 		disable_web_page_preview = disable_web_page_preview,
-		parse_mode = use_markdown,
+		parse_mode = parse_mode,
 		reply_markup = reply_markup
 	} )
 end
 
 function utilities:send_reply(old_msg, text, use_markdown, reply_markup)
-    if use_markdown == true then
-	  use_markdown = 'Markdown'
-	elseif not use_markdown then
-	  use_markdown = nil
-	end
-	return bindings.request(self, 'sendMessage', {
-		chat_id = old_msg.chat.id,
-		text = text,
-		disable_web_page_preview = true,
-		reply_to_message_id = old_msg.message_id,
-		parse_mode = use_markdown,
-		reply_markup = reply_markup
-	} )
+	return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown, reply_markup)
 end
 
 -- NOTE: Telegram currently only allows file uploads up to 50 MB
@@ -222,33 +212,16 @@ function utilities:answer_inline_query(inline_query, results, cache_time, is_per
 	} )
 end
 
- -- get the indexed word in a string
-function utilities.get_word(s, i)
-	s = s or ''
-	i = i or 1
-	local t = {}
-	for w in s:gmatch('%g+') do
-		table.insert(t, w)
-	end
-	return t[i] or false
-end
-
- -- Like get_word(), but better.
- -- Returns the actual index.
-function utilities.index(s)
-	local t = {}
-	for w in s:gmatch('%g+') do
-		table.insert(t, w)
-	end
-	return t
-end
-
  -- Returns the string after the first space.
 function utilities.input(s)
 	if not s:find(' ') then
 		return false
 	end
 	return s:sub(s:find(' ')+1)
+end
+
+function utilities.input_from_msg(msg)
+	return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
 end
 
 -- Calculates the length of the given string as UTF-8 characters
@@ -343,13 +316,13 @@ end
  -- Loads a JSON file as a table.
 function utilities.load_data(filename)
 	local f = io.open(filename)
-	if not f then
+	if f then
+		local s = f:read('*all')
+		f:close()
+		return json.decode(s)
+	else
 		return {}
 	end
-	local s = f:read('*all')
-	f:close()
-	local data = json.decode(s)
-	return data
 end
 
  -- Saves a table to a JSON file.
@@ -412,78 +385,6 @@ function utilities:resolve_username(input)
 	end
 end
 
- -- Simpler than above function; only returns an ID.
- -- Returns nil if no ID is available.
-function utilities:id_from_username(input)
-	input = input:gsub('^@', '')
-	for _, user in pairs(self.database.users) do
-		if user.username and user.username:lower() == input:lower() then
-			return user.id
-		end
-	end
-end
-
- -- Simpler than below function; only returns an ID.
- -- Returns nil if no ID is available.
-function utilities:id_from_message(msg)
-	if msg.reply_to_message then
-		return msg.reply_to_message.from.id
-	else
-		local input = utilities.input(msg.text)
-		if input then
-			if tonumber(input) then
-				return tonumber(input)
-			elseif input:match('^@') then
-				return utilities.id_from_username(self, input)
-			end
-		end
-	end
-end
-
-function utilities:user_from_message(msg, no_extra)
-	local input = utilities.input(msg.text_lower)
-	local target = {}
-	if msg.reply_to_message then
-		for k,v in pairs(self.database.users[msg.reply_to_message.from.id_str]) do
-			target[k] = v
-		end
-	elseif input and tonumber(input) then
-		target.id = tonumber(input)
-		if self.database.users[input] then
-			for k,v in pairs(self.database.users[input]) do
-				target[k] = v
-			end
-		end
-	elseif input and input:match('^@') then
-		local uname = input:gsub('^@', '')
-		for _,v in pairs(self.database.users) do
-			if v.username and uname == v.username:lower() then
-				for key, val in pairs(v) do
-					target[key] = val
-				end
-			end
-		end
-		if not target.id then
-			target.err = 'Sorry, I don\'t recognize that username.'
-		end
-	else
-		target.err = 'Please specify a user via reply, ID, or username.'
-	end
-
-	if not no_extra then
-		if target.id then
-			target.id_str = tostring(target.id)
-		end
-		if not target.first_name then
-			target.first_name = 'User'
-		end
-		target.name = utilities.build_name(target.first_name, target.last_name)
-	end
-
-	return target
-
-end
-
 function utilities:handle_exception(err, message, config)
   if not err then err = '' end
   local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
@@ -500,15 +401,17 @@ function utilities.download_file(url, filename)
   return download_to_file(url, filename)
 end
 
-function utilities.markdown_escape(text)
-	text = text:gsub('_', '\\_')
-	text = text:gsub('%[', '\\[')
-	text = text:gsub('%*', '\\*')
-	text = text:gsub('`', '\\`')
-	return text
+function utilities.md_escape(text)
+	return text:gsub('_', '\\_')
+			:gsub('%[', '\\['):gsub('%]', '\\]')
+			:gsub('%*', '\\*'):gsub('`', '\\`')
 end
 
-utilities.md_escape = utilities.markdown_escape
+utilities.markdown_escape = utilities.md_escape
+
+function utilities.html_escape(text)
+	return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
+end
 
 utilities.triggers_meta = {}
 utilities.triggers_meta.__index = utilities.triggers_meta
@@ -584,7 +487,8 @@ utilities.char = {
 	arabic = '[\216-\219][\128-\191]',
 	rtl_override = '‮',
 	rtl_mark = '‏',
-	em_dash = '—'
+	em_dash = '—',
+	utf_8 = '[%z\1-\127\194-\244][\128-\191]',
 }
 
 -- taken from http://stackoverflow.com/a/11130774/3163199

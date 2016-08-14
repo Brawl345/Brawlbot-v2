@@ -30,14 +30,10 @@ function gMaps:inline_callback(inline_query, config, matches)
 end
 
 function gMaps:action(msg, config)
-  local input = utilities.input(msg.text)
+  local input = utilities.input_from_msg(msg)
   if not input then
-    if msg.reply_to_message and msg.reply_to_message.text then
-	  input = msg.reply_to_message.text
-	else
-	  utilities.send_message(self, msg.chat.id, gMaps.doc, true, msg.message_id, true)
-	  return
-	end
+    utilities.send_reply(self, msg, gMaps.doc, true)
+	return
   end
 
   utilities.send_typing(self, msg.chat.id, 'find_location')

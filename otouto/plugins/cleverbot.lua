@@ -5,21 +5,27 @@ function cleverbot:init(config)
 	"^/cbot (.+)$",
 	"^[Bb]rawlbot, (.+)$",
 	}
-	
-	cleverbot.doc = [[*
-]]..config.cmd_pat..[[cbot* _<Text>_*: Befragt den Cleverbot]]
+	cleverbot.url = config.chatter.cleverbot_api
 end
 
 cleverbot.command = 'cbot <Text>'
 
-function cleverbot:action(msg, config)
-  local text = msg.text
-  local url = "https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text="..URL.escape(text)
+function cleverbot:action(msg, config, matches)
   utilities.send_typing(self, msg.chat.id, 'typing')
-  local query = https.request(url)
-  if query == nil then utilities.send_reply(self, msg, 'Ein Fehler ist aufgetreten :(') return end
-  local decode = json.decode(query)
-  local answer = string.gsub(decode.clever, "&Auml;", "Ä")
+  local text = matches[1]
+  local query, code = https.request(cleverbot.url..URL.escape(text))
+  if code ~= 200 then
+	utilities.send_reply(self, msg, 'Ich möchte jetzt nicht reden...')
+	return
+  end
+
+  local data = json.decode(query)
+  if not data.clever then
+    utilities.send_reply(self, msg, 'Ich möchte jetzt nicht reden...')
+	return
+  end
+
+  local answer = string.gsub(data.clever, "&Auml;", "Ä")
   local answer = string.gsub(answer, "&auml;", "ä")
   local answer = string.gsub(answer, "&Ouml;", "Ö")
   local answer = string.gsub(answer, "&ouml;", "ö")

@@ -48,7 +48,7 @@ function bindings:request(method, parameters, file)
 	end
 	local response = {}
 	local body, boundary = MP_ENCODE(parameters)
-	local success = HTTPS.request{
+	local success, code = HTTPS.request{
 		url = self.BASE_URL .. method,
 		method = 'POST',
 		headers = {
@@ -60,7 +60,7 @@ function bindings:request(method, parameters, file)
 	}
 	local data = table.concat(response)
 	if not success then
-		print(method .. ': Connection error.')
+		print(method .. ': Connection error. [' .. code  .. ']')
 		return false, false
 	else
 		local result = JSON.decode(data)

@@ -1,8 +1,11 @@
 local patterns = {}
 
-patterns.triggers = {
-	'^/?s/.-/.-$'
-}
+function patterns:init(config)
+  patterns.command = 's/<Pattern>/<Ersetzung>'
+  patterns.triggers = {
+  config.cmd_pat .. '?s/.-/.-$'
+  }
+end
 
 function patterns:action(msg)
 	if not msg.reply_to_message then return true end

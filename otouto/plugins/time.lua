@@ -91,7 +91,7 @@ function time:inline_callback(inline_query, config, matches)
 end
 
 function time:action(msg, config)
-  local input = utilities.input(msg.text)
+  local input = utilities.input_from_msg(msg)
   if not input then
     local output = os.date("%A, %d. %B %Y, *%H:%M:%S Uhr*")
 	utilities.send_reply(self, msg, time:localize(output), true)

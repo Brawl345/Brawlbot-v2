@@ -51,14 +51,10 @@ function gSearch:stringlinks(results, stats)
 end
 
 function gSearch:action(msg, config)
-  local input = utilities.input(msg.text)
+  local input = utilities.input_from_msg(msg)
   if not input then
-	if msg.reply_to_message and msg.reply_to_message.text then
-	  input = msg.reply_to_message.text
-	else
-	  utilities.send_message(self, msg.chat.id, gSearch.doc, true, msg.message_id, true)
-	  return
-	end
+	utilities.send_reply(self, msg, gImages.doc, true)
+	return
   end
   
   local results, stats = gSearch:googlethat(input, onfig)
