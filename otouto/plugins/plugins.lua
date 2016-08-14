@@ -5,12 +5,12 @@ local bot = require('otouto.bot')
 function plugin_manager:init(config)
 	plugin_manager.triggers = {
     "^/plugins$",
+    "^/plugins? (enable) ([%w_%.%-]+) (chat) (%d+)$",
+    "^/plugins? (enable) ([%w_%.%-]+) (chat)$",
+	"^/plugins? (disable) ([%w_%.%-]+) (chat) (%d+)$",
+	"^/plugins? (disable) ([%w_%.%-]+) (chat)$",
     "^/plugins? (enable) ([%w_%.%-]+)$",
     "^/plugins? (disable) ([%w_%.%-]+)$",
-    "^/plugins? (enable) ([%w_%.%-]+) (chat) (%d+)",
-    "^/plugins? (enable) ([%w_%.%-]+) (chat)",
-	"^/plugins? (disable) ([%w_%.%-]+) (chat) (%d+)",
-	"^/plugins? (disable) ([%w_%.%-]+) (chat)",
     "^/plugins? (reload)$",
 	"^/(reload)$"
 	}

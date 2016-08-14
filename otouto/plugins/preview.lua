@@ -4,10 +4,9 @@ preview.command = 'preview <link>'
 
 function preview:init(config)
 	preview.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('preview', true).table
-	preview.doc = [[```
-]]..config.cmd_pat..[[preview <link>
-Returns a full-message, "unlinked" preview.
-```]]
+	preview.doc = [[*
+]]..config.cmd_pat..[[preview* _<URL>_
+Erstellt einen Preview-Link]]
 end
 
 function preview:action(msg)
