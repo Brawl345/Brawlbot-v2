@@ -1,10 +1,6 @@
 local Redis = require 'redis'
 local FakeRedis = require 'fakeredis'
-
-
-local params = {
-  'unix:///home/anditest/.redis/sock'
-}
+local config = require('config')
 
 -- Overwrite HGETALL
 Redis.commands.hgetall = Redis.command('hgetall', {
@@ -19,7 +15,15 @@ local redis = nil
 
 -- Won't launch an error if fails
 local ok = pcall(function()
-  redis = Redis.connect('unix:///home/anditest/.redis/sock') -- FUCKING FUCK REDIS LUA FUCK Y U NO WORK WITH PARAMS
+  if config.redis.use_socket and config.redis.socket_path then
+    redis = Redis.connect(config.redis.socket_path)
+  else
+	local params = {
+	  host = config.redis.host,
+	  port = config.redis.port
+	}
+    redis = Redis.connect(params)
+  end
 end)
 
 if not ok then
@@ -30,9 +34,6 @@ if not ok then
   fake_func()
   fake = FakeRedis.new()
 
-  print('\27[31mRedis addr: '..params.host..'\27[39m')
-  print('\27[31mRedis port: '..params.port..'\27[39m')
-
   redis = setmetatable({fakeredis=true}, {
   __index = function(a, b)
     if b ~= 'data' and fake[b] then
@@ -41,6 +42,13 @@ if not ok then
     return fake[b] or fake_func
   end })
 
+else
+  if config.redis.password then
+    redis:auth(config.redis.password)
+  end
+  if config.redis.database then
+    redis:select(config.redis.database)
+  end
 end
 
 
