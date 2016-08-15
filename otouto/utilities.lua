@@ -12,7 +12,7 @@ json = require("dkjson")
 pcall(json.use_lpeg)
 serpent = require("serpent")
 redis = (loadfile "./otouto/redis.lua")()
-mimetype = (loadfile "./otouto/mimetype.lua")()
+mime = (loadfile "./otouto/mimetype.lua")()
 OAuth = require "OAuth"
 helpers = require "OAuth.helpers"
 
