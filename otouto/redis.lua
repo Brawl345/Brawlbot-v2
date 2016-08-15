@@ -1,6 +1,13 @@
 local Redis = require 'redis'
 local FakeRedis = require 'fakeredis'
 local config = require('config')
+if not config.redis then -- Please update the values in the config.lua!
+  config.redis = {
+	host = '127.0.0.1',
+	port = 6379,
+	use_socket = false
+  }
+end
 
 -- Overwrite HGETALL
 Redis.commands.hgetall = Redis.command('hgetall', {
