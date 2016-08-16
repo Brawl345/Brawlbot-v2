@@ -48,6 +48,9 @@ function banhammer:kick_user(user_id, chat_id, self, onlykick)
 	  chat_id = chat_id,
 	  user_id = user_id
 	} )
+	local hash = 'chat:'..chat_id..':users'
+	print('User '..user_id..' was kicked/left the chat, deleting them from redis set '..hash)
+	redis:srem(hash, user_id)
 	if onlykick then return end
     if not request then return 'User gebannt, aber kicken war nicht erfolgreich. Bin ich Administrator oder ist der User hier überhaupt?' end
     return 'User '..user_id..' gebannt!'

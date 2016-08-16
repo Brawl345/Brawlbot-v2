@@ -80,18 +80,18 @@ function stats:chat_stats(chat_id)
 end
 
 function stats:pre_process(msg, self)
-  -- Ignore service msg
-  if is_service_msg(msg) then
-    print('Service message')
-    return msg
-  end
-
   if msg.left_chat_member then
     -- delete user from redis set, but keep message count
 	local hash = 'chat:'..msg.chat.id..':users'
 	local user_id_left = msg.left_chat_member.id
-	print('User '..user_id_left..' was kicked, deleting him/her from redis set '..hash)
+	print('User '..user_id_left..' was kicked/left the chat, deleting them from redis set '..hash)
 	redis:srem(hash, user_id_left)
+    return msg
+  end
+
+  -- Ignore service msg
+  if is_service_msg(msg) then
+    print('Service message')
     return msg
   end
   
