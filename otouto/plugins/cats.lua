@@ -56,7 +56,7 @@ function cats:inline_callback(inline_query, config, matches)
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 120)
+  utilities.answer_inline_query(self, inline_query, results, 30)
 end
 
 function cats:action(msg, config)
