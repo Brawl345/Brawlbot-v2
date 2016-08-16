@@ -25,7 +25,7 @@ end
 
 function notify:pre_process(msg, self)
   local notify_users = redis:smembers('notify:ls')
-  
+
   -- I call this beautiful lady the "if soup"
   if msg.chat.type == 'chat' or msg.chat.type == 'supergroup' then
     if msg.text then
@@ -37,16 +37,15 @@ function notify:pre_process(msg, self)
 		  -- so that we don't send the user some private text, when he/she is not
 		  -- in the group.
 		  if redis:sismember('chat:'..chat_id..':users', id) then
-		  
 		    -- ignore message, if user is mentioning him/herself
-		    if id == tostring(msg.from.id) then break; end
-
-	        local send_date = run_command('date -d @'..msg.date..' +"%d.%m.%Y um %H:%M:%S Uhr"')
-			local send_date = string.gsub(send_date, "\n", "")
-		    local from = string.gsub(msg.from.name, "%_", " ")
-			local chat_name = string.gsub(msg.chat.title, "%_", " ")
-		    local text = from..' am '..send_date..' in "'..chat_name..'":\n\n'..msg.text
-			utilities.send_message(self, id, text, true)
+		    if id ~= tostring(msg.from.id) then
+			  local send_date = run_command('date -d @'..msg.date..' +"%d.%m.%Y um %H:%M:%S Uhr"')
+			  local send_date = string.gsub(send_date, "\n", "")
+			  local from = string.gsub(msg.from.name, "%_", " ")
+			  local chat_name = string.gsub(msg.chat.title, "%_", " ")
+			  local text = from..' am '..send_date..' in "'..chat_name..'":\n\n'..msg.text
+			  utilities.send_message(self, id, text, true)
+			end
 		  end
 	    end
 	  end
