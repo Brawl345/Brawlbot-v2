@@ -3,7 +3,7 @@ local bot = {}
 bindings = require('otouto.bindings')
 utilities = require('otouto.utilities')
 
-bot.version = '2.2.6.2'
+bot.version = '2.2.6.3'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
 	cred_data = load_cred()
@@ -233,7 +233,6 @@ function pre_process_msg(self, msg, config)
     if plugin.pre_process and msg then
 	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
 	  new_msg = plugin:pre_process(msg, self, config)
-	  if not new_msg then return end
     end
   end
   return new_msg
