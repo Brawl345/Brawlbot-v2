@@ -233,6 +233,7 @@ function pre_process_msg(self, msg, config)
     if plugin.pre_process and msg then
 	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
 	  new_msg = plugin:pre_process(msg, self, config)
+	  if not new_msg then return end
     end
   end
   return new_msg
