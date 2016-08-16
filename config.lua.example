@@ -24,6 +24,10 @@ Sende /hilfe, um zu starten
 	-- false = only whitelisted users can use inline querys
 	-- NOTE that it doesn't matter, if the chat is whitelisted! The USER must be whitelisted!
 	enable_inline_for_everyone = true,
+
+	-- Path, where getFile.lua should store the files WITHOUT an ending slash!
+	-- Create the following folders in this folder: photo, document, video, voice
+	getfile_path = '/tmp/telegram_files',
 	
 	-- Redis settings. Only edit if you know what you're doing.
 	redis = {

@@ -7,7 +7,7 @@ media_download.triggers = {
   '/nil'
 }
 
-function media_download:download_to_file_permanently(url, file_name)
+function media_download:download_to_file_permanently(url, save_dir, file_name)
   local respbody = {}
   local options = {
     url = url,
@@ -23,9 +23,7 @@ function media_download:download_to_file_permanently(url, file_name)
 
   if code ~= 200 then return false end
 
-  -- TODO: Save, when folder doesn't exist
-  -- Create necessary folders in this folder!
-  local file_path = "/home/YOURPATH/tmp/"..file_name
+  local file_path = save_dir..'/'..file_name
   file = io.open(file_path, "w+")
   file:write(table.concat(respbody))
   file:close()
@@ -54,7 +52,7 @@ function media_download:pre_process(msg, self, config)
     file_id = msg.document.file_id
 	file_size = msg.document.file_size
   else
-    return
+    return msg
   end
   
   if file_size > 19922944 then
@@ -62,11 +60,17 @@ function media_download:pre_process(msg, self, config)
 	return
   end
   
+  local save_dir = config.getfile_path
+  if not save_dir then
+    print('getfile_path not set in config, aborting...')
+    return msg
+  end
+  
   -- Check if file has already been downloaded
   local already_downloaded = redis:sismember('telegram:file_id', file_id)
   if already_downloaded == true then
     print('File has already been downloaded in the past, skipping...')
-	return
+	return msg
   end
   
   -- Saving file to the Telegram Cloud
@@ -77,7 +81,7 @@ function media_download:pre_process(msg, self, config)
   -- Getting file from the Telegram Cloud
   if not request then
     print('Download failed!')
-	return
+	return msg
   end
   
   -- Use original filename for documents
@@ -89,10 +93,11 @@ function media_download:pre_process(msg, self, config)
   
   -- Construct what we want
   local download_url = 'https://api.telegram.org/file/bot'..config.bot_api_key..'/'..request.result.file_path
-  local ok = media_download:download_to_file_permanently(download_url, file_path)
+
+  local ok = media_download:download_to_file_permanently(download_url, save_dir, file_path)
   if not ok then
     print('Download failed!')
-	return
+	return msg
   end
   
   -- Save file_id to redis to prevent downloading the same file over and over when forwarding
