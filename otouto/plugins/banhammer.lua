@@ -174,8 +174,7 @@ end
 
 function banhammer:action(msg, config, matches)
   if not is_sudo(msg, config) then
-    utilities.send_reply(self, msg, config.errors.sudo)
-	return
+	return -- Silent ignore
   end
   
   if matches[1] == 'leave' then
@@ -194,7 +193,13 @@ function banhammer:action(msg, config, matches)
 	  if not msg.reply_to_message then
 	    return
 	  end
-	  user_id = msg.reply_to_message.from.id
+	  if msg.reply_to_message.new_chat_member then
+	    user_id = msg.reply_to_message.new_chat_member.id
+	  elseif msg.reply_to_message.left_chat_member then
+	    user_id = msg.reply_to_message.left_chat_member.id
+	  else
+	    user_id = msg.reply_to_message.from.id
+	  end
 	end
 
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
@@ -221,7 +226,11 @@ function banhammer:action(msg, config, matches)
 		if not msg.reply_to_message then
 		  return
 		end
-		user_id = msg.reply_to_message.from.id
+	    if msg.reply_to_message.new_chat_member then
+	      user_id = msg.reply_to_message.new_chat_member.id
+	    else
+	      user_id = msg.reply_to_message.from.id
+	    end
 	  end
       banhammer:kick_user(user_id, msg.chat.id, self, true)
 	  return
@@ -250,7 +259,11 @@ function banhammer:action(msg, config, matches)
 	  if not msg.reply_to_message then
 		return
 	  end
-	  local user_id = msg.reply_to_message.from.id
+	  if msg.reply_to_message.new_chat_member then
+		user_id = msg.reply_to_message.new_chat_member.id
+	  else
+		user_id = msg.reply_to_message.from.id
+	  end
 	  local hash = 'whitelist:user#id'..user_id
 	  redis:set(hash, true)
       utilities.send_reply(self, msg, 'User '..user_id..' whitelisted')
@@ -261,7 +274,13 @@ function banhammer:action(msg, config, matches)
 	  if not msg.reply_to_message then
 		return
 	  end
-	  local user_id = msg.reply_to_message.from.id
+	  if msg.reply_to_message.new_chat_member then
+		user_id = msg.reply_to_message.new_chat_member.id
+	  elseif msg.reply_to_message.left_chat_member then
+	    user_id = msg.reply_to_message.left_chat_member.id
+	  else
+		user_id = msg.reply_to_message.from.id
+	  end
 	  local hash = 'whitelist:user#id'..user_id
       redis:del(hash)
       utilities.send_reply(self, msg, 'User '..user_id..' von der Whitelist entfernt!')
@@ -327,7 +346,13 @@ function banhammer:action(msg, config, matches)
 	  if not msg.reply_to_message then
 		return
 	  end
-	  local user_id = msg.reply_to_message.from.id
+	  if msg.reply_to_message.new_chat_member then
+		user_id = msg.reply_to_message.new_chat_member.id
+	  elseif msg.reply_to_message.left_chat_member then
+	    user_id = msg.reply_to_message.left_chat_member.id
+	  else
+		user_id = msg.reply_to_message.from.id
+	  end
 	  local hash = 'blocked:'..user_id
 	  redis:set(hash, true)
 	  utilities.send_reply(self, msg, 'User '..user_id..' darf den Bot nun nicht mehr nutzen.')
@@ -338,7 +363,13 @@ function banhammer:action(msg, config, matches)
 	  if not msg.reply_to_message then
 		return
 	  end
-	  local user_id = msg.reply_to_message.from.id
+	  if msg.reply_to_message.new_chat_member then
+		user_id = msg.reply_to_message.new_chat_member.id
+	  elseif msg.reply_to_message.left_chat_member then
+	    user_id = msg.reply_to_message.left_chat_member.id
+	  else
+		user_id = msg.reply_to_message.from.id
+	  end
 	  local hash = 'blocked:'..user_id
 	  redis:del(hash)
 	  utilities.send_reply(self, msg, 'User '..user_id..' darf den Bot wieder nutzen.')
