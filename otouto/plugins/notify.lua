@@ -27,7 +27,7 @@ function notify:pre_process(msg, self)
   local notify_users = redis:smembers('notify:ls')
 
   -- I call this beautiful lady the "if soup"
-  if msg.chat.type == 'chat' or msg.chat.type == 'supergroup' then
+  if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
     if msg.text then
       for _,user in pairs(notify_users) do
 	    if isWordFoundInString('@'..user, string.lower(msg.text)) then
