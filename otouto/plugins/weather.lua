@@ -22,8 +22,8 @@ function weather:init(config)
 	  "^w$"
 	}
 	weather.doc = [[*
-]]..config.cmd_pat..[[wetter*:  Wetter für deinen Wohnort _(/location set [Ort])_
-*]]..config.cmd_pat..[[wetter* _<Ort>_: Wetter für diesen Ort
+]]..config.cmd_pat..[[w*:  Wetter für deinen Wohnort _(/location set [Ort])_
+*]]..config.cmd_pat..[[w* _<Ort>_: Wetter für diesen Ort
 ]]
 end
 
@@ -176,8 +176,10 @@ function weather:inline_callback(inline_query, config, matches)
   local thumb_url = 'https://anditest.perseus.uberspace.de/inlineQuerys/weather/'
   if icon == 'clear-day' or icon == 'partly-cloudy-day' then
 	thumb_url = thumb_url..'day.jpg'
-  elseif icon == 'clear-night' or icon == 'partly-cloudy-night' then
+  elseif icon == 'clear-night' then
 	thumb_url = thumb_url..'night.jpg'
+  elseif icon == 'partly-cloudy-night' then
+    thumb_url = thumb_url..'cloudy-night.jpg'
   elseif icon == 'rain' then
     thumb_url = thumb_url..'rain.jpg'
   elseif icon == 'snow' then
