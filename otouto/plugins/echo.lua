@@ -35,6 +35,12 @@ function echo:action(msg)
 	  output = '*Echo:*\n"' .. utilities.md_escape(input) .. '"'
 	  utilities.send_message(self, msg.chat.id, output, true, nil, true)
 	  return 
+	elseif msg.chat.type == 'group' then
+	  local b = 1
+	  while b ~= 0 do
+		input = utilities.trim(input)
+		input,b = input:gsub('^/+','')
+	  end
 	end
   utilities.send_message(self, msg.chat.id, input, true, nil, true)
   end
