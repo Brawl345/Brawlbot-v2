@@ -729,7 +729,7 @@ function cache_data(plugin, query, data, timeout, typ, hash_field)
 	  redis:sadd(hash, str)
 	end
   else
-    redis:hset(hash, hash_field, data)
+    redis:hmset(hash, data)
   end
   if timeout then
     redis:expire(hash, timeout)
