@@ -310,6 +310,7 @@ function create_plugin_set()
     'control',
     'about',
     'id',
+	'creds',
     'echo',
 	'currency',
     'banhammer',
