@@ -12,7 +12,7 @@ function xkcd:init(config)
 end
 
 function xkcd:get_xkcd(id)
-  local res,code  = http.request("http://xkcd.com/"..id.."/info.0.json")
+  local res,code  = https.request("https://xkcd.com/"..id.."/info.0.json")
   if code ~= 200 then return nil end
   local data = json.decode(res)
   local link_image = data.img
@@ -22,7 +22,7 @@ function xkcd:get_xkcd(id)
   return link_image, data.title, data.alt
 end
 
-function xkcd:action(msg, config)
+function xkcd:action(msg, config, matches)
   local url, title, alt = xkcd:get_xkcd(matches[1])
   if not url then utilities.send_reply(self, msg, config.errors.connection) return end
   utilities.send_typing(self, msg.chat.id, 'upload_photo')
