@@ -53,7 +53,7 @@ end
 function gSearch:action(msg, config)
   local input = utilities.input_from_msg(msg)
   if not input then
-	utilities.send_reply(self, msg, gImages.doc, true)
+	utilities.send_reply(self, msg, gSearch.doc, true)
 	return
   end
   
