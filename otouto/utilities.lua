@@ -79,6 +79,10 @@ function utilities.edit_message(chat_id, message_id, text, disable_web_page_prev
 	)
 end
 
+function utilities.delete_message(chat_id, message_id)
+  return utilities.edit_message(chat_id, message_id, '<i>Gelöschte Nachricht</i>', true, 'HTML')
+end
+
 function utilities.send_reply(msg, text, use_markdown, reply_markup)
     local parse_mode
     if type(use_markdown) == 'string' then
