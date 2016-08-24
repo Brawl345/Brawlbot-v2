@@ -8,14 +8,18 @@ function gps:init(config)
 	"google.de/maps/@([^,]*)[,%s]([^,]*)",
 	"google.com/maps/@([^,]*)[,%s]([^,]*)",
 	"google.de/maps/place/@([^,]*)[,%s]([^,]*)",
-	"google.com/maps/place/@([^,]*)[,%s]([^,]*)"
+	"google.com/maps/place/@([^,]*)[,%s]([^,]*)",
+	"google.de/maps/place/.+/@([^,]*)[,%s]([^,]*)",
+	"google.com/maps/place/.+/@([^,]*)[,%s]([^,]*)"
 	}
 	gps.inline_triggers = {
     "^gps ([^,]*)[,%s]([^,]*)$",
 	"google.de/maps/@([^,]*)[,%s]([^,]*)",
 	"google.com/maps/@([^,]*)[,%s]([^,]*)",
 	"google.de/maps/place/@([^,]*)[,%s]([^,]*)",
-	"google.com/maps/place/@([^,]*)[,%s]([^,]*)"
+	"google.com/maps/place/@([^,]*)[,%s]([^,]*)",
+	"google.de/maps/place/.+/@([^,]*)[,%s]([^,]*)",
+	"google.com/maps/place/.+/@([^,]*)[,%s]([^,]*)"
 	}
 	gps.doc = [[*
 ]]..config.cmd_pat..[[gps* _<Breitengrad>_,_<Längengrad>_: Sendet Karte mit diesen Koordinaten]]
