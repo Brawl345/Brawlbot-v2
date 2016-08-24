@@ -57,7 +57,7 @@ function youtube_channel:action(msg)
   
   local data = youtube_channel:get_yt_channel_data(channel_name)
   local output = youtube_channel:send_yt_channel_data(data)
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return youtube_channel

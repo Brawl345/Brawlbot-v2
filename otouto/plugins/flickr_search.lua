@@ -32,15 +32,15 @@ end
 
 function flickr_search:action(msg, config, matches)
   local url = flickr_search:get_flickr(matches[1])
-  if not url then utilities.send_reply(self, msg, config.errors.results) return end
+  if not url then utilities.send_reply(msg, config.errors.results) return end
   
   local file = download_to_file(url)
   
   if string.ends(url, ".gif") then
-    utilities.send_document(self, msg.chat.id, file, url)
+    utilities.send_document(msg.chat.id, file, url)
 	return
   else
-    utilities.send_photo(self, msg.chat.id, file, url)
+    utilities.send_photo(msg.chat.id, file, url)
 	return
   end
 end

@@ -73,14 +73,14 @@ end
 function ip_info:action(msg, config, matches)
   local host = matches[1]
   local text, image_url = ip_info:get_host_data(host)
-  if not text then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not text then utilities.send_reply(msg, config.errors.connection) return end
   
   if image_url then
-    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+    utilities.send_typing(msg.chat.id, 'upload_photo')
     local file = download_to_file(image_url, 'map.png')
-    utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+    utilities.send_photo(msg.chat.id, file, text, msg.message_id)
   else
-    utilities.send_reply(self, msg, text)
+    utilities.send_reply(msg, text)
   end
 end
 

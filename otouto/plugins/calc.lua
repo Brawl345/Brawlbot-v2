@@ -29,7 +29,7 @@ function calc:mathjs(exp)
 end
 
 function calc:action(msg, config, matches)
-  utilities.send_reply(self, msg, calc:mathjs(matches[1]))
+  utilities.send_reply(msg, calc:mathjs(matches[1]))
 end
 
 return calc

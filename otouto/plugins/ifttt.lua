@@ -53,22 +53,22 @@ function ifttt:action(msg, config, matches)
   local value3 = matches[4]
   
   if event == '!set' then
-    utilities.send_reply(self, msg, ifttt:set_ifttt_key(hash, value1), true)
+    utilities.send_reply(msg, ifttt:set_ifttt_key(hash, value1), true)
     return
   end
   
   if not key then
-    utilities.send_reply(self, msg, '*Bitte speichere zuerst deinen Schlüssel ein!* Aktiviere dazu den [Maker Channel](https://ifttt.com/maker) und speichere deinen Schlüssel mit `/ifttt !set KEY` ein', true)
+    utilities.send_reply(msg, '*Bitte speichere zuerst deinen Schlüssel ein!* Aktiviere dazu den [Maker Channel](https://ifttt.com/maker) und speichere deinen Schlüssel mit `/ifttt !set KEY` ein', true)
     return
   end
   
   if event == '!unauth' then
     redis:hdel(hash, 'ifttt')
-	utilities.send_reply(self, msg, '*Erfolgreich ausgeloggt!*', true)
+	utilities.send_reply(msg, '*Erfolgreich ausgeloggt!*', true)
 	return
   end
   
-  utilities.send_reply(self, msg, ifttt:do_ifttt_request(key, event, value1, value2, value3), true)
+  utilities.send_reply(msg, ifttt:do_ifttt_request(key, event, value1, value2, value3), true)
 end
 
 return ifttt

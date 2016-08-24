@@ -19,10 +19,10 @@ function clypit:get_clypit_details(shortcode)
 end
 
 function clypit:action(msg, config, matches)
-  utilities.send_typing(self, msg.chat.id, 'upload_audio')
+  utilities.send_typing(msg.chat.id, 'upload_audio')
   local audio, title, duration = clypit:get_clypit_details(matches[1])
-  if not audio then return utilities.send_reply(self, msg, config.errors.connection) end
-  utilities.send_audio(self, msg.chat.id, audio, nil, msg.message_id, duration, nil, title)
+  if not audio then return utilities.send_reply(msg, config.errors.connection) end
+  utilities.send_audio(msg.chat.id, audio, nil, msg.message_id, duration, nil, title)
 end
 
 return clypit

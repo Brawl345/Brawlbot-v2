@@ -60,7 +60,7 @@ function migrate:action(msg, config, matches)
   end
   
   print('--- SUPERGROUP MIGRATION ENDED ---')
-  utilities.send_message(self, new_id, 'Die User-ID dieser Gruppe ist nun '..new_id..'.\nAlle Daten wurden übertragen.')
+  utilities.send_message(new_id, 'Die User-ID dieser Gruppe ist nun '..new_id..'.\nAlle Daten wurden übertragen.')
 end
 
 return migrate

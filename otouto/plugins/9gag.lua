@@ -28,7 +28,7 @@ end
 
 function ninegag:inline_callback(inline_query, config)
   local res, code = http.request(url)
-  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
+  if code ~= 200 then abort_inline_query(inline_query) return end
   local gag = json.decode(res)
   
   local results = '['
@@ -42,19 +42,19 @@ function ninegag:inline_callback(inline_query, config)
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 300)
+  utilities.answer_inline_query(inline_query, results, 300)
 end
 
 function ninegag:action(msg, config)
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local url, title, post_url = ninegag:get_9GAG()
   if not url then
-	utilities.send_reply(self, msg, config.errors.connection)
+	utilities.send_reply(msg, config.errors.connection)
 	return
   end
 
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, title, msg.message_id, '{"inline_keyboard":[[{"text":"Post aufrufen","url":"'..post_url..'"}]]}')
+  utilities.send_photo(msg.chat.id, file, title, msg.message_id, '{"inline_keyboard":[[{"text":"Post aufrufen","url":"'..post_url..'"}]]}')
 end
 
 return ninegag

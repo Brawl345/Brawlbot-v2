@@ -27,7 +27,7 @@ function expand:inline_callback(inline_query, config, matches)
   end
   
   local results = '[{"type":"article","id":"7","title":"'..title..'","description":"'..description..'","url":"'..url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/generic/internet.jpg","thumb_width":165,"thumb_height":150,"hide_url":true,"input_message_content":{"message_text":"'..url..'"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 3600)
+  utilities.answer_inline_query(inline_query, results, 3600)
 end
 
 function expand:url(long_url)
@@ -47,10 +47,10 @@ end
 function expand:action(msg, config, matches)
    local ok, response_headers = expand:url(matches[1])
    if ok and response_headers.location then
-      utilities.send_reply(self, msg, response_headers.location)
+      utilities.send_reply(msg, response_headers.location)
       return
    else
-      utilities.send_reply(self, msg, "Fehler beim Erweitern der URL.")
+      utilities.send_reply(msg, "Fehler beim Erweitern der URL.")
       return
    end
 end

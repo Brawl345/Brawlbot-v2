@@ -181,42 +181,42 @@ function gh_feed:action(msg, config, matches)
   -- For channels
   if matches[1] == 'sub' and matches[2] and matches[3] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local id = '@'..matches[3]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local output = gh_feed:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
 	return
   elseif matches[1] == 'del' and matches[2] and matches[3] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local id = '@'..matches[3]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local output = gh_feed:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
 	return
   elseif matches[1] == 'gh' and matches[2] then
     local id = '@'..matches[2]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local chat_name = result.result.title
     local output = gh_feed:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
 	return
   end
   
@@ -228,42 +228,39 @@ function gh_feed:action(msg, config, matches)
 
   if matches[1] == 'sub' and matches[2] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local output = gh_feed:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
 	return
   elseif matches[1] == 'del' and matches[2] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local output = gh_feed:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, true, '{"hide_keyboard":true}')
+	utilities.send_reply(msg, output, true, '{"hide_keyboard":true}')
 	return
   elseif matches[1] == 'del' and not matches[2] then
     local list_subs, keyboard = gh_feed:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, list_subs, true, keyboard)
+	utilities.send_reply(msg, list_subs, true, keyboard)
     return
   elseif matches[1] == 'sync' then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
-	gh_feed:cron(self)
+	gh_feed:cron()
 	return
   end
   
   local output = gh_feed:print_subs(id, chat_name)
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
   return
 end
 
-function gh_feed:cron(self_plz)
-   if not self.BASE_URL then
-     self = self_plz
-   end  
+function gh_feed:cron()
    local keys = redis:keys(gh_feed_get_base_redis("*", "subs"))
    for k,v in pairs(keys) do
      local repo = string.match(v, "github:(.+):subs")
@@ -292,7 +289,7 @@ function gh_feed:cron(self_plz)
 	     redis:set(gh_feed_get_base_redis(repo, "etag"), last_etag)
 	     redis:set(gh_feed_get_base_redis(repo, "date"), last_date)
 	     for k2, receiver in pairs(redis:smembers(v)) do
-	       utilities.send_message(self, receiver, text, true, nil, true)
+	       utilities.send_message(receiver, text, true, nil, true)
 	     end
 	   end
     end

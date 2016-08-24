@@ -50,7 +50,7 @@ function get:action(msg)
     output = get:list_variables(msg)
   end
 
-  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+  utilities.send_message(msg.chat.id, output, true, nil, true)
 end
 
 return get

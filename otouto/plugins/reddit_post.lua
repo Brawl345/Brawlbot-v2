@@ -39,12 +39,12 @@ function reddit_post:action(msg, config, matches)
   local subreddit = matches[1]
   local reddit_code = matches[2]
   local data = reddit_post:get_reddit_data(subreddit, reddit_code)
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
   
   local text = reddit_post:send_reddit_data(data)
-  if not text then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not text then utilities.send_reply(msg, config.errors.connection) return end
   
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
 end
 
 return reddit_post

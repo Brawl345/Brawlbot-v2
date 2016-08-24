@@ -167,10 +167,10 @@ function weather:inline_callback(inline_query, config, matches)
 	end
   end
   local lat, lng = get_city_coordinates(city, config)
-  if not lat and not lng then utilities.answer_inline_query(self, inline_query) return end
+  if not lat and not lng then abort_inline_query(inline_query) return end
   
   local title, description, icon, text, ttl = weather:get_weather(lat, lng, true)
-  if not title and not description and not icon and not text and not ttl then utilities.answer_inline_query(self, inline_query) return end
+  if not title and not description and not icon and not text and not ttl then abort_inline_query(inline_query) return end
   
   local text = text:gsub('\n', '\\n')
   local thumb_url = 'https://anditest.perseus.uberspace.de/inlineQuerys/weather/'
@@ -188,7 +188,7 @@ function weather:inline_callback(inline_query, config, matches)
     thumb_url = thumb_url..'cloudy.jpg'
   end
   local results = '[{"type":"article","id":"19122006","title":"'..title..'","description":"'..description..'","thumb_url":"'..thumb_url..'","thumb_width":80,"thumb_height":80,"input_message_content":{"message_text":"'..text..'", "parse_mode":"Markdown"}}]'
-  utilities.answer_inline_query(self, inline_query, results, ttl, is_personal)
+  utilities.answer_inline_query(inline_query, results, ttl, is_personal)
 end
 
 function weather:action(msg, config, matches)
@@ -207,7 +207,7 @@ function weather:action(msg, config, matches)
   
   local lat, lng = get_city_coordinates(city, config)
   if not lat and not lng then
-	utilities.send_reply(self, msg, '*Diesen Ort gibt es nicht!*', true)
+	utilities.send_reply(msg, '*Diesen Ort gibt es nicht!*', true)
     return
   end
   
@@ -215,7 +215,7 @@ function weather:action(msg, config, matches)
   if not text then
     text = 'Konnte das Wetter von dieser Stadt nicht bekommen.'
   end
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
 end
 
 return weather

@@ -8,10 +8,10 @@ surrogate.triggers = {
 
 function surrogate:action(msg, config, matches)
   if not is_sudo(msg, config) then
-    utilities.send_reply(self, msg, config.errors.sudo)
+    utilities.send_reply(msg, config.errors.sudo)
 	return
   end
-  utilities.send_message(self, matches[1], matches[2], true, nil, true)
+  utilities.send_message(matches[1], matches[2], true, nil, true)
   return
 end
 

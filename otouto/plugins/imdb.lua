@@ -26,9 +26,9 @@ function imdb:inline_callback(inline_query, config, matches)
   local query = matches[1]
   local url = BASE_URL..'/?s='..URL.escape(query)
   local res, code = https.request(url)
-  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
+  if code ~= 200 then abort_inline_query(inline_query) return end
   local data = json.decode(res)
-  if data.Response ~= "True" then utilities.answer_inline_query(self, inline_query) return end
+  if data.Response ~= "True" then abort_inline_query(inline_query) return end
   
   local results = '['
   local id = 500
@@ -63,26 +63,26 @@ function imdb:inline_callback(inline_query, config, matches)
   
   local results = results:sub(0, -2)
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 10000)
+  utilities.answer_inline_query(inline_query, results, 10000)
 end
 
 function imdb:action(msg, config)
   local input = utilities.input_from_msg(msg)
   if not input then
-    utilities.send_reply(self, msg, imdb.doc, true)
+    utilities.send_reply(msg, imdb.doc, true)
 	return
   end
   
   local url = BASE_URL..'/?t='..URL.escape(input)
   local jstr, res = https.request(url)
   if res ~= 200 then
-    utilities.send_reply(self, msg, config.errors.connection)
+    utilities.send_reply(msg, config.errors.connection)
     return
   end
 
   local jdat = json.decode(jstr)
   if jdat.Response ~= 'True' then
-	utilities.send_reply(self, msg, config.errors.results)
+	utilities.send_reply(msg, config.errors.results)
 	return
   end
 
@@ -90,11 +90,11 @@ function imdb:action(msg, config)
   output = output..string.gsub(jdat.imdbRating, '%.', ',')..'/10 | '..jdat.Runtime..' | '.. jdat.Genre..'\n'
   output = output..'<i>' .. jdat.Plot .. '</i>'
 
-  utilities.send_reply(self, msg, output, 'HTML', '{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'.. jdat.imdbID..'"}]]}')
+  utilities.send_reply(msg, output, 'HTML', '{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'.. jdat.imdbID..'"}]]}')
 	
   if jdat.Poster ~= "N/A" then
     local file = download_to_file(jdat.Poster)
-    utilities.send_photo(self, msg.chat.id, file)
+    utilities.send_photo(msg.chat.id, file)
   end
 end
 

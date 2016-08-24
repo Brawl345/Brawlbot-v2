@@ -47,7 +47,7 @@ function channels:disable_channel(msg)
   end
 end
 
-function channels:pre_process(msg, self, config)
+function channels:pre_process(msg, config)
   -- If is sudo can reeanble the channel
   if is_sudo(msg, config) then
     if msg.text == "/channel enable" then
@@ -57,9 +57,7 @@ function channels:pre_process(msg, self, config)
 
   if channels:is_channel_disabled(msg) then
     print('Channel wurde deaktiviert')
-	msg.text = ''
-	msg.text_lower = ''
-	msg.entities = ''
+	return
   end
 
 	return msg
@@ -67,18 +65,18 @@ end
 
 function channels:action(msg, config, matches)
   if msg.from.id ~= config.admin then
-    utilities.send_reply(self, msg, config.errors.sudo)
+    utilities.send_reply(msg, config.errors.sudo)
 	return
   end
 
   -- Enable a channel
   if matches[1] == 'enable' then
-    utilities.send_reply(self, msg, channels:enable_channel(msg))
+    utilities.send_reply(msg, channels:enable_channel(msg))
     return
   end
   -- Disable a channel
   if matches[1] == 'disable' then
-    utilities.send_reply(self, msg, channels:disable_channel(msg))
+    utilities.send_reply(msg, channels:disable_channel(msg))
     return
   end
 end

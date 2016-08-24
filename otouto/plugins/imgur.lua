@@ -41,14 +41,14 @@ end
 function imgur:action(msg)
   local imgur_code = matches[1]
   if imgur_code == "login" then return nil end
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local link = imgur:get_imgur_data(imgur_code)
   if link then
     local file = download_to_file(link)
     if string.ends(link, ".gif") then
-      utilities.send_document(self, msg.chat.id, file, nil, msg.message_id)
+      utilities.send_document(msg.chat.id, file, nil, msg.message_id)
     else
-      utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+      utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
     end
   end
 end

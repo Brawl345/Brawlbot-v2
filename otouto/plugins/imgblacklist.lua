@@ -50,7 +50,7 @@ end
 
 function imgblacklist:action(msg, config, matches)
   if msg.from.id ~= config.admin then
-    utilities.send_reply(self, msg, config.errors.sudo)
+    utilities.send_reply(msg, config.errors.sudo)
 	return
   end
   
@@ -60,22 +60,22 @@ function imgblacklist:action(msg, config, matches)
   _blacklist = redis:smembers("telegram:img_blacklist")
   
   if action == 'add' and not word then
-    utilities.send_reply(self, msg, imgblacklist.doc, true)
+    utilities.send_reply(msg, imgblacklist.doc, true)
 	return
   elseif action == "add" and word then
-	utilities.send_reply(self, msg, imgblacklist:add_blacklist(word), true)
+	utilities.send_reply(msg, imgblacklist:add_blacklist(word), true)
     return
   end
   
   if action == 'remove' and not word then
-    utilities.send_reply(self, msg, imgblacklist.doc, true)
+    utilities.send_reply(msg, imgblacklist.doc, true)
 	return
   elseif action == "remove" and word then
-	utilities.send_reply(self, msg, imgblacklist:remove_blacklist(word), true)
+	utilities.send_reply(msg, imgblacklist:remove_blacklist(word), true)
     return
    end
 
-  utilities.send_reply(self, msg, imgblacklist:show_blacklist())
+  utilities.send_reply(msg, imgblacklist:show_blacklist())
 end
 
 return imgblacklist

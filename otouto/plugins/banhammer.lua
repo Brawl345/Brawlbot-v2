@@ -40,11 +40,11 @@ function banhammer:init(config)
 Alternativ kann auch auf die Nachricht des Users geantwortet werden, die Befehle sind dnn die obrigen ohne `user` bzw.`delete`.]]
 end
 
-function banhammer:kick_user(user_id, chat_id, self, onlykick)
+function banhammer:kick_user(user_id, chat_id, onlykick)
   if user_id == tostring(our_id) then
     return "Ich werde mich nicht selbst kicken!"
   else
-    local request = bindings.request(self, 'kickChatMember', {
+    local request = bindings.request('kickChatMember', {
 	  chat_id = chat_id,
 	  user_id = user_id
 	} )
@@ -57,7 +57,7 @@ function banhammer:kick_user(user_id, chat_id, self, onlykick)
   end
 end
 
-function banhammer:ban_user(user_id, chat_id, self)
+function banhammer:ban_user(user_id, chat_id)
   if user_id == tostring(our_id) then
     return "Ich werde mich nicht selbst kicken!"
   else
@@ -65,15 +65,15 @@ function banhammer:ban_user(user_id, chat_id, self)
     local hash =  'banned:'..chat_id..':'..user_id
     redis:set(hash, true)
     -- Kick from chat
-    return banhammer:kick_user(user_id, chat_id, self)
+    return banhammer:kick_user(user_id, chat_id)
   end
 end
 
-function banhammer:unban_user(user_id, chat_id, self, chat_type)
+function banhammer:unban_user(user_id, chat_id, chat_type)
   local hash =  'banned:'..chat_id..':'..user_id
   redis:del(hash)
   if chat_type == 'supergroup' then
-    bindings.request(self, 'unbanChatMember', {
+    bindings.request('unbanChatMember', {
 	    chat_id = chat_id,
 	    user_id = user_id
 	  } )
@@ -99,7 +99,7 @@ function banhammer:is_chat_whitelisted(id)
   return white
 end
 
-function banhammer:pre_process(msg, self, config)
+function banhammer:pre_process(msg, config)
   -- SERVICE MESSAGE
   if msg.new_chat_member then
 	local user_id = msg.new_chat_member.id
@@ -107,7 +107,7 @@ function banhammer:pre_process(msg, self, config)
 	local banned = banhammer:is_banned(user_id, msg.chat.id)
 	if banned then
       print('User is banned!')
-      banhammer:kick_user(user_id, msg.chat.id, self, true)
+      banhammer:kick_user(user_id, msg.chat.id, true)
     end
     -- No further checks
     return msg
@@ -120,7 +120,7 @@ function banhammer:pre_process(msg, self, config)
     local banned = banhammer:is_banned(user_id, chat_id)
     if banned then
       print('Banned user talking!')
-      banhammer:ban_user(user_id, chat_id, self)
+      banhammer:ban_user(user_id, chat_id)
       return
     end
   end
@@ -156,7 +156,7 @@ function banhammer:pre_process(msg, self, config)
 		end
       else
 	    if not has_been_warned then
-		  utilities.send_reply(self, msg, "Dies ist ein privater Bot, der erst nach einer Freischaltung benutzt werden kann.\nThis is a private bot, which can only be after an approval.")
+		  utilities.send_reply(msg, "Dies ist ein privater Bot, der erst nach einer Freischaltung benutzt werden kann.\nThis is a private bot, which can only be after an approval.")
 		  redis:hset('user:'..user_id, 'has_been_warned', true)
 		else
 		  print('User has already been warned!')
@@ -182,7 +182,7 @@ function banhammer:action(msg, config, matches)
   
   if matches[1] == 'leave' then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-	  bindings.request(self, 'leaveChat', {
+	  bindings.request('leaveChat', {
 	    chat_id = msg.chat.id
 	  } )
 	  return
@@ -207,17 +207,17 @@ function banhammer:action(msg, config, matches)
 
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
       if matches[2] == 'user' or not matches[2] then
-        local text = banhammer:ban_user(user_id, chat_id, self)
-		utilities.send_reply(self, msg, text)
+        local text = banhammer:ban_user(user_id, chat_id)
+		utilities.send_reply(msg, text)
         return
       end
       if matches[2] == 'delete' then
-		local text = banhammer:unban_user(user_id, chat_id, self, msg.chat.type)
-		utilities.send_reply(self, msg, text)
+		local text = banhammer:unban_user(user_id, chat_id, msg.chat.type)
+		utilities.send_reply(msg, text)
         return
       end
     else
-	  utilities.send_reply(self, msg, 'Das ist keine Chat-Gruppe')
+	  utilities.send_reply(msg, 'Das ist keine Chat-Gruppe')
       return
     end
   end
@@ -235,10 +235,10 @@ function banhammer:action(msg, config, matches)
 	      user_id = msg.reply_to_message.from.id
 	    end
 	  end
-      banhammer:kick_user(user_id, msg.chat.id, self, true)
+      banhammer:kick_user(user_id, msg.chat.id, true)
 	  return
     else
-	  utilities.send_reply(self, msg, 'Das ist keine Chat-Gruppe')
+	  utilities.send_reply(msg, 'Das ist keine Chat-Gruppe')
       return
     end
   end
@@ -247,14 +247,14 @@ function banhammer:action(msg, config, matches)
     if matches[2] == 'enable' then
       local hash = 'whitelist:enabled'
       redis:set(hash, true)
-      utilities.send_reply(self, msg, 'Whitelist aktiviert')
+      utilities.send_reply(msg, 'Whitelist aktiviert')
 	  return
     end
 
     if matches[2] == 'disable' then
       local hash = 'whitelist:enabled'
       redis:del(hash)
-      utilities.send_reply(self, msg, 'Whitelist deaktiviert')
+      utilities.send_reply(msg, 'Whitelist deaktiviert')
 	  return
     end
 	
@@ -269,7 +269,7 @@ function banhammer:action(msg, config, matches)
 	  end
 	  local hash = 'whitelist:user#id'..user_id
 	  redis:set(hash, true)
-      utilities.send_reply(self, msg, 'User '..user_id..' whitelisted')
+      utilities.send_reply(msg, 'User '..user_id..' whitelisted')
 	  return
 	end
 	
@@ -286,14 +286,14 @@ function banhammer:action(msg, config, matches)
 	  end
 	  local hash = 'whitelist:user#id'..user_id
       redis:del(hash)
-      utilities.send_reply(self, msg, 'User '..user_id..' von der Whitelist entfernt!')
+      utilities.send_reply(msg, 'User '..user_id..' von der Whitelist entfernt!')
 	  return
 	end
 
     if matches[2] == 'user' then
       local hash = 'whitelist:user#id'..matches[3]
       redis:set(hash, true)
-      utilities.send_reply(self, msg, 'User '..matches[3]..' whitelisted')
+      utilities.send_reply(msg, 'User '..matches[3]..' whitelisted')
 	  return
     end
 
@@ -301,10 +301,10 @@ function banhammer:action(msg, config, matches)
       if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
 	    local hash = 'whitelist:chat#id'..msg.chat.id
         redis:set(hash, true)
-        utilities.send_reply(self, msg, 'Chat '..msg.chat.id..' whitelisted')
+        utilities.send_reply(msg, 'Chat '..msg.chat.id..' whitelisted')
 		return
       else
-	    utilities.send_reply(self, msg, 'Das ist keine Chat-Gruppe!')
+	    utilities.send_reply(msg, 'Das ist keine Chat-Gruppe!')
 	    return
       end
 	end
@@ -312,7 +312,7 @@ function banhammer:action(msg, config, matches)
     if matches[2] == 'delete' and matches[3] == 'user' then
       local hash = 'whitelist:user#id'..matches[4]
       redis:del(hash)
-      utilities.send_reply(self, msg, 'User '..matches[4]..' von der Whitelist entfernt!')
+      utilities.send_reply(msg, 'User '..matches[4]..' von der Whitelist entfernt!')
 	  return
     end
 
@@ -320,10 +320,10 @@ function banhammer:action(msg, config, matches)
      if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
         local hash = 'whitelist:chat#id'..msg.chat.id
         redis:del(hash)
-        utilities.send_reply(self, msg, 'Chat '..msg.chat.id..' von der Whitelist entfernt')
+        utilities.send_reply(msg, 'Chat '..msg.chat.id..' von der Whitelist entfernt')
 	    return
       else
-	    utilities.send_reply(self, msg, 'Das ist keine Chat-Gruppe!')
+	    utilities.send_reply(msg, 'Das ist keine Chat-Gruppe!')
 	    return
       end
     end
@@ -334,14 +334,14 @@ function banhammer:action(msg, config, matches)
 	if matches[2] == 'user' and matches[3] then
 	  local hash = 'blocked:'..matches[3]
 	  redis:set(hash, true)
-	  utilities.send_reply(self, msg, 'User '..matches[3]..' darf den Bot nun nicht mehr nutzen.')
+	  utilities.send_reply(msg, 'User '..matches[3]..' darf den Bot nun nicht mehr nutzen.')
 	  return
 	end
 	
 	if matches[2] == 'delete' and matches[3] then
 	  local hash = 'blocked:'..matches[3]
 	  redis:del(hash)
-	  utilities.send_reply(self, msg, 'User '..matches[3]..' darf den Bot wieder nutzen.')
+	  utilities.send_reply(msg, 'User '..matches[3]..' darf den Bot wieder nutzen.')
 	  return
 	end
 	
@@ -358,7 +358,7 @@ function banhammer:action(msg, config, matches)
 	  end
 	  local hash = 'blocked:'..user_id
 	  redis:set(hash, true)
-	  utilities.send_reply(self, msg, 'User '..user_id..' darf den Bot nun nicht mehr nutzen.')
+	  utilities.send_reply(msg, 'User '..user_id..' darf den Bot nun nicht mehr nutzen.')
 	  return
 	end
 	
@@ -375,7 +375,7 @@ function banhammer:action(msg, config, matches)
 	  end
 	  local hash = 'blocked:'..user_id
 	  redis:del(hash)
-	  utilities.send_reply(self, msg, 'User '..user_id..' darf den Bot wieder nutzen.')
+	  utilities.send_reply(msg, 'User '..user_id..' darf den Bot wieder nutzen.')
 	  return
 	end
 	

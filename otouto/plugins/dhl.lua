@@ -28,7 +28,7 @@ end
 function dhl:action(msg, config, matches)
   local sendungs_id = matches[1]
   if string.len(sendungs_id) < 8 then return end
-  utilities.send_reply(self, msg, dhl:sendungsstatus(sendungs_id), true)
+  utilities.send_reply(msg, dhl:sendungsstatus(sendungs_id), true)
 end
 
 return dhl

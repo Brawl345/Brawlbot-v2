@@ -18,8 +18,8 @@ Alias: ]]..config.cmd_pat..[[who
 ```]]
 end
 
-function id:get_member_count(self, msg, chat_id)
-	return bindings.request(self, 'getChatMembersCount', {
+function id:get_member_count(msg, chat_id)
+	return bindings.request('getChatMembersCount', {
 		chat_id = chat_id
 	} )
 end
@@ -54,7 +54,7 @@ function id:inline_callback(inline_query, config, matches)
   local name = utilities.build_name(inline_query.from.first_name, inline_query.from.last_name)
   
   local results = '[{"type":"article","id":"30","title":"Deine Telegram-ID ist:","description":"'..id..'","input_message_content":{"message_text":"<b>'..name..'</b>: <code>'..id..'</code>","parse_mode":"HTML"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 10000, true)
+  utilities.answer_inline_query(inline_query, results, 10000, true)
 end
 
 function id:action(msg, config, matches)
@@ -86,10 +86,10 @@ function id:action(msg, config, matches)
 
 	local output = user .. ', und du bist in der Gruppe ' .. group
 
-	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
   elseif matches[1] == "chat" then
     if msg.chat.type ~= 'group' and msg.chat.type ~= 'supergroup' then
-	  utilities.send_reply(self, msg, 'Das hier ist keine Gruppe!')
+	  utilities.send_reply(msg, 'Das hier ist keine Gruppe!')
 	  return
 	end
     local chat_name = msg.chat.title
@@ -106,7 +106,7 @@ function id:action(msg, config, matches)
     end
 
 	-- get all administrators and the creator
-	local administrators = utilities.get_chat_administrators(self, chat_id)
+	local administrators = utilities.get_chat_administrators(chat_id)
 	local admins = {}
 	for num in pairs(administrators.result) do
 	  if administrators.result[num].status ~= 'creator' then
@@ -115,7 +115,7 @@ function id:action(msg, config, matches)
 	    creator_id = administrators.result[num].user.id
 	  end
     end
-	local result = id:get_member_count(self, msg, chat_id)
+	local result = id:get_member_count(msg, chat_id)
 	local member_count = result.result
 	if member_count == 1 then
 	  member_count = 'ist *1 Mitglied'
@@ -132,7 +132,7 @@ function id:action(msg, config, matches)
         text = text..'*'..user.name..'* `['..user.id..']`\n'
 	  end
     end
-	utilities.send_reply(self, msg, text..'_(Bots sind nicht gelistet)_', true)
+	utilities.send_reply(msg, text..'_(Bots sind nicht gelistet)_', true)
   end
 end
 

@@ -93,17 +93,17 @@ function translate:get_all_languages()
 end
 
 function translate:action(msg, config, matches)
-  utilities.send_typing(self, msg.chat.id, 'typing')
+  utilities.send_typing(msg.chat.id, 'typing')
   
   if matches[1] == '/getlanguages' then
-    utilities.send_reply(self, msg, translate:get_all_languages(), true)
+    utilities.send_reply(msg, translate:get_all_languages(), true)
 	return
   end
   
   if matches[1] == 'whatlang' and matches[2] then
     local text = matches[2]
 	local lang = translate:detect_language(text)
-	utilities.send_reply(self, msg, 'Erkannte Sprache: '..lang, true)
+	utilities.send_reply(msg, 'Erkannte Sprache: '..lang, true)
 	return
   end
 
@@ -112,7 +112,7 @@ function translate:action(msg, config, matches)
     print("First")
     local text = matches[1]
 	local language = translate:detect_language(text)
-	utilities.send_reply(self, msg, translate:translate(language, nil, text))
+	utilities.send_reply(msg, translate:translate(language, nil, text))
     return
   end
 
@@ -122,7 +122,7 @@ function translate:action(msg, config, matches)
     local target = matches[2]
     local text = matches[3]
 	local language = translate:detect_language(text)
-	utilities.send_reply(self, msg, translate:translate(language, target, text))
+	utilities.send_reply(msg, translate:translate(language, target, text))
     return
   end
 
@@ -132,7 +132,7 @@ function translate:action(msg, config, matches)
     local source = matches[1]
     local target = matches[2]
     local text = matches[3]
-	utilities.send_reply(self, msg, translate:translate(source, target, text))
+	utilities.send_reply(msg, translate:translate(source, target, text))
     return
   end
 

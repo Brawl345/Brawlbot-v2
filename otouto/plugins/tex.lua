@@ -14,18 +14,18 @@ function tex:action(msg, config)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, tex.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, tex.doc, true, msg.message_id, true)
 	  return
 	end
   end
 
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local eq = URL.escape(input)
 
   local url = "http://latex.codecogs.com/png.download?"
     .."\\dpi{300}%20\\LARGE%20"..eq
   local file = download_to_file(url, 'latex.png')
-  utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 end
 
 return tex

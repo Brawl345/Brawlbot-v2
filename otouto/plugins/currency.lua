@@ -39,7 +39,7 @@ function currency:inline_callback(inline_query, config, matches)
   end
   
   local value, iserr = currency:convert_money(base, to, amount)
-  if iserr then utilities.answer_inline_query(self, inline_query) return end
+  if iserr then abort_inline_query(inline_query) return end
   
   local output = amount..' '..base..' = *'..value..' '..to..'*'
   if tonumber(amount) == 1 then
@@ -48,7 +48,7 @@ function currency:inline_callback(inline_query, config, matches)
     title = amount..' '..base..' entsprechen'
   end
   local results = '[{"type":"article","id":"20","title":"'..title..'","description":"'..value..' '..to..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/currency/cash.jpg","thumb_width":157,"thumb_height":140,"input_message_content":{"message_text":"'..output..'","parse_mode":"Markdown"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 3600)
+  utilities.answer_inline_query(inline_query, results, 3600)
 end
 
 function currency:convert_money(base, to, amount)
@@ -83,7 +83,7 @@ end
 
 function currency:action(msg, config, matches)
   if matches[1] == '/cash' then
-    utilities.send_reply(self, msg, currency.doc, true)
+    utilities.send_reply(msg, currency.doc, true)
     return
   elseif not matches[2] then -- first pattern
     base = 'EUR'
@@ -100,24 +100,24 @@ function currency:action(msg, config, matches)
   end
 
   if from == to then
-    utilities.send_reply(self, msg, 'Jaja, sehr witzig...')
+    utilities.send_reply(msg, 'Jaja, sehr witzig...')
 	return
   end
 
   local value = currency:convert_money(base, to, amount)
   if value == 'NOCONNECT' then
-    utilities.send_reply(self, msg, config.errors.connection)
+    utilities.send_reply(msg, config.errors.connection)
     return
   elseif value == 'WRONGBASE' then 
-    utilities.send_reply(self, msg, 'Keine gültige Basiswährung.')
+    utilities.send_reply(msg, 'Keine gültige Basiswährung.')
 	return
   elseif value == 'WRONGCONVERTRATE' then
-    utilities.send_reply(self, msg, 'Keine gültige Umwandlungswährung.')
+    utilities.send_reply(msg, 'Keine gültige Umwandlungswährung.')
 	return
   end
 
   local output = amount..' '..base..' = *'..value..' '..to..'*'
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return currency

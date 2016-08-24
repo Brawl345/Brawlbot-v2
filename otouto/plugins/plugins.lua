@@ -162,13 +162,13 @@ end
 
 function plugin_manager:action(msg, config, matches)
   if msg.from.id ~= config.admin then
-    utilities.send_reply(self, msg, config.errors.sudo)
+    utilities.send_reply(msg, config.errors.sudo)
 	return
   end
 
   -- Show the available plugins 
   if matches[1] == '/plugins' then
-    utilities.send_reply(self, msg, plugin_manager:list_plugins())
+    utilities.send_reply(msg, plugin_manager:list_plugins())
     return
   end
   
@@ -178,11 +178,11 @@ function plugin_manager:action(msg, config, matches)
 	if matches[4] then 
 	  local id = matches[4]
       print("enable "..plugin..' on chat#id'..id)
-	  utilities.send_reply(self, msg, plugin_manager:reenable_plugin_on_chat(id, plugin))
+	  utilities.send_reply(msg, plugin_manager:reenable_plugin_on_chat(id, plugin))
       return
 	else
       print("enable "..plugin..' on this chat')
-	  utilities.send_reply(self, msg, plugin_manager:reenable_plugin_on_chat(msg, plugin))
+	  utilities.send_reply(msg, plugin_manager:reenable_plugin_on_chat(msg, plugin))
       return
     end
   end
@@ -191,7 +191,7 @@ function plugin_manager:action(msg, config, matches)
   if matches[1] == 'enable' then
     local plugin_name = matches[2]
     print("enable: "..matches[2])
-	utilities.send_reply(self, msg, plugin_manager:enable_plugin(self, config, plugin_name))
+	utilities.send_reply(msg, plugin_manager:enable_plugin(self, config, plugin_name))
     return
   end
   
@@ -201,11 +201,11 @@ function plugin_manager:action(msg, config, matches)
 	if matches[4] then 
 	  local id = matches[4]
       print("disable "..plugin..' on chat#id'..id)
-	  utilities.send_reply(self, msg, plugin_manager:disable_plugin_on_chat(id, plugin))
+	  utilities.send_reply(msg, plugin_manager:disable_plugin_on_chat(id, plugin))
       return
 	else
       print("disable "..plugin..' on this chat')
-	  utilities.send_reply(self, msg, plugin_manager:disable_plugin_on_chat(msg, plugin))
+	  utilities.send_reply(msg, plugin_manager:disable_plugin_on_chat(msg, plugin))
       return
     end
   end
@@ -213,13 +213,13 @@ function plugin_manager:action(msg, config, matches)
   -- Disable a plugin
   if matches[1] == 'disable' then
     print("disable: "..matches[2])
-	utilities.send_reply(self, msg, plugin_manager:disable_plugin(self, config, matches[2]))
+	utilities.send_reply(msg, plugin_manager:disable_plugin(self, config, matches[2]))
     return
   end
 
   -- Reload all the plugins!
   if matches[1] == 'reload' then
-    utilities.send_reply(self, msg, plugin_manager:reload_plugins(self, config))
+    utilities.send_reply(msg, plugin_manager:reload_plugins(self, config))
     return
   end
 end

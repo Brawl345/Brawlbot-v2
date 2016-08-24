@@ -25,10 +25,10 @@ end
 function googl:inline_callback(inline_query, config, matches)
   local shorturl = matches[1]
   local text, longUrl = googl:send_googl_info(shorturl)
-  if not longUrl then utilities.answer_inline_query(self, inline_query) return end
+  if not longUrl then abort_inline_query(inline_query) return end
 
   local results = '[{"type":"article","id":"9","title":"Verlängerte URL","description":"'..longUrl..'","url":"'..longUrl..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/generic/internet.jpg","thumb_width":165,"thumb_height":150,"hide_url":true,"input_message_content":{"message_text":"'..text..'"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 1)
+  utilities.answer_inline_query(inline_query, results, 1)
 end
 
 function googl:send_googl_info (shorturl)
@@ -49,8 +49,8 @@ end
 function googl:action(msg, config, matches)
   local shorturl = matches[1]
   local text = googl:send_googl_info(shorturl)
-  if not text then utilities.send_reply(self, msg, config.errors.connection) return end
-  utilities.send_reply(self, msg, text)
+  if not text then utilities.send_reply(msg, config.errors.connection) return end
+  utilities.send_reply(msg, text)
 end
 
 return googl

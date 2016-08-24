@@ -183,7 +183,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
   
   local search_url = 'https://'..lang..'.wikipedia.org/w/api.php?action=query&list=search&srsearch='..URL.escape(query)..'&format=json&prop=extracts&srprop=snippet&&srlimit=5'
   local res, code = https.request(search_url)
-  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
+  if code ~= 200 then abort_inline_query(inline_query) return end
   local data = json.decode(res).query
 
 
@@ -191,7 +191,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
   local id = 700
   for num in pairs(data.search) do
 	local title, result, keyboard = wikipedia:wikintro(data.search[num].title, lang, true)
-	if not title or not result or not keyboard then utilities.answer_inline_query(self, inline_query) return end
+	if not title or not result or not keyboard then abort_inline_query(inline_query) return end
 	results = results..'{"type":"article","id":"'..id..'","title":"'..title..'","description":"'..wikipedia:snip_snippet(data.search[num].snippet)..'","url":"https://'..lang..'.wikipedia.org/wiki/'..URL.escape(title)..'","hide_url":true,"thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/wiki/logo.jpg","thumb_width":95,"thumb_height":86,"reply_markup":'..keyboard..',"input_message_content":{"message_text":"'..result..'","parse_mode":"HTML"}}'
 	id = id+1
 	if num < #data.search then
@@ -199,7 +199,7 @@ function wikipedia:inline_callback(inline_query, config, matches)
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 3600)
+  utilities.answer_inline_query(inline_query, results, 3600)
 end
 
 function wikipedia:action(msg, config, matches)
@@ -221,7 +221,7 @@ function wikipedia:action(msg, config, matches)
     lang = nil
   end
   if term == "" then
-    utilities.send_reply(self, msg, wikipedia.doc, true)
+    utilities.send_reply(msg, wikipedia.doc, true)
     return
   end
 
@@ -231,7 +231,7 @@ function wikipedia:action(msg, config, matches)
   else
     result, keyboard = wikipedia:wikintro(term, lang)
   end
-  utilities.send_reply(self, msg, result, true, keyboard)
+  utilities.send_reply(msg, result, true, keyboard)
 end
 
 return wikipedia

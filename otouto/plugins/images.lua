@@ -7,8 +7,8 @@ images.triggers = {
 
 function images:action(msg, config, matches)
   local url = matches[1]
-  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, 'upload_photo', self)
-  local result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, 'upload_photo')
+  local result = utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 
   if nocache then return end
   if not result then return end

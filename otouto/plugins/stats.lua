@@ -79,7 +79,7 @@ function stats:chat_stats(chat_id)
   return text
 end
 
-function stats:pre_process(msg, self)
+function stats:pre_process(msg)
   if msg.left_chat_member then
     -- delete user from redis set, but keep message count
 	local hash = 'chat:'..msg.chat.id..':users'
@@ -126,21 +126,21 @@ function stats:action(msg, config, matches)
 
     if not matches[2] then
       if msg.chat.type == 'private' then
-	    utilities.send_reply(self, msg, 'Stats funktionieren nur in Chats!')
+	    utilities.send_reply(msg, 'Stats funktionieren nur in Chats!')
         return
       else
         local chat_id = msg.chat.id
-		utilities.send_reply(self, msg, stats:chat_stats(chat_id), 'HTML')
+		utilities.send_reply(msg, stats:chat_stats(chat_id), 'HTML')
         return
       end
     end
 
     if matches[2] == "chat" then
 	  if msg.from.id ~= config.admin then
-        utilities.send_reply(self, msg, config.errors.sudo)
+        utilities.send_reply(msg, config.errors.sudo)
 	    return
       else
-	    utilities.send_reply(self, msg, stats:chat_stats(matches[3]), 'HTML')
+	    utilities.send_reply(msg, stats:chat_stats(matches[3]), 'HTML')
         return
       end
     end

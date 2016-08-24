@@ -23,11 +23,11 @@ function patterns:action(msg)
 		end
 	)
 	if res == false then
-		utilities.send_reply(self, msg, 'Falsches Pattern!')
+		utilities.send_reply(msg, 'Falsches Pattern!')
 	else
 		output = output:sub(1, 4000)
 		output = '*Du meintest wohl*:\n"'..utilities.md_escape(utilities.trim(output))..'"'
-		utilities.send_reply(self, msg.reply_to_message, output, true)
+		utilities.send_reply(msg.reply_to_message, output, true)
 	end
 end
 

@@ -26,7 +26,7 @@ function fefe:post(id)
 end
 
 function fefe:action(msg, config, matches)
-  utilities.send_reply(self, msg, fefe:post(matches[1]))
+  utilities.send_reply(msg, fefe:post(matches[1]))
 end
 
 return fefe

@@ -90,31 +90,31 @@ end
 function creds_manager:action(msg, config, matches)
   local receiver = msg.from.id
   if receiver ~= config.admin then
-    utilities.send_reply(self, msg, config.errors.sudo)
+    utilities.send_reply(msg, config.errors.sudo)
 	return
   end
 
   if msg.chat.type ~= 'private' then
-    utilities.send_reply(self, msg, 'Dieses Plugin solltest du nur [privat](http://telegram.me/' .. self.info.username .. '?start=creds) verwenden!', true)
+    utilities.send_reply(msg, 'Dieses Plugin solltest du nur [privat](http://telegram.me/' .. self.info.username .. '?start=creds) verwenden!', true)
     return
   end
   
   if matches[1] == "/creds" then
-    utilities.send_reply(self, msg, creds_manager:list_creds())
+    utilities.send_reply(msg, creds_manager:list_creds())
     return
   elseif matches[1] == "/creds add" then
     local var = string.lower(string.sub(matches[2], 1, 50))
     local key = string.sub(matches[3], 1, 1000)
-	utilities.send_reply(self, msg, creds_manager:add_creds(var, key))
+	utilities.send_reply(msg, creds_manager:add_creds(var, key))
     return
   elseif matches[1] == "/creds del" then
     local var = string.lower(matches[2])
-	utilities.send_reply(self, msg, creds_manager:del_creds(var))
+	utilities.send_reply(msg, creds_manager:del_creds(var))
     return
   elseif matches[1] == "/creds rename" then
     local var = string.lower(string.sub(matches[2], 1, 50))
     local newvar = string.lower(string.sub(matches[3], 1, 1000))
-	utilities.send_reply(self, msg, creds_manager:rename_creds(var, newvar))
+	utilities.send_reply(msg, creds_manager:rename_creds(var, newvar))
     return
   end
 end

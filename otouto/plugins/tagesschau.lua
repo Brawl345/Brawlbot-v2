@@ -42,7 +42,7 @@ function tagesschau:inline_callback(inline_query, config, matches)
   local article = matches[1]
   local full_url = 'http://www.tagesschau.de/'..article..'.html'
   local text, img_url, headline, shorttext = tagesschau:get_tagesschau_article(article)
-  if text == 'HTTP-Fehler' or text == 'Artikel nicht gefunden!' then utilities.answer_inline_query(self, inline_query) return end
+  if text == 'HTTP-Fehler' or text == 'Artikel nicht gefunden!' then abort_inline_query(inline_query) return end
 
   if text:match('"') then
     text = text:gsub('"', '\\"')
@@ -56,18 +56,18 @@ function tagesschau:inline_callback(inline_query, config, matches)
   
   local text = text:gsub('\n', '\\n')
   local results = '[{"type":"article","id":"11","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 7200)
+  utilities.answer_inline_query(inline_query, results, 7200)
 end
 
 function tagesschau:action(msg, config, matches)
   local article = matches[1]
   local text, image_url = tagesschau:get_tagesschau_article(article)
   if image_url then
-    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+    utilities.send_typing(msg.chat.id, 'upload_photo')
     local file = download_to_file(image_url)
-    utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+    utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
   end
-  utilities.send_reply(self, msg, text, 'HTML')
+  utilities.send_reply(msg, text, 'HTML')
 end
 
 return tagesschau

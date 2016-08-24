@@ -44,20 +44,20 @@ function loc_manager:action(msg, config, matches)
   local user_id = msg.from.id
   
   if matches[1] == 'set' then
-	utilities.send_reply(self, msg, loc_manager:set_location(user_id, matches[2]), true)
+	utilities.send_reply(msg, loc_manager:set_location(user_id, matches[2]), true)
 	return
   elseif matches[1] == 'del' then
-    utilities.send_reply(self, msg, loc_manager:del_location(user_id), true)
+    utilities.send_reply(msg, loc_manager:del_location(user_id), true)
     return
   else
     local set_location = get_location(user_id)
     if not set_location then
-	  utilities.send_reply(self, msg, '*Du hast keinen Ort gesetzt!*', true)
+	  utilities.send_reply(msg, '*Du hast keinen Ort gesetzt!*', true)
       return
     else
 	  local coords = utilities.get_coords(set_location, config)
-	  utilities.send_location(self, msg.chat.id, coords.lat, coords.lon, msg.message_id)
-	  utilities.send_reply(self, msg, 'Gesetzter Wohnort: *'..set_location..'*', true)
+	  utilities.send_location(msg.chat.id, coords.lat, coords.lon, msg.message_id)
+	  utilities.send_reply(msg, 'Gesetzter Wohnort: *'..set_location..'*', true)
 	  return
     end
   end

@@ -22,7 +22,7 @@ function channel:action(msg, config)
   local input = utilities.input(msg.text)
   local output
   local chat_id = '@'..matches[1]
-  local admin_list, gca_results = utilities.get_chat_administrators(self, chat_id)
+  local admin_list, gca_results = utilities.get_chat_administrators(chat_id)
 
   if admin_list then
 	local is_admin = false
@@ -39,17 +39,17 @@ function channel:action(msg, config)
 		-- this plugin will also be ready :P
 		-- Also, URL buttons work!? Maybe beta?
 		if reply_markup:match('"callback_data":"') then
-		  utilities.send_reply(self, msg, 'callback_data ist in Buttons nicht erlaubt.')
+		  utilities.send_reply(msg, 'callback_data ist in Buttons nicht erlaubt.')
 		  return
 		elseif reply_markup:match('"switch_inline_query":"') then
-		  utilities.send_reply(self, msg, 'switch_inline_query ist in Buttons nicht erlaubt.')
+		  utilities.send_reply(msg, 'switch_inline_query ist in Buttons nicht erlaubt.')
 		  return
 		end
 	  else
 	    text = matches[2]
 		reply_markup = nil
 	  end
-	  local success, result = utilities.send_message(self, chat_id, text, true, nil, true, reply_markup)
+	  local success, result = utilities.send_message(chat_id, text, true, nil, true, reply_markup)
 	  if success then
 	    output = 'Deine Nachricht wurde versendet!'
 	  else
@@ -61,7 +61,7 @@ function channel:action(msg, config)
   else
 	output = 'Sorry, ich konnte die Administratorenliste nicht abrufen!\n`'..gca_results.description..'`'
   end
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return channel

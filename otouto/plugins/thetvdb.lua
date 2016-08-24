@@ -30,7 +30,7 @@ function tv:get_tv_info(series)
   return result
 end
 
-function tv:send_tv_data(result, self, msg)
+function tv:send_tv_data(result, msg)
   local title = xml.find(result, 'SeriesName')[1]
   local id = xml.find(result, 'seriesid')[1]
   
@@ -68,11 +68,11 @@ function tv:send_tv_data(result, self, msg)
   local text = '*'..title..'*'..alias..aired..publisher..imdb..desc..'\n[TVDB-Seite besuchen](http://thetvdb.com/?id='..id..'&tab=series)'
   if xml.find(result, 'banner') then
     local image_url = 'http://www.thetvdb.com/banners/'..xml.find(result, 'banner')[1]
-	utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	utilities.send_typing(msg.chat.id, 'upload_photo')
     local file = download_to_file(image_url)
-	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
   end
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
 end
 
 
@@ -80,13 +80,13 @@ function tv:action(msg, config, matches)
   local series = URL.escape(matches[1])
   local tv_info = tv:get_tv_info(series)
   if tv_info == "NOTFOUND" then
-    utilities.send_reply(self, msg, config.errors.results)
+    utilities.send_reply(msg, config.errors.results)
 	return
   elseif tv_info == "HTTP-ERROR" then
-    utilities.send_reply(self, msg, config.errors.connection)
+    utilities.send_reply(msg, config.errors.connection)
 	return
   else
-    tv:send_tv_data(tv_info, self,msg)
+    tv:send_tv_data(tv_info, msg)
   end
 end
 

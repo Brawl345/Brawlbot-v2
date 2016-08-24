@@ -29,10 +29,10 @@ function help:inline_callback(inline_query, config, matches)
 	  local doc = doc:gsub('\\n', '\\\n')
 	  local chosen_plugin = utilities.get_word(plugin.command, 1)
 	  local results = '[{"type":"article","id":"9","title":"Hilfe für '..chosen_plugin..'","description":"Hilfe für das Plugin \\"'..chosen_plugin..'\\" wird gepostet.","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/help/hilfe.jpg","input_message_content":{"message_text":"'..doc..'","parse_mode":"Markdown"}}]'
-	  utilities.answer_inline_query(self, inline_query, results, 600, nil, nil, 'Hilfe anzeigen', 'hilfe_'..chosen_plugin)
+	  utilities.answer_inline_query(inline_query, results, 600, nil, nil, 'Hilfe anzeigen', 'hilfe_'..chosen_plugin)
 	end
   end
-  utilities.answer_inline_query(self, inline_query)
+  utilities.answer_inline_query(inline_query)
 end
 
 function help:action(msg, config, matches)
@@ -62,11 +62,11 @@ function help:action(msg, config, matches)
 	local help_text = help_text .. table.concat(commandlist, '\n• '..config.cmd_pat) .. '\nParameter: <benötigt> [optional]'
 	local help_text = help_text:gsub('%[', '\\[')
 
-	local res = utilities.send_message(self, msg.from.id, help_text, true, nil, true)
+	local res = utilities.send_message(msg.from.id, help_text, true, nil, true)
 	if not res then
-	  utilities.send_reply(self, msg, 'Bitte schreibe mir zuerst [privat](http://telegram.me/' .. self.info.username .. '?start=help) für eine Hilfe.', true)
+	  utilities.send_reply(msg, 'Bitte schreibe mir zuerst [privat](http://telegram.me/' .. self.info.username .. '?start=help) für eine Hilfe.', true)
 	elseif msg.chat.type ~= 'private' then
-	  utilities.send_reply(self, msg, 'Ich habe dir die Hilfe privat gesendet!.')
+	  utilities.send_reply(msg, 'Ich habe dir die Hilfe privat gesendet!.')
 	end
 	return
   end
@@ -75,12 +75,12 @@ function help:action(msg, config, matches)
     local plugin = self.plugins[n]
     if plugin.command and utilities.get_word(plugin.command, 1) == input and plugin.doc then
 	  local output = '*Hilfe für* _' .. utilities.get_word(plugin.command, 1) .. '_ *:*' .. plugin.doc
-	  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	  utilities.send_message(msg.chat.id, output, true, nil, true)
 	  return
 	end
   end
 
-  utilities.send_reply(self, msg, 'Für diesen Befehl gibt es keine Hilfe.')
+  utilities.send_reply(msg, 'Für diesen Befehl gibt es keine Hilfe.')
 end
 
 return help

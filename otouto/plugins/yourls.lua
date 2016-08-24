@@ -46,7 +46,7 @@ end
 function yourls:action(msg, config, matches)
   local long_url = matches[1]
   local baseurl, protocol = yourls:prot_url(SITE_URL)
-  utilities.send_reply(self, msg, yourls:create_yourls_link(long_url, protocol))
+  utilities.send_reply(msg, yourls:create_yourls_link(long_url, protocol))
   return
 end
 

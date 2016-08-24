@@ -1,23 +1,36 @@
+--[[
+    bot.lua
+    The heart and sole of otouto, ie the init and main loop.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License version 3 as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+]]--
+
 local bot = {}
 
-bindings = require('otouto.bindings')
-utilities = require('otouto.utilities')
-
-bot.version = '2.2.6.3'
+bot.version = '2.2.7'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
+    bindings = require('otouto.bindings').init(config.bot_api_key)
+	utilities = require('otouto.utilities')
 	cred_data = load_cred()
-
-	assert(
-		config.bot_api_key,
-    'You did not set your bot token in the config!'
-	)
-	self.BASE_URL = 'https://api.telegram.org/bot' .. config.bot_api_key .. '/'
 
 	-- Fetch bot information. Try until it succeeds.
 	repeat
 		print('Fetching bot information...')
-		self.info = bindings.getMe(self)
+		self.info = bindings.getMe()
 	until self.info
 	self.info = self.info.result
 
@@ -87,7 +100,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   -- vardump(callback)
 
   if msg.date < os.time() - 1800 then -- Do not process old messages.
-    utilities.answer_callback_query(self, callback, 'Nachricht älter als eine halbe Stunde, bitte sende den Befehl selbst noch einmal.', true)
+    utilities.answer_callback_query(callback, 'Nachricht älter als eine halbe Stunde, bitte sende den Befehl selbst noch einmal.', true)
     return
   end
 
@@ -99,14 +112,14 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   local user_id = callback.from.id
   local chat_id = msg.chat.id
   if redis:get('blocked:'..user_id) then
-    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+    utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 	return
   end
  
   -- Check if user is banned
   local banned = redis:get('banned:'..chat_id..':'..user_id)
   if banned then
-    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+    utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 	return
   end
   
@@ -119,11 +132,11 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
       if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
         local allowed = redis:get('whitelist:chat#id'.. chat_id)
 	    if not allowed then
-	      utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+	      utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 		  return
 	    end
 	  else
-	    utilities.answer_callback_query(self, callback, 'Du darfst den Bot nicht nutzen!', true)
+	    utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 		return
 	  end
 	end
@@ -156,13 +169,13 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   -- but he WON'T be able to make new requests. 
   local user_id = inline_query.from.id
   if redis:get('blocked:'..user_id) then
-    utilities.answer_inline_query(self, inline_query, nil, 0, true)
+    abort_inline_query(inline_query)
 	return
   end
 
   if not config.enable_inline_for_everyone then
     local is_whitelisted = redis:get('whitelist:user#id'..inline_query.from.id)
-    if not is_whitelisted then utilities.answer_inline_query(self, inline_query, nil, 0, true) return end
+    if not is_whitelisted then abort_inline_query(inline_query) return end
   end
 
   if inline_query.query:match('"') then
@@ -175,7 +188,7 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
   end
   
   -- Stop the spinning circle
-  utilities.answer_inline_query(self, inline_query, nil, 0, true)
+  abort_inline_query(inline_query)
 end
 
 function bot:run(config)
@@ -183,7 +196,7 @@ function bot:run(config)
 
 	while self.is_started do
 		-- Update loop
-		local res = bindings.getUpdates(self, { timeout = 20, offset = self.last_update+1 } )
+		local res = bindings.getUpdates{ timeout = 20, offset = self.last_update+1 }
 		if res then
 			-- Iterate over every new message.
 		    for n=1, #res.result do
@@ -208,9 +221,9 @@ function bot:run(config)
 		    for n=1, #self.plugins do 
 			    local v = self.plugins[n]
 				if v.cron then -- Call each plugin's cron function, if it has one.
-					local result, err = pcall(function() v.cron(self, config) end)
+					local result, err = pcall(function() v.cron(config) end)
 					if not result then
-						utilities.handle_exception(self, err, 'CRON: ' .. n, config)
+						utilities.handle_exception(err, 'CRON: ' .. n, config.log_chat)
 					end
 				end
 			end
@@ -232,7 +245,8 @@ function pre_process_msg(self, msg, config)
 	local plugin = self.plugins[n]
     if plugin.pre_process and msg then
 	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
-	  new_msg = plugin:pre_process(msg, self, config)
+	  new_msg = plugin:pre_process(msg, config)
+	  if not new_msg then return end -- Message was deleted
     end
   end
   return new_msg
@@ -274,7 +288,7 @@ function match_plugins(self, msg, config, plugin)
 	  end
 	end)
 	if not success then
-	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config)
+	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config.log_chat)
 	  return
 	end
 	-- if one pattern matches, end
@@ -310,12 +324,17 @@ function create_plugin_set()
     'control',
     'about',
     'id',
+	'post_photo',
+	'images',
+	'media',
+	'service_migrate_to_supergroup',
 	'creds',
     'echo',
 	'currency',
     'banhammer',
     'channels',
 	'plugins',
+	'settings',
     'help'
   }
   print ('enabling a few plugins - saving to redis set telegram:enabled_plugins')

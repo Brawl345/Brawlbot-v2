@@ -57,19 +57,19 @@ function webshot:action(msg, config, matches)
      webshot_url = matches[2]
 	 size = string.upper(matches[1])
    end
-   utilities.send_typing(self, msg.chat.id, 'upload_photo')
+   utilities.send_typing(msg.chat.id, 'upload_photo')
    local find = webshot:get_webshot_url(webshot_url, size)
    if find then
       local imgurl = base .. find
 	  local file = download_to_file(imgurl)
 	  if size == "F" then
-	    utilities.send_document(self, msg.chat.id, file, nil, msg.message_id)
+	    utilities.send_document(msg.chat.id, file, nil, msg.message_id)
 		return
 	  else
-        utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+        utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 	  end
    else
-     utilities.send_reply(self, msg, config.errors.connection)
+     utilities.send_reply(msg, config.errors.connection)
    end
 end
 

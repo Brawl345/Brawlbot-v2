@@ -22,10 +22,10 @@ function entergroup:chat_new_user(msg, self)
     return
   end
   local text = 'Hallo '..user_name..', willkommen bei <b>'..chat_title..'</b>!'..added_by
-  utilities.send_reply(self, msg, text, 'HTML')
+  utilities.send_reply(msg, text, 'HTML')
 end
 
-function entergroup:chat_del_user(msg, self)
+function entergroup:chat_del_user(msg)
   if msg.left_chat_member.id == msg.from.id then -- silent ignore, if user wasn't kicked
     return
   end
@@ -36,7 +36,7 @@ function entergroup:chat_del_user(msg, self)
     at_name = ''
   end
   local text = '<b>'..user_name..'</b> wurde von <b>'..msg.from.first_name..'</b>'..at_name..' aus der Gruppe gekickt.'
-  utilities.send_reply(self, msg, text, 'HTML')
+  utilities.send_reply(msg, text, 'HTML')
 end
 
 function entergroup:action(msg, config, matches)
@@ -45,7 +45,7 @@ function entergroup:action(msg, config, matches)
   if matches[1] == 'new_chat_member' then
     entergroup:chat_new_user(msg, self)
   elseif matches[1] == 'left_chat_member'then
-    entergroup:chat_del_user(msg, self)
+    entergroup:chat_del_user(msg)
   end
 end
 

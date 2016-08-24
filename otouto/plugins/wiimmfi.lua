@@ -43,10 +43,10 @@ end
 
 function wiimmfi:action(msg, config, matches)
   if matches[1] == "mkw" then
-    utilities.send_reply(self, msg, wiimmfi:getplayer('mkw'))
+    utilities.send_reply(msg, wiimmfi:getplayer('mkw'))
     return
   else
-    utilities.send_reply(self, msg, wiimmfi:getplayer())
+    utilities.send_reply(msg, wiimmfi:getplayer())
     return
   end
 end

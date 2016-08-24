@@ -23,7 +23,7 @@ function gSearch:googlethat(query, config)
     return '403'
   end
   if code ~= 200 then
-    utilities.send_reply(self, msg, config.errors.connection)
+    utilities.send_reply(msg, config.errors.connection)
 	return
   end
   local data = json.decode(res)
@@ -53,22 +53,22 @@ end
 function gSearch:action(msg, config)
   local input = utilities.input_from_msg(msg)
   if not input then
-	utilities.send_reply(self, msg, gSearch.doc, true)
+	utilities.send_reply(msg, gSearch.doc, true)
 	return
   end
   
   local results, stats = gSearch:googlethat(input, onfig)
   if results == '403' then
-    utilities.send_reply(self, msg, config.errors.quotaexceeded)
+    utilities.send_reply(msg, config.errors.quotaexceeded)
 	return
   end
  
   if not results then
-    utilities.send_reply(self, msg, config.errors.results)
+    utilities.send_reply(msg, config.errors.results)
 	return
   end
 
-  utilities.send_message(self, msg.chat.id, gSearch:stringlinks(results, stats), true, nil, true, '{"inline_keyboard":[[{"text":"Alle Ergebnisse anzeigen","url":"https://www.google.com/search?q='..URL.escape(input)..'"}]]}')
+  utilities.send_message(msg.chat.id, gSearch:stringlinks(results, stats), true, nil, true, '{"inline_keyboard":[[{"text":"Alle Ergebnisse anzeigen","url":"https://www.google.com/search?q='..URL.escape(input)..'"}]]}')
 
 end
 

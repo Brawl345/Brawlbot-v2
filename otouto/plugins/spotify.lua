@@ -15,7 +15,7 @@ function spotify:get_track_data(track)
   return data
 end
 
-function spotify:send_track_data(data, self, msg)
+function spotify:send_track_data(data, msg)
 	local name = data.name
     local album = data.album.name
     local artist = data.artists[1].name
@@ -28,20 +28,20 @@ function spotify:send_track_data(data, self, msg)
 	
     local text = '*'..name..'* von *'..artist..'* aus dem Album *'..album..'* _('..duration..')_'
 	if preview then
-	  utilities.send_typing(self, msg.chat.id, 'upload_audio')
+	  utilities.send_typing(msg.chat.id, 'upload_audio')
 	  local file = download_to_file(preview, name..'.mp3')
-      utilities.send_audio(self, msg.chat.id, file, msg.message_id, totalseconds, artist, name)
+      utilities.send_audio(msg.chat.id, file, msg.message_id, totalseconds, artist, name)
 	  return
 	else
-	  utilities.send_reply(self, msg, text, true)
+	  utilities.send_reply(msg, text, true)
 	  return
 	end
 end
 
 function spotify:action(msg, config, matches)
   local data = spotify:get_track_data(matches[1])
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
-  spotify:send_track_data(data, self, msg)
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
+  spotify:send_track_data(data, msg)
   return
 end
 

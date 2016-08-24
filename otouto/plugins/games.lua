@@ -52,7 +52,7 @@ function games:send_game_photo(result, self, msg)
   for k, v in pairs(images) do
     i = i+1
     local file = download_to_file(v, 'game'..i..'.jpg')
-	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
   end
 end
 
@@ -117,10 +117,10 @@ function games:send_game_data(game_id, self, msg)
   end
   
   local text = '*'..title..'* für *'..platform..'*'..date..desc..genre..players..video..publisher
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
   
   if xml.find(result, 'fanrt') or xml.find(result, 'boxart') then
-    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+    utilities.send_typing(msg.chat.id, 'upload_photo')
     games:send_game_photo(result, self, msg)
   end
   return
@@ -133,14 +133,14 @@ function games:action(msg, config)
     if msg.reply_to_message and msg.reply_to_message.text then
       game = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, fun.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, fun.doc, true, msg.message_id, true)
 	  return
 	end
   end
 
   local game_id = games:get_game_id(game)
   if not game_id then
-    utilities.send_reply(self, msg, 'Spiel nicht gefunden!')
+    utilities.send_reply(msg, 'Spiel nicht gefunden!')
     return
   else
     games:send_game_data(game_id, self, msg)

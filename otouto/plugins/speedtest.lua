@@ -7,9 +7,9 @@ speedtest.triggers = {
 
 function speedtest:action(msg, config, matches)
   local url = 'http://www.speedtest.net/result/'..matches[1]..'.png'
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 end
 
 return speedtest

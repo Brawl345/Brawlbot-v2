@@ -24,10 +24,10 @@ end
 
 function xkcd:action(msg, config, matches)
   local url, title, alt = xkcd:get_xkcd(matches[1])
-  if not url then utilities.send_reply(self, msg, config.errors.connection) return end
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  if not url then utilities.send_reply(msg, config.errors.connection) return end
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, title..'\n'..alt, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, title..'\n'..alt, msg.message_id)
 end
 
 return xkcd

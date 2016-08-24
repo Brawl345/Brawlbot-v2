@@ -82,31 +82,31 @@ function time:inline_callback(inline_query, config, matches)
     results = '[{"type":"article","id":"12","title":"Europa/Berlin","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..cur_time..'","parse_mode":"Markdown"}}]'
   else
 	local coords = utilities.get_coords(matches[1], config)
-	if type(coords) == 'string' then utilities.answer_inline_query(self, inline_query) return end
+	if type(coords) == 'string' then abort_inline_query(inline_query) return end
 	local output, place, desc_time = time:get_time(coords)
-	if not output then utilities.answer_inline_query(self, inline_query) return end
+	if not output then abort_inline_query(inline_query) return end
     results = '[{"type":"article","id":"13","title":"'..place..'","description":"'..desc_time..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/time/clock.jpg","input_message_content":{"message_text":"'..output..'","parse_mode":"Markdown"}}]'
   end
-  utilities.answer_inline_query(self, inline_query, results, 1)
+  utilities.answer_inline_query(inline_query, results, 1)
 end
 
 function time:action(msg, config)
   local input = utilities.input_from_msg(msg)
   if not input then
     local output = os.date("%A, %d. %B %Y, *%H:%M:%S Uhr*")
-	utilities.send_reply(self, msg, time:localize(output), true)
+	utilities.send_reply(msg, time:localize(output), true)
 	return
   end
 
   local coords = utilities.get_coords(input, config)
   if type(coords) == 'string' then
-    utilities.send_reply(self, msg, coords)
+    utilities.send_reply(msg, coords)
     return
   end
   local output = time:get_time(coords)
-  if not output then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not output then utilities.send_reply(msg, config.errors.connection) return end
 	
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return time

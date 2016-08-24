@@ -6,13 +6,13 @@ end
 
 function shell:action(msg, config)
   if not is_sudo(msg, config) then
-	utilities.send_reply(self, msg, config.errors.sudo)
+	utilities.send_reply(msg, config.errors.sudo)
 	return
   end
 
   local input = utilities.input(msg.text)
   if not input then
-	utilities.send_reply(self, msg, 'Bitte gib ein Kommando ein.')
+	utilities.send_reply(msg, 'Bitte gib ein Kommando ein.')
 	return
   end
   input = input:gsub('—', '--')
@@ -25,7 +25,7 @@ function shell:action(msg, config)
   end
   output = output:gsub('<pre>%\n', '<pre>')
   output = output:gsub('%\n%\n</pre>', '</pre>')
-  utilities.send_message(self, msg.chat.id, output, true, msg.message_id, 'HTML')
+  utilities.send_message(msg.chat.id, output, true, msg.message_id, 'HTML')
 end
 
 return shell

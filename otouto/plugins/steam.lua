@@ -35,7 +35,7 @@ function steam:price_info(data)
   return price
 end
 
-function steam:send_steam_data(data, self, msg)
+function steam:send_steam_data(data, msg)
   local description = string.sub(unescape(data.about_the_game:gsub("%b<>", "")), 1, DESC_LENTH) .. '...'
   local title = data.name
   local price = steam:price_info(data.price_overview)
@@ -47,12 +47,12 @@ end
 
 function steam:action(msg)
   local data = steam:get_steam_data(matches[1])
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
 
-  local text, image_url = steam:send_steam_data(data, self, msg)
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
-  utilities.send_photo(self, msg.chat.id, download_to_file(image_url, matches[1]..'.jpg'), nil, msg.message_id)
-  utilities.send_reply(self, msg, text, true)
+  local text, image_url = steam:send_steam_data(data, msg)
+  utilities.send_typing(msg.chat.id, 'upload_photo')
+  utilities.send_photo(msg.chat.id, download_to_file(image_url, matches[1]..'.jpg'), nil, msg.message_id)
+  utilities.send_reply(msg, text, true)
 end
 
 return steam

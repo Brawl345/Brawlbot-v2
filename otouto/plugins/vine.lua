@@ -31,11 +31,11 @@ end
 
 function vine:action(msg, config, matches)
   local data = vine:get_vine_data(matches[1])
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
   
-  utilities.send_typing(self, msg.chat.id, 'upload_video')
+  utilities.send_typing(msg.chat.id, 'upload_video')
   local text, file = vine:send_vine_data(data)
-  utilities.send_video(self, msg.chat.id, file, text, msg.message_id)
+  utilities.send_video(msg.chat.id, file, text, msg.message_id)
 end
 
 return vine

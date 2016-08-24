@@ -23,7 +23,7 @@ function luarun:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
-		utilities.send_reply(self, msg, 'Please enter a string to load.')
+		utilities.send_reply(msg, 'Please enter a string to load.')
 		return
 	end
 
@@ -40,8 +40,8 @@ function luarun:action(msg, config)
 		local URL = require('socket.url')
 		local HTTP = require('socket.http')
 		local HTTPS = require('ssl.https')
-		return function (self, msg, config) ]] .. input .. [[ end
-	]] )()(self, msg, config)
+		return function (msg, config) ]] .. input .. [[ end
+	]] )()(msg, config)
 	if output == nil then
 		output = 'Done!'
 	else
@@ -53,7 +53,7 @@ function luarun:action(msg, config)
 		end
 		output = '```\n' .. tostring(output) .. '\n```'
 	end
-	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
 
 end
 

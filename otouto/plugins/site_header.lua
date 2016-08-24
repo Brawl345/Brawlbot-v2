@@ -9,7 +9,7 @@ end
 
 function site_header:action(msg, config, matches)
   if msg.from.id ~= config.admin then
-	utilities.send_reply(self, msg, config.errors.sudo)
+	utilities.send_reply(msg, config.errors.sudo)
   end
   
   local url = matches[2]
@@ -20,7 +20,7 @@ function site_header:action(msg, config, matches)
   end
   local output = io.popen(input):read('*all')
   output = '```\n' .. output .. '\n```'
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return site_header

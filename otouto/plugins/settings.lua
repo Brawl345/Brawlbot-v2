@@ -37,18 +37,18 @@ function settings:action(msg, config, matches)
   local hash = 'user:'..msg.from.id
 
   if matches[1] == '⚙ Einstellungen' or matches[1] == '/settings' then
-    utilities.send_reply(self, msg, 'Was möchtest du einstellen?', false, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
+    utilities.send_reply(msg, 'Was möchtest du einstellen?', false, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
 	return
   elseif matches[1] == '💤 AFK-Keyboard einschalten' then
     redis:hset(hash, 'afk_keyboard', 'true')
-	utilities.send_reply(self, msg, 'Das AFK-Keyboard wurde erfolgreich *eingeschaltet*.', true, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
+	utilities.send_reply(msg, 'Das AFK-Keyboard wurde erfolgreich *eingeschaltet*.', true, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
 	return
   elseif matches[1] == '💤 AFK-Keyboard ausschalten' then
     redis:hset(hash, 'afk_keyboard', 'false')
-	utilities.send_reply(self, msg, 'Das AFK-Keyboard wurde erfolgreich *ausgeschaltet*.', true, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
+	utilities.send_reply(msg, 'Das AFK-Keyboard wurde erfolgreich *ausgeschaltet*.', true, '{"keyboard":'..settings:keyboard(msg.from.id)..', "one_time_keyboard":true, "selective":true, "resize_keyboard":true}')
 	return
   elseif matches[1] == '❌ Einstellungen verstecken' then
-	utilities.send_reply(self, msg, 'Um die Einstellungen wieder einzublenden, führe /settings aus.', true, '{"hide_keyboard":true}')
+	utilities.send_reply(msg, 'Um die Einstellungen wieder einzublenden, führe /settings aus.', true, '{"hide_keyboard":true}')
 	return
   end
 end

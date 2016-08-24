@@ -33,10 +33,10 @@ function pasteee:action(msg, config, matches)
   local text = matches[1]
   local link, iserror = upload(text)
   if iserror then
-    utilities.send_reply(self, msg, link)
+    utilities.send_reply(msg, link)
 	return
   end
-  utilities.send_reply(self, msg, '[Text auf Paste.ee ansehen]('..link..')', true)
+  utilities.send_reply(msg, '[Text auf Paste.ee ansehen]('..link..')', true)
 end
 
 return pasteee

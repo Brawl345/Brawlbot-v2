@@ -19,7 +19,7 @@ function urbandictionary:action(msg, config)
 		if msg.reply_to_message and msg.reply_to_message.text then
 			input = msg.reply_to_message.text
 		else
-			utilities.send_message(self, msg.chat.id, urbandictionary.doc, true, msg.message_id, true)
+			utilities.send_message(msg.chat.id, urbandictionary.doc, true, msg.message_id, true)
 			return
 		end
 	end
@@ -28,13 +28,13 @@ function urbandictionary:action(msg, config)
 
 	local jstr, res = http.request(url)
 	if res ~= 200 then
-		utilities.send_reply(self, msg, config.errors.connection)
+		utilities.send_reply(msg, config.errors.connection)
 		return
 	end
 
 	local jdat = json.decode(jstr)
 	if jdat.result_type == "no_results" then
-		utilities.send_reply(self, msg, config.errors.results)
+		utilities.send_reply(msg, config.errors.results)
 		return
 	end
 
@@ -45,7 +45,7 @@ function urbandictionary:action(msg, config)
 	
 	output = output:gsub('%[', ''):gsub('%]', '')
 
-	utilities.send_reply(self, msg, output, 'HTML')
+	utilities.send_reply(msg, output, 'HTML')
 
 end
 

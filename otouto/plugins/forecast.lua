@@ -217,17 +217,17 @@ function forecast:inline_callback(inline_query, config, matches)
   end
   
   local lat, lng = get_city_coordinates(city, config)
-  if not lat and not lng then utilities.answer_inline_query(self, inline_query) return end
+  if not lat and not lng then abort_inline_query(inline_query) return end
   if matches[1] == 'f' then
     title, description, text, ttl = forecast:get_forecast(lat, lng, true)
   else
     title, description, text, ttl = forecast:get_forecast_hourly(lat, lng, true)
   end
-  if not title and not description and not text and not ttl then utilities.answer_inline_query(self, inline_query) return end
+  if not title and not description and not text and not ttl then abort_inline_query(inline_query) return end
 
   local text = text:gsub('\n', '\\n')
   local results = '[{"type":"article","id":"28062013","title":"'..title..'","description":"'..description..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/weather/cloudy.jpg","thumb_width":80,"thumb_height":80,"input_message_content":{"message_text":"'..text..'", "parse_mode":"Markdown"}}]'
-  utilities.answer_inline_query(self, inline_query, results, ttl, is_personal)
+  utilities.answer_inline_query(inline_query, results, ttl, is_personal)
 end
 
 function forecast:action(msg, config, matches)
@@ -246,7 +246,7 @@ function forecast:action(msg, config, matches)
   
   local lat, lng = get_city_coordinates(city, config)
   if not lat and not lng then
-	utilities.send_reply(self, msg, '*Diesen Ort gibt es nicht!*', true)
+	utilities.send_reply(msg, '*Diesen Ort gibt es nicht!*', true)
     return
   end
   
@@ -258,7 +258,7 @@ function forecast:action(msg, config, matches)
   if not text then
     text = '*Konnte die Wettervorhersage für diese Stadt nicht bekommen.*'
   end
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
 end
 
 return forecast

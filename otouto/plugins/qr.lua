@@ -71,9 +71,9 @@ end
 
 function qr:inline_callback(inline_query, config, matches)
   local text = matches[1]
-  if string.len(text) > 200 then utilities.answer_inline_query(self, inline_query) return end
+  if string.len(text) > 200 then abort_inline_query(inline_query) return end
   local image_url = qr:qr(text, nil, nil, 'jpg')
-  if not image_url then utilities.answer_inline_query(self, inline_query) return end
+  if not image_url then abort_inline_query(inline_query) return end
   
   local id = 600
  
@@ -93,7 +93,7 @@ function qr:inline_callback(inline_query, config, matches)
   end
   
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 10000)
+  utilities.answer_inline_query(inline_query, results, 10000)
 end
 
 function qr:action(msg, config, matches)
@@ -108,9 +108,9 @@ function qr:action(msg, config, matches)
   end
 
   local image_url = qr:qr(text, color, back)
-  if not image_url then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not image_url then utilities.send_reply(msg, config.errors.connection) return end
   local file = download_to_file(image_url, 'qr.png')
-  utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 end
 
 return qr

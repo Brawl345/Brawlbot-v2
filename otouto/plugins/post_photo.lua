@@ -7,7 +7,7 @@ post_photo.triggers = {
   '/nil'
 }
 
-function post_photo:pre_process(msg, self, config)
+function post_photo:pre_process(msg, config)
   if not msg.document then return msg end -- Ignore
   local mime_type = msg.document.mime_type
   local valid_mimetypes = {['image/jpeg'] = true, ['image/png'] = true, ['image/bmp'] = true}
@@ -20,15 +20,15 @@ function post_photo:pre_process(msg, self, config)
 	return
   end
   
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   -- Saving file to the Telegram Cloud
-  local request = bindings.request(self, 'getFile', {
+  local request = bindings.request('getFile', {
 		file_id = file_id
   } )
 
   local download_url = 'https://api.telegram.org/file/bot'..config.bot_api_key..'/'..request.result.file_path
   local file = download_to_file(download_url, msg.file_name)
-  utilities.send_photo(self, msg.chat.id, file, msg.caption, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, msg.caption, msg.message_id)
   
   return msg
 end

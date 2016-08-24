@@ -26,10 +26,10 @@ function pagespeed_insights:get_pagespeed(test_url)
 end
 
 function pagespeed_insights:action(msg, config, matches)
-  utilities.send_typing(self, msg.chat.id, 'typing')
+  utilities.send_typing(msg.chat.id, 'typing')
   local text = pagespeed_insights:get_pagespeed(matches[1])
-  if not text then utilities.send_reply(self, msg, config.errors.connection) return end
-  utilities.send_reply(self, msg, text, true)
+  if not text then utilities.send_reply(msg, config.errors.connection) return end
+  utilities.send_reply(msg, text, true)
 end
 
 return pagespeed_insights

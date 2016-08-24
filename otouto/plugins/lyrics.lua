@@ -36,12 +36,12 @@ function lyrics:action(msg, config, matches)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, lyrics.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, lyrics.doc, true, msg.message_id, true)
 	  return
 	end
   end
   
-  utilities.send_reply(self, msg, lyrics:getLyrics(input), true)
+  utilities.send_reply(msg, lyrics:getLyrics(input), true)
 end
 
 return lyrics

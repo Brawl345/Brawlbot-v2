@@ -96,15 +96,15 @@ function app_store:action(msg, config, matches)
   local data = app_store:get_appstore_data()
   if data == nil then print('Das Appstore-Plugin unterstützt nur Apps!') end
   if data == 'HTTP-FEHLER' or data == 'NOTFOUND' then
-    utilities.send_reply(self, msg, '<b>App nicht gefunden!</b>', 'HTML')
+    utilities.send_reply(msg, '<b>App nicht gefunden!</b>', 'HTML')
     return
   else
     local output, image_url = app_store:send_appstore_data(data)
-    utilities.send_reply(self, msg, output, 'HTML')
+    utilities.send_reply(msg, output, 'HTML')
 	if image_url then
-	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	  utilities.send_typing(msg.chat.id, 'upload_photo')
 	  local file = download_to_file(image_url)
-	  utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+	  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 	end
   end
 end

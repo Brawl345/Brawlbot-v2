@@ -249,7 +249,7 @@ end
 function twitter_send:action(msg, config, matches)
   if matches[1] == "twwhitelist add" then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     else
 	  local user_id = matches[2]
@@ -259,14 +259,14 @@ function twitter_send:action(msg, config, matches)
 		end
 	    user_id = msg.reply_to_message.from.id
 	  end  
-	  utilities.send_reply(self, msg, twitter_send:add_to_twitter_whitelist(user_id), true)
+	  utilities.send_reply(msg, twitter_send:add_to_twitter_whitelist(user_id), true)
       return
     end
   end
 
   if matches[1] == "twwhitelist del" then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     else
 	  local user_id = matches[2]
@@ -276,7 +276,7 @@ function twitter_send:action(msg, config, matches)
 		end
 	    user_id = msg.reply_to_message.from.id
 	  end
-	  utilities.send_reply(self, msg, twitter_send:del_from_twitter_whitelist(user_id), true)
+	  utilities.send_reply(msg, twitter_send:del_from_twitter_whitelist(user_id), true)
       return
     end
   end
@@ -289,22 +289,22 @@ function twitter_send:action(msg, config, matches)
   if not oauth_token and not oauth_token_secret then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
 	  if msg.from.id ~= config.admin then
-        utilities.send_reply(self, msg, config.errors.sudo)
+        utilities.send_reply(msg, config.errors.sudo)
 	    return
       else
         local text, auth_url = twitter_send:do_twitter_authorization_flow(hash, true)
-		local res = utilities.send_message(self, msg.from.id, text, true, nil, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
+		local res = utilities.send_message(msg.from.id, text, true, nil, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
 		if not res then
-			utilities.send_reply(self, msg, 'Bitte starte mich zuerst [privat](http://telegram.me/' .. self.info.username .. '?start).', true)
+			utilities.send_reply(msg, 'Bitte starte mich zuerst [privat](http://telegram.me/' .. self.info.username .. '?start).', true)
 		elseif msg.chat.type ~= 'private' then
-			local result = utilities.send_message(self, msg.chat.id, '_Bitte warten, der Administrator meldet sich an..._', true, nil, true)
+			local result = utilities.send_message(msg.chat.id, '_Bitte warten, der Administrator meldet sich an..._', true, nil, true)
 			redis:hset(hash, 'login_msg', result.result.message_id)
 		end
 		return
 	  end
     else
 	  local text, auth_url = twitter_send:do_twitter_authorization_flow(hash)
-	  local result = utilities.send_reply(self, msg, text, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
+	  local result = utilities.send_reply(msg, text, true, '{"inline_keyboard":[[{"text":"Bei Twitter anmelden","url":"'..auth_url..'"}]]}')
 	  redis:hset(hash, 'login_msg', result.result.message_id)
 	  return
 	end
@@ -313,14 +313,14 @@ function twitter_send:action(msg, config, matches)
   if matches[1] == 'auth' and matches[2] then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
       if msg.from.id ~= config.admin then
-        utilities.send_reply(self, msg, config.errors.sudo)
+        utilities.send_reply(msg, config.errors.sudo)
 	    return
       end
 	end
-    if string.len(matches[2]) > 7 then utilities.send_reply(self, msg, 'Invalide PIN!') return end
-	utilities.send_reply(self, msg, twitter_send:get_twitter_access_token(hash, matches[2], oauth_token, oauth_token_secret), 'HTML')
+    if string.len(matches[2]) > 7 then utilities.send_reply(msg, 'Invalide PIN!') return end
+	utilities.send_reply(msg, twitter_send:get_twitter_access_token(hash, matches[2], oauth_token, oauth_token_secret), 'HTML')
 	local message_id = redis:hget(hash, 'login_msg')
-	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
+	utilities.edit_message(msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
 	redis:hdel(hash, 'login_msg')
 	return
   end
@@ -328,33 +328,33 @@ function twitter_send:action(msg, config, matches)
   if matches[1] == 'unauth' then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
       if msg.from.id ~= config.admin then
-        utilities.send_reply(self, msg, config.errors.sudo)
+        utilities.send_reply(msg, config.errors.sudo)
 	    return
       end
 	end
-	utilities.send_reply(self, msg, twitter_send:reset_twitter_auth(hash), 'HTML')
+	utilities.send_reply(msg, twitter_send:reset_twitter_auth(hash), 'HTML')
 	return
   end
   
   if matches[1] == 'verify' then
     local text, pp_url = twitter_send:twitter_verify_credentials(oauth_token, oauth_token_secret)
 	local file = download_to_file(pp_url)
-	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
-	utilities.send_reply(self, msg, text)
+	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_reply(msg, text)
 	return
   end
   
   
   if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
     if not can_send_tweet(msg) then
-	  utilities.send_reply(self, msg, '*Du darfst keine Tweets senden.* Entweder wurdest du noch gar nicht freigeschaltet oder ausgeschlossen.', true)
+	  utilities.send_reply(msg, '*Du darfst keine Tweets senden.* Entweder wurdest du noch gar nicht freigeschaltet oder ausgeschlossen.', true)
 	  return 
 	else
-	  utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
+	  utilities.send_reply(msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
 	  return
 	end
   else
-    utilities.send_reply(self, msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
+    utilities.send_reply(msg, twitter_send:send_tweet(matches[1], oauth_token, oauth_token_secret, hash), 'HTML')
 	return
   end
 end

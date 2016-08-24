@@ -31,22 +31,22 @@ function control:action(msg, config)
 				config[k] = v
 			end
 		end
-		bot.init(self, config)
-		utilities.send_reply(self, msg, 'Bot neu gestartet!')
+		bot.init(config)
+		utilities.send_reply(msg, 'Bot neu gestartet!')
 	elseif msg.text_lower:match('^'..cmd_pat..'halt') then
 		self.is_started = false
-		utilities.send_reply(self, msg, 'Stoppe Bot!')
+		utilities.send_reply(msg, 'Stoppe Bot!')
 	elseif msg.text_lower:match('^'..cmd_pat..'script') then
 		local input = msg.text_lower:match('^'..cmd_pat..'script\n(.+)')
 		if not input then
-			utilities.send_reply(self, msg, 'usage: ```\n'..cmd_pat..'script\n'..cmd_pat..'command <arg>\n...\n```', true)
+			utilities.send_reply(msg, 'usage: ```\n'..cmd_pat..'script\n'..cmd_pat..'command <arg>\n...\n```', true)
 			return
 		end
 		input = input .. '\n'
 		for command in input:gmatch('(.-)\n') do
 			command = utilities.trim(command)
 			msg.text = command
-			bot.on_msg_receive(self, msg, config)
+			bot.on_msg_receive(msg, config)
 		end
 	end
 

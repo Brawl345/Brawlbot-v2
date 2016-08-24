@@ -35,11 +35,11 @@ function br:action(msg, config, matches)
   local article = URL.escape(matches[1])
   local text, image_url = br:get_br_article(article)
   if image_url then
-    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+    utilities.send_typing(msg.chat.id, 'upload_photo')
     local file = download_to_file(image_url, 'br_teaser.jpg')
-    utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+    utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
   end
-  utilities.send_reply(self, msg, text, true)
+  utilities.send_reply(msg, text, true)
 end
 
 return br

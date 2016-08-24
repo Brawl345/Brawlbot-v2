@@ -52,14 +52,14 @@ function fun:action(msg, config, matches)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, fun.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, fun.doc, true, msg.message_id, true)
 	  return
 	end
   end
 
   local user_name = get_name(msg)
   local result = fun:choose_random(user_name, input)
-  utilities.send_message(self, msg.chat.id, result)
+  utilities.send_message(msg.chat.id, result)
 end
 
 return fun

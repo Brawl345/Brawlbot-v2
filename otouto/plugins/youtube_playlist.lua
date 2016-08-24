@@ -55,7 +55,7 @@ function youtube_playlist:action(msg)
   
   local data = youtube_playlist:get_pl_data(pl_code)
   local output = youtube_playlist:send_youtubepl_data(data)
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return youtube_playlist

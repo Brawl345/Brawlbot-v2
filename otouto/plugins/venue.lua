@@ -6,7 +6,7 @@ venue.triggers = {
 
 local apikey = cred_data.google_apikey
 
-function venue:pre_process(msg, self)
+function venue:pre_process(msg)
   if not msg.venue then return msg end -- Ignore
 
   local lat = msg.venue.location.latitude
@@ -16,7 +16,7 @@ function venue:pre_process(msg, self)
   if code ~= 200 then return msg end
   local data = json.decode(res).results[1]
   local city = data.formatted_address
-  utilities.send_reply(self, msg, city)
+  utilities.send_reply(msg, city)
   
   return msg
 end

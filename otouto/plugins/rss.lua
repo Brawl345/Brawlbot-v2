@@ -212,42 +212,42 @@ function rss:action(msg, config, matches)
   -- For channels
   if matches[1] == 'sub' and matches[2] and matches[3] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local id = '@'..matches[3]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local output = rss:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, 'HTML')
+	utilities.send_reply(msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] and matches[3] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local id = '@'..matches[3]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local output = rss:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, 'HTML')
+	utilities.send_reply(msg, output, 'HTML')
 	return
   elseif matches[1] == 'rss' and matches[2] then
     local id = '@'..matches[2]
-	local result = utilities.get_chat_info(self, id)
+	local result = utilities.get_chat_info(id)
 	if not result then
-	  utilities.send_reply(self, msg, 'Diesen Kanal gibt es nicht!')
+	  utilities.send_reply(msg, 'Diesen Kanal gibt es nicht!')
 	  return
 	end
 	local chat_name = result.result.title
     local output = rss:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, output, 'HTML')
+	utilities.send_reply(msg, output, 'HTML')
 	return
   end
   
@@ -259,42 +259,39 @@ function rss:action(msg, config, matches)
   
   if matches[1] == 'sub' and matches[2] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local output = rss:subscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, 'HTML')
+	utilities.send_reply(msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
 	local output = rss:unsubscribe(id, matches[2])
-	utilities.send_reply(self, msg, output, 'HTML', '{"hide_keyboard":true}')
+	utilities.send_reply(msg, output, 'HTML', '{"hide_keyboard":true}')
 	return
   elseif matches[1] == 'del' and not matches[2] then
     local list_subs, keyboard = rss:print_subs(id, chat_name)
-	utilities.send_reply(self, msg, list_subs, 'HTML', keyboard)
+	utilities.send_reply(msg, list_subs, 'HTML', keyboard)
     return
   elseif matches[1] == 'sync' then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
-	rss:cron(self)
+	rss:cron()
 	return
   end
   
   local output = rss:print_subs(id, chat_name)
-  utilities.send_reply(self, msg, output, 'HTML')
+  utilities.send_reply(msg, output, 'HTML')
   return
 end
 
-function rss:cron(self_plz)
-   if not self.BASE_URL then
-     self = self_plz
-   end
+function rss:cron()
    local keys = redis:keys(get_base_redis("*", "subs"))
    for k,v in pairs(keys) do
       local base = string.match(v, "rss:(.+):subs")  -- Get the URL base
@@ -340,7 +337,7 @@ function rss:cron(self_plz)
          for k2, receiver in pairs(redis:smembers(v)) do
 		   local receiver = string.gsub(receiver, 'chat%#id', '')
 		   local receiver = string.gsub(receiver, 'user%#id', '')
-		   utilities.send_message(self, receiver, text, true, nil, 'HTML')
+		   utilities.send_message(receiver, text, true, nil, 'HTML')
          end
       end
    end

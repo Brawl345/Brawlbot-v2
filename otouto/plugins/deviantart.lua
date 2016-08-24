@@ -34,13 +34,13 @@ end
 
 function deviantart:action(msg, config, matches)
   local data = deviantart:get_da_data('http://'..matches[1]..'.deviantart.com/art/'..matches[2])
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
   
   local text, file = deviantart:send_da_data(data)
   if file then
-    utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+    utilities.send_photo(msg.chat.id, file, text, msg.message_id)
   else
-    utilities.send_reply(self, msg, text)
+    utilities.send_reply(msg, text)
 	return
   end
 end

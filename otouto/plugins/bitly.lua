@@ -38,10 +38,10 @@ function bitly:inline_callback(inline_query, config, matches)
     url = data.long_url
   end
   
-  if not url then utilities.answer_inline_query(self, inline_query) return end
+  if not url then abort_inline_query(inline_query) return end
   
   local results = '[{"type":"article","id":"2","title":"Verlängerte URL","description":"'..url..'","url":"'..url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/generic/internet.jpg","thumb_width":165,"thumb_height":150,"hide_url":true,"input_message_content":{"message_text":"'..url..'"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 3600)
+  utilities.answer_inline_query(inline_query, results, 3600)
 end
 
 function bitly:action(msg, config, matches)
@@ -50,14 +50,14 @@ function bitly:action(msg, config, matches)
   if redis:exists(hash) == false then
     local longurl = bitly:expand_bitly_link(shorturl)
 	if not longurl then
-	  utilities.send_reply(self, msg, config.errors.connection)
+	  utilities.send_reply( msg, config.errors.connection)
 	  return
 	end
-    utilities.send_reply(self, msg, longurl)
+    utilities.send_reply(msg, longurl)
     return
   else
     local data = redis:hgetall(hash)
-	utilities.send_reply(self, msg, data.long_url)
+	utilities.send_reply(msg, data.long_url)
 	return
   end
 end

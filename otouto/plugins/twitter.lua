@@ -130,15 +130,15 @@ function twitter:action(msg, config, matches)
   end
   
   -- send the parts 
-  utilities.send_reply(self, msg, header .. "\n" .. text.."\n"..footer, 'HTML')
+  utilities.send_reply(msg, header .. "\n" .. text.."\n"..footer, 'HTML')
   if videos[1] then images = {} end
   for k, v in pairs(images) do
     local file = download_to_file(v)
-	utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
   end
   for k, v in pairs(videos) do
     local file = download_to_file(v)
-	utilities.send_video(self, msg.chat.id, file, nil, msg.message_id)
+	utilities.send_video(msg.chat.id, file, nil, msg.message_id)
   end
 end
 

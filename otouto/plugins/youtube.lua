@@ -137,9 +137,9 @@ function send_youtube_data(data, msg, self, link, sendpic)
       text = text..'\nACHTUNG, In Deutschland gesperrt!'
     end
     local file = download_to_file(image_url)
-	utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+	utilities.send_photo(msg.chat.id, file, text, msg.message_id)
   else
-    utilities.send_reply(self, msg, text, 'HTML')
+    utilities.send_reply(msg, text, 'HTML')
   end
 end
 
@@ -147,10 +147,10 @@ function youtube:inline_callback(inline_query, config, matches)
   local query = matches[1]
   local url = BASE_URL..'/search?part=snippet&key='..apikey..'&maxResults=10&type=video&q='..URL.escape(query)..'&fields=items(id(videoId),snippet(publishedAt,title,thumbnails,channelTitle))'
   local res,code  = https.request(url)
-  if code ~= 200 then utilities.answer_inline_query(self, inline_query) return end
+  if code ~= 200 then abort_inline_query(inline_query) return end
 
   local data = json.decode(res)
-  if not data.items[1] then utilities.answer_inline_query(self, inline_query) return end
+  if not data.items[1] then abort_inline_query(inline_query) return end
   
   local video_ids = ""
   -- We get all videoIds from search...
@@ -203,14 +203,14 @@ function youtube:inline_callback(inline_query, config, matches)
 	end
   end
   local results = results..']'
-  utilities.answer_inline_query(self, inline_query, results, 0)
+  utilities.answer_inline_query(inline_query, results, 0)
 end
 
 function youtube:action(msg, config, matches)
   local yt_code = matches[1]
   local data = get_yt_data(yt_code)
   if not data then
-    utilities.send_reply(self, msg, config.errors.results)
+    utilities.send_reply(msg, config.errors.results)
 	return
   end
   send_youtube_data(data, msg, self)

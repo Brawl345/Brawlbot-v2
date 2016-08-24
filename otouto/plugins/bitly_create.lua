@@ -83,38 +83,38 @@ function bitly_create:action(msg, config, matches)
   bitly_access_token = redis:hget(hash, 'bitly')
   
   if matches[1] == 'auth' and matches[2] then
-    utilities.send_reply(self, msg, bitly_create:get_bitly_access_token(hash, matches[2]), true)
+    utilities.send_reply(msg, bitly_create:get_bitly_access_token(hash, matches[2]), true)
 	local message_id = redis:hget(hash, 'bitly_login_msg')
-	utilities.edit_message(self, msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
+	utilities.edit_message(msg.chat.id, message_id, '*Anmeldung abgeschlossen!*', true, true)
 	redis:hdel(hash, 'bitly_login_msg')
     return
   end
   
   if matches[1] == 'auth' then
-    local result = utilities.send_reply(self, msg, '*Bitte logge dich ein und folge den Anweisungen.*', true, '{"inline_keyboard":[[{"text":"Bei Bitly anmelden","url":"https://bitly.com/oauth/authorize?client_id='..client_id..'&redirect_uri='..redirect_uri..'&state='..self.info.username..'"}]]}')
+    local result = utilities.send_reply(msg, '*Bitte logge dich ein und folge den Anweisungen.*', true, '{"inline_keyboard":[[{"text":"Bei Bitly anmelden","url":"https://bitly.com/oauth/authorize?client_id='..client_id..'&redirect_uri='..redirect_uri..'&state='..self.info.username..'"}]]}')
     redis:hset(hash, 'bitly_login_msg', result.result.message_id)
 	return
   end
   
   if matches[1] == 'unauth' and bitly_access_token then
     redis:hdel(hash, 'bitly')
-	utilities.send_reply(self, msg, '*Erfolgreich ausgeloggt!* Du kannst den Zugriff [in deinen Kontoeinstellungen](https://bitly.com/a/settings/connected) endgültig entziehen.', true)
+	utilities.send_reply(msg, '*Erfolgreich ausgeloggt!* Du kannst den Zugriff [in deinen Kontoeinstellungen](https://bitly.com/a/settings/connected) endgültig entziehen.', true)
 	return
   elseif matches[1] == 'unauth' and not bitly_access_token then
-    utilities.send_reply(self, msg, 'Wie willst du dich ausloggen, wenn du gar nicht eingeloggt bist?', true)
+    utilities.send_reply(msg, 'Wie willst du dich ausloggen, wenn du gar nicht eingeloggt bist?', true)
     return
   end
   
   if matches[1] == 'me' and bitly_access_token then
     local text = bitly_create:get_bitly_user_info(bitly_access_token)
 	if text then
-	  utilities.send_reply(self, msg, text, true)
+	  utilities.send_reply(msg, text, true)
 	  return
 	else
 	  return
 	end
   elseif matches[1] == 'me' and not bitly_access_token then
-    utilities.send_reply(self, msg, 'Du bist nicht eingeloggt! Logge dich ein mit\n/short auth', true)
+    utilities.send_reply(msg, 'Du bist nicht eingeloggt! Logge dich ein mit\n/short auth', true)
     return
   end
 
@@ -130,7 +130,7 @@ function bitly_create:action(msg, config, matches)
     long_url = url_encode(matches[2])
 	domain = matches[1]
   end
-  utilities.send_reply(self, msg, bitly_create:create_bitlink(long_url, domain, bitly_access_token))
+  utilities.send_reply(msg, bitly_create:create_bitlink(long_url, domain, bitly_access_token))
   return
 end
 

@@ -90,7 +90,7 @@ function youtube_dl:convert_audio(id)
 end
 
 function youtube_dl:callback(callback, msg, self, config, input)
-  utilities.answer_callback_query(self, callback, 'Informationen werden verarbeitet...')
+  utilities.answer_callback_query(callback, 'Informationen werden verarbeitet...')
   local video_id = input:match('(.+)@')
   local vid_format = input:match('@(%d+)')
   local hash = 'telegram:cache:youtube_dl:mp4:'..video_id
@@ -114,19 +114,19 @@ function youtube_dl:callback(callback, msg, self, config, input)
   local file = format_info.file_id
   
   if size > 52420000 then
-    utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
+    utilities.edit_message(msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
 	return
   end
   
-  utilities.edit_message(self, msg.chat.id, msg.message_id, '<b>Video wird hochgeladen</b>', nil, 'HTML')
-  utilities.send_typing(self, msg.chat.id, 'upload_video')
+  utilities.edit_message(msg.chat.id, msg.message_id, '<b>Video wird hochgeladen</b>', nil, 'HTML')
+  utilities.send_typing(msg.chat.id, 'upload_video')
   
   if not file then
     file = download_to_file(full_url, video_id..'.'..ext)
   end
   if not file then return end
-  local result = utilities.send_video(self, msg.chat.id, file, '('..format..')', msg.message_id, duration, width, height)
-  utilities.edit_message(self, msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
+  local result = utilities.send_video(msg.chat.id, file, '('..format..')', msg.message_id, duration, width, height)
+  utilities.edit_message(msg.chat.id, msg.message_id, '<a href="'..full_url..'">Direktlink zum Video</a> ('..format..', '..pretty_size..')', nil, 'HTML', keyboard)
   if not result then return end
   local file_id = result.result.video.file_id
   redis:hset(format_hash, 'file_id', file_id)
@@ -134,20 +134,20 @@ end
 
 function youtube_dl:action(msg, config, matches)
   if msg.chat.type ~= 'private' then
-    utilities.send_reply(self, msg, 'Dieses Plugin kann nur im Privatchat benutzt werden')
+    utilities.send_reply(msg, 'Dieses Plugin kann nur im Privatchat benutzt werden')
 	return
   end
   local id = matches[2]
 
   if matches[1] == 'mp4' then
     local hash = 'telegram:cache:youtube_dl:mp4:'..id
-    local first_msg = utilities.send_reply(self, msg, '<b>Verfügbare Videoformate werden ausgelesen...</b>', 'HTML')
+    local first_msg = utilities.send_reply(msg, '<b>Verfügbare Videoformate werden ausgelesen...</b>', 'HTML')
 	local callback_keyboard = redis:hget(hash, 'keyboard')
 	if not callback_keyboard then
-	  utilities.send_typing(self, msg.chat.id, 'typing')
+	  utilities.send_typing(msg.chat.id, 'typing')
       local available_formats = youtube_dl:get_availabe_formats(id, hash)
 	  if not available_formats then
-	    utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, config.errors.results)
+	    utilities.edit_message(msg.chat.id, first_msg.result.message_id, config.errors.results)
 	    return
 	  end
 
@@ -178,19 +178,19 @@ function youtube_dl:action(msg, config, matches)
 	  redis:hset(hash, 'keyboard', callback_keyboard)
 	  redis:expire(hash, 7889400)
 	end
-	utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, 'Wähle die gewünschte Auflösung.', nil, nil, callback_keyboard)
+	utilities.edit_message(msg.chat.id, first_msg.result.message_id, 'Wähle die gewünschte Auflösung.', nil, nil, callback_keyboard)
 	return
   end
   
   if matches[1] == 'mp3' then
-    local first_msg = utilities.send_reply(self, msg, '<b>Audio wird heruntergeladen...</b>', 'HTML')
-    utilities.send_typing(self, msg.chat.id, 'upload_audio')
+    local first_msg = utilities.send_reply(msg, '<b>Audio wird heruntergeladen...</b>', 'HTML')
+    utilities.send_typing(msg.chat.id, 'upload_audio')
     local file = youtube_dl:convert_audio(id)
 	if file == 'TOOBIG' then
-	  utilities.edit_message(self, msg.chat.id, first_msg.result.message_id, '<b>Die MP3 überschreitet die Grenze von 50 MB!</b>', nil, 'HTML')
+	  utilities.edit_message(msg.chat.id, first_msg.result.message_id, '<b>Die MP3 überschreitet die Grenze von 50 MB!</b>', nil, 'HTML')
 	  return
 	end
-	utilities.send_audio(self, msg.chat.id, file, msg.message_id)
+	utilities.send_audio(msg.chat.id, file, msg.message_id)
 	return
   end
 end

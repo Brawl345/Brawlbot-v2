@@ -31,7 +31,7 @@ function media_download:download_to_file_permanently(url, save_dir, file_name)
   return true
 end
 
-function media_download:pre_process(msg, self, config)
+function media_download:pre_process(msg, config)
   if msg.photo then
 	local lv = #msg.photo -- find biggest photo, always the last value
     file_id = msg.photo[lv].file_id
@@ -57,7 +57,7 @@ function media_download:pre_process(msg, self, config)
   
   if file_size > 19922944 then
     print('File is over 20 MB - can\'t download :(')
-	return
+	return msg
   end
   
   local save_dir = config.getfile_path
@@ -74,7 +74,7 @@ function media_download:pre_process(msg, self, config)
   end
   
   -- Saving file to the Telegram Cloud
-  local request = bindings.request(self, 'getFile', {
+  local request = bindings.request('getFile', {
 		file_id = file_id
 	} )
 

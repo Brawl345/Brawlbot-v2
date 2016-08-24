@@ -62,14 +62,14 @@ end
 function instagram:action(msg, config, matches)
   local insta_code = matches[1]
   local data = instagram:get_insta_data(insta_code)
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
   
   local text, image_url = instagram:send_instagram_data(data)
-  if not image_url then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not image_url then utilities.send_reply(msg, config.errors.connection) return end
   
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local file = download_to_file(image_url)
-  utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, text, msg.message_id)
 end
 
 return instagram

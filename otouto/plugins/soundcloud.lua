@@ -30,8 +30,8 @@ end
 
 function soundcloud:action(msg, config, matches)
   local text = soundcloud:send_soundcloud_info(matches[1])
-  if not text then utilities.send_reply(self, msg, config.errors.connection) return end
-  utilities.send_reply(self, msg, text, true)
+  if not text then utilities.send_reply(msg, config.errors.connection) return end
+  utilities.send_reply(msg, text, true)
 end
 
 return soundcloud

@@ -15,7 +15,7 @@ function muschel:frag_die_muschel()
 end
 
 function muschel:action(msg, config, matches)
-  utilities.send_reply(self, msg, muschel:frag_die_muschel())
+  utilities.send_reply(msg, muschel:frag_die_muschel())
 end
 
 return muschel

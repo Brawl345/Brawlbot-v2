@@ -191,31 +191,31 @@ function mal:action(msg, config, matches)
   if matches[1] == 'anime' then
     local anime_info = mal:get_mal_info(query, 'anime')
     if anime_info == "HTTP-Fehler" then
-      utilities.send_reply(self, msg, 'Anime nicht gefunden!')
+      utilities.send_reply(msg, 'Anime nicht gefunden!')
 	  return
     else
       local text, image_url = mal:send_anime_data(anime_info)
 	  if image_url then
-	    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	    utilities.send_typing(msg.chat.id, 'upload_photo')
 	    local file = download_to_file(image_url)
-		utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+		utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 	  end
-	  utilities.send_reply(self, msg, text, true)  
+	  utilities.send_reply(msg, text, true)  
 	  return
     end
   elseif matches[1] == 'manga' then
     local manga_info = mal:get_mal_info(query, 'manga')
     if manga_info == "HTTP-Fehler" then
-      utilities.send_reply(self, msg, 'Manga nicht gefunden!')
+      utilities.send_reply(msg, 'Manga nicht gefunden!')
 	  return
     else
       local text, image_url = mal:send_manga_data(manga_info)
 	  if image_url then
-	    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	    utilities.send_typing(msg.chat.id, 'upload_photo')
 	    local file = download_to_file(image_url)
-		utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+		utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 	  end
-	  utilities.send_reply(self, msg, text, true)
+	  utilities.send_reply(msg, text, true)
 	  return
     end
   end

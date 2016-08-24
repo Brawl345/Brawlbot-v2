@@ -58,10 +58,10 @@ function afk:switch_afk(user_name, user_id, chat_id, timestamp, text)
   end
 end
 
-function afk:pre_process(msg, self)
+function afk:pre_process(msg)
   if msg.chat.type == "private" then
 	-- Ignore
-    return
+    return msg
   end
 
   local user_name = get_name(msg)
@@ -84,15 +84,15 @@ function afk:pre_process(msg, self)
     if afk_text then
 	  redis:hset(hash, 'afk_text', false)
 	  if show_afk_keyboard == 'true' then
-	    utilities.send_reply(self, msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
+	    utilities.send_reply(msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
 	 else
-	   utilities.send_message(self, chat_id, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', true, nil, 'HTML')
+	   utilities.send_message(chat_id, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', true, nil, 'HTML')
 	 end
 	else
 	  if show_afk_keyboard == 'true' then
-	    utilities.send_reply(self, msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
+	    utilities.send_reply(msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
 	  else
-	    utilities.send_message(self, chat_id, user_name..' ist wieder da (war '..duration..' weg)!')
+	    utilities.send_message(chat_id, user_name..' ist wieder da (war '..duration..' weg)!')
 	  end
 	end
   end
@@ -102,7 +102,7 @@ end
 
 function afk:action(msg, config, matches)
   if msg.chat.type == "private" then
-    utilities.send_reply(self, msg, "Mir ist's egal, ob du AFK bist ._.")
+    utilities.send_reply(msg, "Mir ist's egal, ob du AFK bist ._.")
     return
   end
   
@@ -118,7 +118,7 @@ function afk:action(msg, config, matches)
     keyboard = nil
   end
   
-  utilities.send_reply(self, msg, afk:switch_afk(user_name, user_id, chat_id, timestamp, matches[2]), false, keyboard)
+  utilities.send_reply(msg, afk:switch_afk(user_name, user_id, chat_id, timestamp, matches[2]), false, keyboard)
 end
 
 return afk

@@ -22,29 +22,29 @@ end
 function gMaps:inline_callback(inline_query, config, matches)
   local place = matches[1]
   local coords = utilities.get_coords(place, config)
-  if type(coords) == 'string' then utilities.answer_inline_query(self, inline_query) return end
+  if type(coords) == 'string' then abort_inline_query(inline_query) return end
   
   local results = '[{"type":"venue","id":"10","latitude":'..coords.lat..',"longitude":'..coords.lon..',"title":"Ort","address":"'..coords.addr..'"}]'
 
-  utilities.answer_inline_query(self, inline_query, results, 10000)
+  utilities.answer_inline_query(inline_query, results, 10000)
 end
 
 function gMaps:action(msg, config)
   local input = utilities.input_from_msg(msg)
   if not input then
-    utilities.send_reply(self, msg, gMaps.doc, true)
+    utilities.send_reply(msg, gMaps.doc, true)
 	return
   end
 
-  utilities.send_typing(self, msg.chat.id, 'find_location')
+  utilities.send_typing(msg.chat.id, 'find_location')
   local coords = utilities.get_coords(input, config)
   if type(coords) == 'string' then
-	utilities.send_reply(self, msg, coords)
+	utilities.send_reply(msg, coords)
 	return
   end
 
-  utilities.send_location(self, msg.chat.id, coords.lat, coords.lon, msg.message_id)
-  utilities.send_photo(self, msg.chat.id, gMaps:get_staticmap(input, coords.lat, coords.lon), nil, msg.message_id)
+  utilities.send_location(msg.chat.id, coords.lat, coords.lon, msg.message_id)
+  utilities.send_photo(msg.chat.id, gMaps:get_staticmap(input, coords.lat, coords.lon), nil, msg.message_id)
 end
 
 return gMaps

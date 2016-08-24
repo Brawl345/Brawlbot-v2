@@ -22,18 +22,18 @@ function echo:inline_callback(inline_query, config, matches)
   end
 
   local results = results..'{"type":"article","id":"4","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fett.jpg","title":"Fett","description":"*'..text..'*","input_message_content":{"message_text":"<b>'..text..'</b>","parse_mode":"HTML"}},{"type":"article","id":"5","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/kursiv.jpg","title":"Kursiv","description":"_'..text..'_","input_message_content":{"message_text":"<i>'..text..'</i>","parse_mode":"HTML"}},{"type":"article","id":"6","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/echo/fixedsys.jpg","title":"Feste Breite","description":"`'..text..'`","input_message_content":{"message_text":"<code>'..text..'</code>","parse_mode":"HTML"}}]'
-  utilities.answer_inline_query(self, inline_query, results, 0)
+  utilities.answer_inline_query(inline_query, results, 0)
 end
 
 function echo:action(msg)
   local input = utilities.input_from_msg(msg)
   if not input then
-	utilities.send_message(self, msg.chat.id, echo.doc, true, msg.message_id, true)
+	utilities.send_message(msg.chat.id, echo.doc, true, msg.message_id, true)
   else
 	local output
 	if msg.chat.type == 'supergroup' then
 	  output = '*Echo:*\n"' .. utilities.md_escape(input) .. '"'
-	  utilities.send_message(self, msg.chat.id, output, true, nil, true)
+	  utilities.send_message(msg.chat.id, output, true, nil, true)
 	  return 
 	elseif msg.chat.type == 'group' then
 	  local b = 1
@@ -42,7 +42,7 @@ function echo:action(msg)
 		input,b = input:gsub('^/+','')
 	  end
 	end
-  utilities.send_message(self, msg.chat.id, input, true, nil, true)
+  utilities.send_message(msg.chat.id, input, true, nil, true)
   end
 end
 

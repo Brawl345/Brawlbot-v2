@@ -23,7 +23,7 @@ function roll:roll_dice()
 end
 
 function roll:action(msg)
-  utilities.send_reply(self, msg, 'Du hast eine *'..roll:roll_dice()..'* gewürfelt.', true)
+  utilities.send_reply(msg, 'Du hast eine *'..roll:roll_dice()..'* gewürfelt.', true)
 end
 
 return roll

@@ -34,19 +34,19 @@ function media:action(msg, config, matches)
     chat_action = 'upload_document'
   end
 
-  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, chat_action, self)
+  local file, last_modified, nocache = get_cached_file(url, nil, msg.chat.id, chat_action)
   if not file then return end
 
   if ext == 'gif' then
-    result = utilities.send_document(self, receiver, file, nil, msg.message_id)
+    result = utilities.send_document(receiver, file, nil, msg.message_id)
   elseif ext == 'ogg' then
-	result = utilities.send_voice(self, receiver, file, nil, msg.message_id)
+	result = utilities.send_voice(receiver, file, nil, msg.message_id)
   elseif mime_type == 'audio' then
-    result = utilities.send_audio(self, receiver, file, nil, msg.message_id)
+    result = utilities.send_audio(receiver, file, nil, msg.message_id)
   elseif mime_type == 'video' then
-	result = utilities.send_video(self, receiver, file, nil, msg.message_id)
+	result = utilities.send_video(receiver, file, nil, msg.message_id)
   else
-    result = utilities.send_document(self, receiver, file, nil, msg.message_id)
+    result = utilities.send_document(receiver, file, nil, msg.message_id)
   end
   
   if nocache then return end

@@ -26,8 +26,8 @@ gImages.command = 'img <Suchbegriff>'
 -- Yes, the callback is copied from below, but I can't think of another method :\
 function gImages:callback(callback, msg, self, config, input)
   if not msg then return end
-  utilities.answer_callback_query(self, callback, 'Suche nochmal nach "'..URL.unescape(input)..'"')
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.answer_callback_query(callback, 'Suche nochmal nach "'..URL.unescape(input)..'"')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local hash = 'telegram:cache:gImages'
   local results = redis:smembers(hash..':'..string.lower(URL.unescape(input)))
   
@@ -35,10 +35,10 @@ function gImages:callback(callback, msg, self, config, input)
     print('doing web request')
     results = gImages:get_image(input)
 	if results == 403 then
-	  utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	  utilities.send_reply(msg, config.errors.quotaexceeded, true)
 	  return
     elseif not results then
-      utilities.send_reply(self, msg, config.errors.results, true)
+      utilities.send_reply(msg, config.errors.results, true)
 	  return
     end
     gImages:cache_result(results, input)
@@ -86,18 +86,18 @@ function gImages:callback(callback, msg, self, config, input)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true)
+    utilities.send_reply(msg, 'Fehler beim Herunterladen eines Bildes.', true)
 	return
   end
   
   if mimetype == 'image/gif' then
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
+    result = utilities.send_document(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
   else
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
+    result = utilities.send_photo(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
   end
 
   if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
+    utilities.send_reply(msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..input..'"}]]}')
 	return
   end
 end
@@ -144,18 +144,18 @@ function gImages:action(msg, config, matches)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, gImages.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, gImages.doc, true, msg.message_id, true)
 	  return
 	end
   end
   
   print ('Checking if search contains blacklisted word: '..input)
   if is_blacklisted(input) then
-    utilities.send_reply(self, msg, 'Vergiss es! ._.')
+    utilities.send_reply(msg, 'Vergiss es! ._.')
 	return
   end
 
-  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+  utilities.send_typing(msg.chat.id, 'upload_photo')
 
   local hash = 'telegram:cache:gImages'
   local results = redis:smembers(hash..':'..string.lower(input))
@@ -164,10 +164,10 @@ function gImages:action(msg, config, matches)
     print('doing web request')
     results = gImages:get_image(URL.escape(input))
 	if results == 403 then
-	  utilities.send_reply(self, msg, config.errors.quotaexceeded, true)
+	  utilities.send_reply(msg, config.errors.quotaexceeded, true)
 	  return
     elseif not results or results == 'NORESULTS' then
-      utilities.send_reply(self, msg, config.errors.results, true)
+      utilities.send_reply(msg, config.errors.results, true)
 	  return
     end
     gImages:cache_result(results, input)
@@ -215,18 +215,18 @@ function gImages:action(msg, config, matches)
   end
   
   if failed then
-    utilities.send_reply(self, msg, 'Fehler beim Herunterladen eines Bildes.', true)
+    utilities.send_reply(msg, 'Fehler beim Herunterladen eines Bildes.', true)
 	return
   end
   
   if mimetype == 'image/gif' then
-    result = utilities.send_document(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_document(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
   else
-    result = utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
+    result = utilities.send_photo(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
   end
 
   if not result then
-    utilities.send_reply(self, msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
+    utilities.send_reply(msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"@'..self.info.username..' gImages:'..URL.escape(input)..'"}]]}')
 	return
   end
 end

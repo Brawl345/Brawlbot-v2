@@ -34,7 +34,7 @@ end
 function wikia:action(msg, config, matches)
   local wikia = matches[1]
   local article = matches[2]
-  utilities.send_reply(self, msg, send_wikia_article(wikia, article), true)
+  utilities.send_reply(msg, send_wikia_article(wikia, article), true)
 end
 
 return wikia

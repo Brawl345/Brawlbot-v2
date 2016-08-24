@@ -16,14 +16,14 @@ function mc_skin:action(msg, config, matches)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, mc_skin.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, mc_skin.doc, true, msg.message_id, true)
 	  return
 	end
   end
 
   local url = 'http://www.minecraft-skin-viewer.net/3d.php?layers=true&aa=true&a=0&w=330&wt=10&abg=330&abd=40&ajg=340&ajd=20&ratio=13&format=png&login='..input..'&headOnly=false&displayHairs=true&randomness=341.png'
   local file = download_to_file(url)
-  utilities.send_photo(self, msg.chat.id, file, nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
 end
 
 return mc_skin

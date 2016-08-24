@@ -74,7 +74,7 @@ function mc_server:parseText(text, mc_server)
 end
 
 function mc_server:action(msg, config, matches)
-  utilities.send_reply(self, msg, mc_server:parseText(msg.text, mc_server), true)
+  utilities.send_reply(msg, mc_server:parseText(msg.text, mc_server), true)
 end
 
 return mc_server

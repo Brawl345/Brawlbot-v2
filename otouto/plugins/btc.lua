@@ -28,7 +28,7 @@ end
 
 
 function btc:action(msg, config, matches)
-  utilities.send_reply(self, msg, btc:getBTCX(cur), true)
+  utilities.send_reply(msg, btc:getBTCX(cur), true)
 end
 
 return btc

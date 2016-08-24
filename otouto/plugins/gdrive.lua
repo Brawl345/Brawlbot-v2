@@ -38,15 +38,15 @@ function gdrive:send_drive_document_data(data, self, msg)
   if mimetype:match('google') then -- if document is Google document (like a Spreadsheet)
     if mimetype:match('drawing') then -- Drawing
 	  local image_url = BASE_URL..'/files/'..id..'/export?key='..apikey..'&mimeType=image/png'
-	  utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	  utilities.send_typing(msg.chat.id, 'upload_photo')
 	  local file = download_to_file(image_url, 'export.png')
-	  utilities.send_photo(self, msg.chat.id, file, text, msg.message_id)
+	  utilities.send_photo(msg.chat.id, file, text, msg.message_id)
 	  return
 	else
 	  local pdf_url = BASE_URL..'/files/'..id..'/export?key='..apikey..'&mimeType=application/pdf'
-	  utilities.send_typing(self, msg.chat.id, 'upload_document')
+	  utilities.send_typing(msg.chat.id, 'upload_document')
 	  local file = download_to_file(pdf_url, 'document.pdf')
-	  utilities.send_document(self, msg.chat.id, file, text, msg.message_id)
+	  utilities.send_document(msg.chat.id, file, text, msg.message_id)
 	  return
 	end
   else
@@ -65,19 +65,19 @@ function gdrive:send_drive_document_data(data, self, msg)
       local headers = response[3]
 	  local file_url = headers.location
 	  if ext == "jpg"  or ext == "jpeg" or ext == "png" then
-	    utilities.send_typing(self, msg.chat.id, 'upload_photo')
+	    utilities.send_typing(msg.chat.id, 'upload_photo')
         local file = download_to_file(file_url, 'photo.'..ext)
-        utilities.send_photo(self, msg.chat.id, file, text, msg.message_id, keyboard)
+        utilities.send_photo(msg.chat.id, file, text, msg.message_id, keyboard)
 		return
 	  else
-	    utilities.send_typing(self, msg.chat.id, 'upload_document')
+	    utilities.send_typing(msg.chat.id, 'upload_document')
 	    local file = download_to_file(file_url, 'document.'..ext)
-        utilities.send_document(self, msg.chat.id, file, text, msg.message_id, keyboard)
+        utilities.send_document(msg.chat.id, file, text, msg.message_id, keyboard)
 		return
 	  end
 	else
 	  local text = '*'..title..'*, freigegeben von _'..owner..'_'
-	  utilities.send_reply(self, msg, text, true, keyboard)
+	  utilities.send_reply(msg, text, true, keyboard)
 	  return
 	end
   end
@@ -86,7 +86,7 @@ end
 function gdrive:action(msg, config, matches)
   local docid = matches[2]
   local data = gdrive:get_drive_document_data(docid)
-  if not data then utilities.send_reply(self, msg, config.errors.connection) return end
+  if not data then utilities.send_reply(msg, config.errors.connection) return end
   gdrive:send_drive_document_data(data, self, msg)
   return
 end

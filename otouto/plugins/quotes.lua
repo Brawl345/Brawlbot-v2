@@ -81,28 +81,28 @@ end
 
 function quotes:action(msg, config, matches)
   if matches[1] == "quote" then
-    utilities.send_message(self, msg.chat.id, quotes:get_quote(msg), true)
+    utilities.send_message(msg.chat.id, quotes:get_quote(msg), true)
     return
   elseif matches[1] == "addquote" and matches[2] then
-    utilities.send_reply(self, msg, quotes:save_quote(msg), true)
+    utilities.send_reply(msg, quotes:save_quote(msg), true)
     return
   elseif matches[1] == "delquote" and matches[2] then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
-	  utilities.send_reply(self, msg, quotes:delete_quote(msg), true)
+	  utilities.send_reply(msg, quotes:delete_quote(msg), true)
 	  return
   elseif matches[1] == "listquotes" then
     local link, iserror = quotes:list_quotes(msg)
 	if iserror then
-      utilities.send_reply(self, msg, link, true)
+      utilities.send_reply(msg, link, true)
 	  return
     end
-    utilities.send_reply(self, msg, 'Ich habe eine Liste aller Zitate hochgeladen.', false, '{"inline_keyboard":[[{"text":"Alle Zitate abrufen","url":"'..link..'"}]]}')
+    utilities.send_reply(msg, 'Ich habe eine Liste aller Zitate hochgeladen.', false, '{"inline_keyboard":[[{"text":"Alle Zitate abrufen","url":"'..link..'"}]]}')
     return
   end
-  utilities.send_reply(self, msg, quotes.doc, true)
+  utilities.send_reply(msg, quotes.doc, true)
 end
 
 return quotes

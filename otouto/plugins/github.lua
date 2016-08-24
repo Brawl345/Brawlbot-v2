@@ -63,7 +63,7 @@ function github:action(msg, config, matches)
   else
     output = github:send_gh_commit_data(gh_code, gh_commit_sha, data)
   end
-  utilities.send_reply(self, msg, output, true)
+  utilities.send_reply(msg, output, true)
 end
 
 return github

@@ -34,7 +34,7 @@ end
 
 function hackernews:action(msg, config, matches)
   local hn_code = matches[1]
-  utilities.send_reply(self, msg, hackernews:send_hackernews_post(hn_code), true)
+  utilities.send_reply(msg, hackernews:send_hackernews_post(hn_code), true)
 end
 
 return hackernews

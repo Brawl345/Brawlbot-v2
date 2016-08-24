@@ -50,7 +50,7 @@ function play_store:action(msg, config, matches)
   if data == nil then
     return
   else
-	utilities.send_reply(self, msg, play_store:send_playstore_data(data), true)
+	utilities.send_reply(msg, play_store:send_playstore_data(data), true)
 	return
    end
 end

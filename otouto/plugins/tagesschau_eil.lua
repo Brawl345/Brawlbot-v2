@@ -44,7 +44,7 @@ function tagesschau_eil:action(msg, config)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, tagesschau_eil.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, tagesschau_eil.doc, true, msg.message_id, true)
 	  return
 	end
   end
@@ -59,25 +59,22 @@ function tagesschau_eil:action(msg, config)
 
   if input:match('(sub)$') then
 	local output = tagesschau_eil:abonnieren(id)
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
   elseif input:match('(del)$') then
 	local output = tagesschau_eil:deabonnieren(id)
-	utilities.send_reply(self, msg, output, true)
+	utilities.send_reply(msg, output, true)
   elseif input:match('(sync)$') then
     if msg.from.id ~= config.admin then
-      utilities.send_reply(self, msg, config.errors.sudo)
+      utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
-	tagesschau_eil:cron(self)
+	tagesschau_eil:cron()
   end
   
   return
 end
 
-function tagesschau_eil:cron(self_plz)
-   if not self.BASE_URL then
-     self = self_plz
-   end
+function tagesschau_eil:cron()
   -- print('EIL: Prüfe...')
   local last_eil = redis:get(hash..':last_entry')
   local res,code  = http.request(url)
@@ -96,7 +93,7 @@ function tagesschau_eil:cron(self_plz)
 	  for _,user in pairs(redis:smembers(hash..':subs')) do
 	    local user = string.gsub(user, 'chat%#id', '')
 		local user = string.gsub(user, 'user%#id', '')
-	    utilities.send_message(self, user, eil, true, nil, 'HTML', '{"inline_keyboard":[[{"text":"Eilmeldung aufrufen","url":"'..post_url..'"}]]}')
+	    utilities.send_message(user, eil, true, nil, 'HTML', '{"inline_keyboard":[[{"text":"Eilmeldung aufrufen","url":"'..post_url..'"}]]}')
       end
     end
   end

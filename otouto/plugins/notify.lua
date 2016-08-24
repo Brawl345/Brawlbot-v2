@@ -23,7 +23,7 @@ function isWordFoundInString(word,input)
          select(2,input:gsub('%W+' .. word .. '%W+','')) > 0
 end
 
-function notify:pre_process(msg, self)
+function notify:pre_process(msg)
   local notify_users = redis:smembers('notify:ls')
 
   -- I call this beautiful lady the "if soup"
@@ -44,7 +44,7 @@ function notify:pre_process(msg, self)
 			  local from = string.gsub(msg.from.name, "%_", " ")
 			  local chat_name = string.gsub(msg.chat.title, "%_", " ")
 			  local text = from..' am '..send_date..' in "'..chat_name..'":\n\n'..msg.text
-			  utilities.send_message(self, id, text, true)
+			  utilities.send_message(id, text, true)
 			end
 		  end
 	    end
@@ -57,7 +57,7 @@ end
 
 function notify:action(msg, config, matches)
   if not msg.from.username then
-    utilities.send_reply(self, msg, 'Du hast keinen Usernamen und kannst daher dieses Feature nicht nutzen. Tut mir leid!' )
+    utilities.send_reply(msg, 'Du hast keinen Usernamen und kannst daher dieses Feature nicht nutzen. Tut mir leid!' )
 	return
   end
   
@@ -67,18 +67,18 @@ function notify:action(msg, config, matches)
   
   if matches[1] == "del" then
     if not redis:sismember('notify:ls', username) then
-	  utilities.send_reply(self, msg, 'Du wirst noch gar nicht benachrichtigt!')
+	  utilities.send_reply(msg, 'Du wirst noch gar nicht benachrichtigt!')
 	  return
 	end
     print('Setting notify in redis hash '..hash..' to false')
     redis:hset(hash, 'notify', false)
     print('Removing '..username..' from redis set notify:ls')
     redis:srem('notify:ls', username)
-	utilities.send_reply(self, msg, 'Du erhälst jetzt keine Benachrichtigungen mehr, wenn du angesprochen wirst.')
+	utilities.send_reply(msg, 'Du erhälst jetzt keine Benachrichtigungen mehr, wenn du angesprochen wirst.')
 	return
   else
     if redis:sismember('notify:ls', username) then
-	  utilities.send_reply(self, msg, 'Du wirst schon benachrichtigt!')
+	  utilities.send_reply(msg, 'Du wirst schon benachrichtigt!')
 	  return
 	end
     print('Setting notify in redis hash '..hash..' to true')
@@ -87,11 +87,11 @@ function notify:action(msg, config, matches)
     redis:hset(hash, 'id', msg.from.id)
     print('Adding '..username..' to redis set notify:ls')
     redis:sadd('notify:ls', username)
-	local res = utilities.send_message(self, msg.from.id, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true, nil, true)
+	local res = utilities.send_message(msg.from.id, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true, nil, true)
 	if not res then
-	  utilities.send_reply(self, msg, 'Bitte schreibe mir [privat](http://telegram.me/' .. self.info.username .. '?start=notify), um den Vorgang abzuschließen.', true)
+	  utilities.send_reply(msg, 'Bitte schreibe mir [privat](http://telegram.me/' .. self.info.username .. '?start=notify), um den Vorgang abzuschließen.', true)
 	elseif msg.chat.type ~= 'private' then
-	  utilities.send_reply(self, msg, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true)
+	  utilities.send_reply(msg, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true)
 	end
   end
 end

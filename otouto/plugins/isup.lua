@@ -68,10 +68,10 @@ end
 
 function isup:action(msg, config)
   if isup:isup(matches[1]) then
-    utilities.send_reply(self, msg, matches[1]..' ist UP! ✅')
+    utilities.send_reply(msg, matches[1]..' ist UP! ✅')
     return
   else
-    utilities.send_reply(self, msg, matches[1]..' ist DOWN! ❌')
+    utilities.send_reply(msg, matches[1]..' ist DOWN! ❌')
     return
   end
 end

@@ -11,17 +11,17 @@ end
 cleverbot.command = 'cbot <Text>'
 
 function cleverbot:action(msg, config, matches)
-  utilities.send_typing(self, msg.chat.id, 'typing')
+  utilities.send_typing(msg.chat.id, 'typing')
   local text = matches[1]
   local query, code = https.request(cleverbot.url..URL.escape(text))
   if code ~= 200 then
-	utilities.send_reply(self, msg, 'Ich möchte jetzt nicht reden...')
+	utilities.send_reply(msg, 'Ich möchte jetzt nicht reden...')
 	return
   end
 
   local data = json.decode(query)
   if not data.clever then
-    utilities.send_reply(self, msg, 'Ich möchte jetzt nicht reden...')
+    utilities.send_reply(msg, 'Ich möchte jetzt nicht reden...')
 	return
   end
 
@@ -32,7 +32,7 @@ function cleverbot:action(msg, config, matches)
   local answer = string.gsub(answer, "&Uuml;", "Ü")
   local answer = string.gsub(answer, "&uuml;", "ü")
   local answer = string.gsub(answer, "&szlig;", "ß")
-  utilities.send_reply(self, msg, answer)
+  utilities.send_reply(msg, answer)
 end
 
 return cleverbot

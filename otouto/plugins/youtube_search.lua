@@ -44,13 +44,13 @@ function yt_search:action(msg)
     if msg.reply_to_message and msg.reply_to_message.text then
       input = msg.reply_to_message.text
     else
-	  utilities.send_message(self, msg.chat.id, yt_search.doc, true, msg.message_id, true)
+	  utilities.send_message(msg.chat.id, yt_search.doc, true, msg.message_id, true)
 	  return
 	end
   end
 
   local link, videoId = searchYoutubeVideo(input)
-  if link == "YouTube-Video nicht gefunden!" or nil then utilities.send_reply(self, msg, 'YouTube-Video nicht gefunden!') return end
+  if link == "YouTube-Video nicht gefunden!" or nil then utilities.send_reply(msg, 'YouTube-Video nicht gefunden!') return end
  
   local data = get_yt_data(videoId)
 

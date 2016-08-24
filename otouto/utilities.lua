@@ -1,5 +1,22 @@
--- utilities.lua
--- Functions shared among plugins.
+--[[
+    utilities.lua
+    Functions shared among otouto plugins.
+
+    Copyright 2016 topkecleon <drew@otou.to>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License version 3 as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+]]--
 
 local utilities = {}
 
@@ -21,55 +38,83 @@ https.timeout = 5
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
-function utilities:send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)
-	local parse_mode
-	if type(use_markdown) == 'string' then
-	  parse_mode = use_markdown
-	elseif use_markdown == true then
-	  parse_mode = 'Markdown'
-	end
-	return bindings.request(self, 'sendMessage', {
-		chat_id = chat_id,
-		text = text,
-		disable_web_page_preview = disable_web_page_preview,
-		reply_to_message_id = reply_to_message_id,
-		parse_mode = parse_mode,
-		reply_markup = reply_markup
-	} )
+function utilities.send_message(chat_id, text, disable_web_page_preview, reply_to_message_id, use_markdown, reply_markup)
+    local parse_mode
+    if type(use_markdown) == 'string' then
+        parse_mode = use_markdown
+    elseif use_markdown == true then
+        parse_mode = 'markdown'
+    end
+    return bindings.request(
+        'sendMessage',
+        {
+			chat_id = chat_id,
+            text = text,
+            disable_web_page_preview = disable_web_page_preview,
+            reply_to_message_id = reply_to_message_id,
+            parse_mode = parse_mode,
+			reply_markup = reply_markup
+        }
+    )
 end
 
 -- https://core.telegram.org/bots/api#editmessagetext
-function utilities:edit_message(chat_id, message_id, text, disable_web_page_preview, use_markdown, reply_markup)
+function utilities.edit_message(chat_id, message_id, text, disable_web_page_preview, use_markdown, reply_markup)
 	local parse_mode
 	if type(use_markdown) == 'string' then
 	  parse_mode = use_markdown
 	elseif use_markdown == true then
 	  parse_mode = 'Markdown'
 	end
-	return bindings.request(self, 'editMessageText', {
-		chat_id = chat_id,
-		message_id = message_id,
-		text = text,
-		disable_web_page_preview = disable_web_page_preview,
-		parse_mode = parse_mode,
-		reply_markup = reply_markup
-	} )
+	return bindings.request(
+		'editMessageText',
+		{
+			chat_id = chat_id,
+			message_id = message_id,
+			text = text,
+			disable_web_page_preview = disable_web_page_preview,
+			parse_mode = parse_mode,
+			reply_markup = reply_markup
+		}
+	)
 end
 
-function utilities:send_reply(old_msg, text, use_markdown, reply_markup)
-	return utilities.send_message(self, old_msg.chat.id, text, true, old_msg.message_id, use_markdown, reply_markup)
+function utilities.send_reply(msg, text, use_markdown, reply_markup)
+    local parse_mode
+    if type(use_markdown) == 'string' then
+        parse_mode = use_markdown
+    elseif use_markdown == true then
+        parse_mode = 'markdown'
+    end
+    return bindings.request(
+        'sendMessage',
+        {
+            chat_id = msg.chat.id,
+            text = text,
+            disable_web_page_preview = true,
+            reply_to_message_id = msg.message_id,
+            parse_mode = parse_mode,
+			reply_markup = reply_markup
+        }
+    )
 end
 
 -- NOTE: Telegram currently only allows file uploads up to 50 MB
 -- https://core.telegram.org/bots/api#sendphoto
-function utilities:send_photo(chat_id, file, text, reply_to_message_id, reply_markup)
+function utilities.send_photo(chat_id, file, text, reply_to_message_id, reply_markup)
     if not file then return false end
-	local output = bindings.request(self, 'sendPhoto', {
-		chat_id = chat_id,
-		caption = text or nil,
-		reply_to_message_id = reply_to_message_id,
-		reply_markup = reply_markup
-	}, {photo = file} )
+	local output = bindings.request(
+		'sendPhoto',
+		{
+			chat_id = chat_id,
+			caption = text or nil,
+			reply_to_message_id = reply_to_message_id,
+			reply_markup = reply_markup
+		},
+		{
+			photo = file
+		}
+	)
 	if string.match(file, '/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
@@ -78,15 +123,21 @@ function utilities:send_photo(chat_id, file, text, reply_to_message_id, reply_ma
 end
 
 -- https://core.telegram.org/bots/api#sendaudio
-function utilities:send_audio(chat_id, file, reply_to_message_id, duration, performer, title)
+function utilities.send_audio(chat_id, file, reply_to_message_id, duration, performer, title)
     if not file then return false end
-	local output = bindings.request(self, 'sendAudio', {
-		chat_id = chat_id,
-		duration = duration or nil,
-		performer = performer or nil,
-		title = title or nil,
-		reply_to_message_id = reply_to_message_id
-	}, {audio = file} )
+	local output = bindings.request(
+		'sendAudio',
+		{
+			chat_id = chat_id,
+			duration = duration or nil,
+			performer = performer or nil,
+			title = title or nil,
+			reply_to_message_id = reply_to_message_id
+		},
+		{
+			audio = file
+		}
+	)
 	if string.match(file, '/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
@@ -95,14 +146,20 @@ function utilities:send_audio(chat_id, file, reply_to_message_id, duration, perf
 end
 
 -- https://core.telegram.org/bots/api#senddocument
-function utilities:send_document(chat_id, file, text, reply_to_message_id, reply_markup)
+function utilities.send_document(chat_id, file, text, reply_to_message_id, reply_markup)
 	if not file then return false end
-	local output = bindings.request(self, 'sendDocument', {
-		chat_id = chat_id,
-		caption = text or nil,
-		reply_to_message_id = reply_to_message_id,
-		reply_markup = reply_markup
-	}, {document = file} )
+	local output = bindings.request(
+		'sendDocument',
+		{
+			chat_id = chat_id,
+			caption = text or nil,
+			reply_to_message_id = reply_to_message_id,
+			reply_markup = reply_markup
+		},
+		{
+			document = file
+		}
+	)
 	if string.match(file, '/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
@@ -111,16 +168,22 @@ function utilities:send_document(chat_id, file, text, reply_to_message_id, reply
 end
 
 -- https://core.telegram.org/bots/api#sendvideo
-function utilities:send_video(chat_id, file, text, reply_to_message_id, duration, width, height)
+function utilities.send_video(chat_id, file, text, reply_to_message_id, duration, width, height)
 	if not file then return false end
-	local output = bindings.request(self, 'sendVideo', {
-		chat_id = chat_id,
-		caption = text or nil,
-		duration = duration or nil,
-		width = width or nil,
-		height = height or nil,
-		reply_to_message_id = reply_to_message_id
-	}, {video = file} )
+	local output = bindings.request(
+		'sendVideo',
+		{
+			chat_id = chat_id,
+			caption = text or nil,
+			duration = duration or nil,
+			width = width or nil,
+			height = height or nil,
+			reply_to_message_id = reply_to_message_id
+		},
+		{
+			video = file
+		}
+	)
 	if string.match(file, '/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
@@ -130,13 +193,19 @@ end
 
 -- NOTE: Voice messages are .ogg files encoded with OPUS
 -- https://core.telegram.org/bots/api#sendvoice
-function utilities:send_voice(chat_id, file, text, reply_to_message_id, duration)
+function utilities.send_voice(chat_id, file, text, reply_to_message_id, duration)
 	if not file then return false end
-	local output = bindings.request(self, 'sendVoice', {
-		chat_id = chat_id,
-		duration = duration or nil,
-		reply_to_message_id = reply_to_message_id
-	}, {voice = file} )
+	local output = bindings.request(
+		'sendVoice',
+		{
+			chat_id = chat_id,
+			duration = duration or nil,
+			reply_to_message_id = reply_to_message_id
+		},
+		{
+			voice = file
+		}
+	)
 	if string.match(file, '/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
@@ -145,71 +214,103 @@ function utilities:send_voice(chat_id, file, text, reply_to_message_id, duration
 end
 
 -- https://core.telegram.org/bots/api#sendlocation
-function utilities:send_location(chat_id, latitude, longitude, reply_to_message_id)
-	return bindings.request(self, 'sendLocation', {
-		chat_id = chat_id,
-		latitude = latitude,
-		longitude = longitude,
-		reply_to_message_id = reply_to_message_id
-	} )
+function utilities.send_location(chat_id, latitude, longitude, reply_to_message_id)
+	return bindings.request(
+		'sendLocation', 
+		{
+			chat_id = chat_id,
+			latitude = latitude,
+			longitude = longitude,
+			reply_to_message_id = reply_to_message_id
+		}
+	)
 end
 
 -- NOTE: Venue is different from location: it shows information, such as the street adress or
 -- title of the location with it.
 -- https://core.telegram.org/bots/api#sendvenue
-function utilities:send_venue(chat_id, latitude, longitude, reply_to_message_id, title, address)
-	return bindings.request(self, 'sendVenue', {
-		chat_id = chat_id,
-		latitude = latitude,
-		longitude = longitude,
-		title = title,
-		address = address,
-		reply_to_message_id = reply_to_message_id
-	} )
+function utilities.send_venue(chat_id, latitude, longitude, reply_to_message_id, title, address)
+	return bindings.request(
+		'sendVenue',
+		{
+			chat_id = chat_id,
+			latitude = latitude,
+			longitude = longitude,
+			title = title,
+			address = address,
+			reply_to_message_id = reply_to_message_id
+		}
+	)
 end
 
 -- https://core.telegram.org/bots/api#sendchataction
-function utilities:send_typing(chat_id, action)
-	return bindings.request(self, 'sendChatAction', {
-		chat_id = chat_id,
-		action = action
-	} )
+function utilities.send_typing(chat_id, action)
+	return bindings.request(
+		'sendChatAction',
+		{
+			chat_id = chat_id,
+			action = action
+		}
+	)
 end
 
 -- https://core.telegram.org/bots/api#answercallbackquery
-function utilities:answer_callback_query(callback, text, show_alert)
-	return bindings.request(self, 'answerCallbackQuery', {
-		callback_query_id = callback.id,
-		text = text,
-		show_alert = show_alert
-	} )
+function utilities.answer_callback_query(callback, text, show_alert)
+	return bindings.request(
+		'answerCallbackQuery',
+		{
+			callback_query_id = callback.id,
+			text = text,
+			show_alert = show_alert
+		}
+	)
 end
 
 -- https://core.telegram.org/bots/api#getchat
-function utilities:get_chat_info(chat_id)
-  return bindings.request(self, 'getChat', {
-		chat_id = chat_id
-	} )
+function utilities.get_chat_info(chat_id)
+	return bindings.request(
+		'getChat',
+		{
+			chat_id = chat_id
+		}
+	)
 end
 
 -- https://core.telegram.org/bots/api#getchatadministrators
-function utilities:get_chat_administrators(chat_id)
-  return bindings.request(self, 'getChatAdministrators', {
-		chat_id = chat_id
-	} )
+function utilities.get_chat_administrators(chat_id)
+	return bindings.request(
+		'getChatAdministrators',
+		{
+			chat_id = chat_id
+		}
+	)
 end
 
 -- https://core.telegram.org/bots/api#answerinlinequery
-function utilities:answer_inline_query(inline_query, results, cache_time, is_personal, next_offset, switch_pm_text, switch_pm_parameter)
-  return bindings.request(self, 'answerInlineQuery', {
-		inline_query_id	 = inline_query.id,
-		results = results,
-		cache_time = cache_time,
-		is_personal = is_personal,
-		next_offset = next_offset,
-		switch_pm_text = switch_pm_text,
-		switch_pm_parameter = switch_pm_parameter
-	} )
+function utilities.answer_inline_query(inline_query, results, cache_time, is_personal, next_offset, switch_pm_text, switch_pm_parameter)
+	return bindings.request(
+		'answerInlineQuery',
+		{
+			inline_query_id	 = inline_query.id,
+			results = results,
+			cache_time = cache_time,
+			is_personal = is_personal,
+			next_offset = next_offset,
+			switch_pm_text = switch_pm_text,
+			switch_pm_parameter = switch_pm_parameter
+		}
+	)
+end
+
+function abort_inline_query(inline_query)
+	return bindings.request(
+		'answerInlineQuery',
+		{
+			inline_query_id	 = inline_query.id,
+			cache_time = 5,
+			is_personal = true
+		}
+	)
 end
 
  -- get the indexed word in a string
@@ -397,12 +498,12 @@ function utilities:resolve_username(input)
 	end
 end
 
-function utilities:handle_exception(err, message, config)
+function utilities:handle_exception(err, message, log_chat)
   if not err then err = '' end
   local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
-  if config.log_chat then
-	output = '```' .. output .. '```'
-	utilities.send_message(self, config.log_chat, output, true, nil, true)
+  if log_chat then
+	output = '<code>' .. utilities.html_escape(output) .. '</code>'
+	return utilities.send_message(log_chat, output, true, nil, 'html')
   else
 	print(output)
   end
@@ -808,7 +909,7 @@ function was_modified_since(url, last_modified)
 end
 
 -- only url is needed!
-function get_cached_file(url, file_name, receiver, chat_action, self)
+function get_cached_file(url, file_name, receiver, chat_action)
   local hash = 'telegram:cache:sent_file'
   local cached_file_id = redis:hget(hash..':'..url, 'file_id')
   local cached_last_modified = redis:hget(hash..':'..url, 'last_modified')
@@ -824,8 +925,8 @@ function get_cached_file(url, file_name, receiver, chat_action, self)
 		return
 	  end
 	  print('File was modified, redownloading...')
-	  if receiver and chat_action and self then
-	    utilities.send_typing(self, receiver, chat_action)
+	  if receiver and chat_action then
+	    utilities.send_typing(receiver, chat_action)
 	  end
 	  file = download_to_file(url, file_name)
 	  return file, new_last_modified, false
@@ -860,8 +961,8 @@ function get_cached_file(url, file_name, receiver, chat_action, self)
     nocache = false
   end
   
-  if receiver and chat_action and self then
-    utilities.send_typing(self, receiver, chat_action)
+  if receiver and chat_action then
+    utilities.send_typing(receiver, chat_action)
   end
   
   if not nocache then
