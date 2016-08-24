@@ -221,9 +221,9 @@ function bot:run(config)
 		    for n=1, #self.plugins do 
 			    local v = self.plugins[n]
 				if v.cron then -- Call each plugin's cron function, if it has one.
-					local result, err = pcall(function() v.cron(config) end)
+					local result, err = pcall(function() v.cron(self, config) end)
 					if not result then
-						utilities.handle_exception(err, 'CRON: ' .. n, config.log_chat)
+						utilities.handle_exception(self, err, 'CRON: ' .. n, config.log_chat)
 					end
 				end
 			end

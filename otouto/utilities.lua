@@ -499,14 +499,20 @@ function utilities:resolve_username(input)
 end
 
 function utilities:handle_exception(err, message, log_chat)
-  if not err then err = '' end
-  local output = '\n[' .. os.date('%F %T', os.time()) .. ']\n' .. self.info.username .. ': ' .. err .. '\n' .. message .. '\n'
-  if log_chat then
-	output = '<code>' .. utilities.html_escape(output) .. '</code>'
-	return utilities.send_message(log_chat, output, true, nil, 'html')
-  else
-	print(output)
-  end
+    local output = string.format(
+        '[%s]\n%s: %s\n%s\n',
+        os.date('%F %T'),
+        self.info.username,
+        err or '',
+        message
+    )
+    if log_chat then
+        output = '<code>' .. utilities.html_escape(output) .. '</code>'
+        return utilities.send_message(log_chat, output, true, nil, 'html')
+    else
+        print(output)
+    end
+
 end
 
 -- MOVED TO DOWNLOAD_TO_FILE
