@@ -21,9 +21,9 @@ function stats:user_print_name(user)
 
   local text = ''
   if user.first_name then
-    text = user.last_name..' '
+    text = user.first_name..' '
   end
-  if user.lastname then
+  if user.last_name then
     text = text..user.last_name
   end
 
