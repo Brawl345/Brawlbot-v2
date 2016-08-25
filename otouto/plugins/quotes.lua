@@ -7,7 +7,8 @@ function quotes:init(config)
     "^/(delquote) (.+)$",
     "^/(addquote) (.+)$",
     "^/(quote)$",
-	"^/(listquotes)$"
+	"^/(listquotes)$",
+	"^/(delquote)$"
 	}
 	quotes.doc = [[*
 ]]..config.cmd_pat..[[addquote* _<Zitat>_: Fügt Zitat hinzu.
@@ -87,12 +88,22 @@ function quotes:action(msg, config, matches)
     utilities.send_reply(msg, quotes:save_quote(msg), true)
     return
   elseif matches[1] == "delquote" and matches[2] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
+	utilities.send_reply(msg, quotes:delete_quote(msg), true)
+	return
+  elseif matches[1] == "delquote" and not matches[2] then
+	if not is_sudo(msg, config) then
+      utilities.send_reply(msg, config.errors.sudo)
+	  return
+    end
+    if msg.reply_to_message then
+	  local msg = msg.reply_to_message
 	  utilities.send_reply(msg, quotes:delete_quote(msg), true)
 	  return
+	end
   elseif matches[1] == "listquotes" then
     local link, iserror = quotes:list_quotes(msg)
 	if iserror then
