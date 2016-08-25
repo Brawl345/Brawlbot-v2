@@ -107,8 +107,6 @@ Einige Funktionen, die oft benötigt werden, sind in `utilites.lua` verfügbar.
 * * *
 
 ## Bindings
-**Diese Sektion wurde noch nicht lokalisiert.**
-
 Die Telegram-API wird mithilfe der `binding.lua` über die multipart-post Library kontaktiert. Brawlbots Bindings-Datei unterstützt alle Standard API-Methoden und Argumente. Die Hauptufnktion `bindings.request` akzeptiert drei Parameter: `method`, `parameters` und `file`. Bevor du die Bindings-Datei nutzt, initialisiere das Modul mit der `init`-Funktion, wobei der Bot-Token als Argument übergeben werden sollte.
 
 `method` ist der Name der API-Methode (bspw. `sendMessage`), `parameters` (optional) ist eine Tabelle mit Schlüssel/Werte-Paaren der Parameter dieser Methode. `file` (optional) ist eine Tabelle mit einem einzigen Schlüssel/Werte-Paar, wobei der Schlüssel der Name de Parameters und der Wert der Dateiname oder die File-ID ist (wenn dies in den `parameters` übergeben wird, wird Brawlbot den Dateinamen als File-ID senden).
