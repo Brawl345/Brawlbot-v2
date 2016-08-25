@@ -109,18 +109,18 @@ Einige Funktionen, die oft benötigt werden, sind in `utilites.lua` verfügbar.
 ## Bindings
 **Diese Sektion wurde noch nicht lokalisiert.**
 
-Calls to the Telegram bot API are performed with the `bindings.lua` file through the multipart-post library. otouto's bindings file supports all standard API methods and all arguments. Its main function, `bindings.request`, accepts three arguments: `method`, `parameters`, `file`. Before using it, initialize the bindings module with its `init` function, passing your bot token as the argument.
+Die Telegram-API wird mithilfe der `binding.lua` über die multipart-post Library kontaktiert. Brawlbots Bindings-Datei unterstützt alle Standard API-Methoden und Argumente. Die Hauptufnktion `bindings.request` akzeptiert drei Parameter: `method`, `parameters` und `file`. Bevor du die Bindings-Datei nutzt, initialisiere das Modul mit der `init`-Funktion, wobei der Bot-Token als Argument übergeben werden sollte.
 
-`method` is the name of the API method. `parameters` (optional) is a table of key/value pairs of the method's parameters to be sent with the method. `file` (super-optional) is a table of a single key/value pair, where the key is the name of the parameter and the value is the filename (if these are included in `parameters` instead, otouto will attempt to send the filename as a file ID).
+`method` ist der Name der API-Methode (bspw. `sendMessage`), `parameters` (optional) ist eine Tabelle mit Schlüssel/Werte-Paaren der Parameter dieser Methode. `file` (optional) ist eine Tabelle mit einem einzigen Schlüssel/Werte-Paar, wobei der Schlüssel der Name de Parameters und der Wert der Dateiname oder die File-ID ist (wenn dies in den `parameters` übergeben wird, wird Brawlbot den Dateinamen als File-ID senden).
 
-Additionally, any method can be called as a key in the `bindings` table (for example, `bindings.getMe`). The `bindings.gen` function (which is also the __index function in its metatable) will forward its arguments to `bindings.request` in their proper form. In this way, the following two function calls are equivalent:
+Zusätzlich kann jede Methode als Schlüssel in der `bindings` Tabelle (zum Beispiel `bindings.getMe`) aufgerufen werden. Die `bindings.gen` Funktion (welche auch die `__index` Funktion in der Metatabelle ist) wird ihre Argumente an `bindings.request` in der richtigen Form übergeben. Mit diesem Weg sind die folgenden zwei Funktionsaufrufe gleich:
 
 ```
 bindings.request(
     'sendMessage',
     {
         chat_id = 987654321,
-        text = 'Quick brown fox.',
+        text = 'Brawlbot is best bot.',
         reply_to_message_id = 54321,
         disable_web_page_preview = false,
         parse_method = 'Markdown'
@@ -129,32 +129,32 @@ bindings.request(
 
 bindings.sendMessage{
     chat_id = 987654321,
-    text = 'Quick brown fox.',
+    text = 'Brawlbot is best bot.',
     reply_to_message_id = 54321,
     disable_web_page_preview = false,
     parse_method = 'Markdown'
 }
 ```
 
-Furthermore, `utilities.lua` provides two "shortcut" functions to mimic the behavior of otouto's old bindings: `send_message` and `send_reply`. `send_message` accepts these arguments: `self`, `chat_id`, `text`, `disable_web_page_preview`, `reply_to_message_id`, `use_markdown`. The following function call is equivalent to the two above:
+`utilities.lua` hat mehrere "Abkürzungen", die dir das leben einfacher machen. Z.b.:
 
 ```
-utilities.send_message(987654321, 'Quick brown fox.', false, 54321, true)
+utilities.send_message(987654321, 'Brawlbot is best bot.', false, 54321, true)
 ```
 
-Uploading a file for the `sendPhoto` method would look like this:
+Eine Datei mit `sendPhoto` hochzuladen würde so aussehen:
 
 ```
-bindings.sendPhoto({ chat_id = 987654321 }, { photo = 'dankmeme.jpg' } )
+utilites.sendPhoto(987654321, 'photo.jpg', 'Beschreibungstext')
 ```
 
-and using `sendPhoto` with a file ID would look like this:
+oder mit einer File-ID:
 
 ```
-bindings.sendPhoto{ chat_id = 987654321, photo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789' }
+utilites.sendPhoto(987654321, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789', 'Beschreibungstext')
 ```
 
-Upon success, bindings will return the deserialized result from the API. Upon failure, it will return false and the result. In the case of a connection error, it will return two false values. If an invalid method name is given, bindings will throw an exception. This is to mimic the behavior of more conventional bindings as well as to prevent "silent errors".
+Falls erfolgreich, wird bindings das deserialisierte Ergebniss der API zurückgeben. Falls nicht erfolgreich, wird `false` und das Ergebnis zurückgegeben. Falls es einen Verbindungsfehler gab, werden zwei `false` Werte zurückgegeben. Wenn ein invalider Methodenname übergeben wurde, wird bindings eine Exception ausgeben. Damit sollen "stille Fehler" vermieden werden.
 
 * * *
 

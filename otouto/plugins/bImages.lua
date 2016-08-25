@@ -9,7 +9,8 @@ function bImages:init(config)
 
   bImages.triggers = {"^/nil$"}
   bImages.inline_triggers = {
-	"^b (.*)"
+	"^b (.*)",
+	"^i (.+)"
   }
 end
 
