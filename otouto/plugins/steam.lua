@@ -45,7 +45,7 @@ function steam:send_steam_data(data, msg)
   return text, image_url
 end
 
-function steam:action(msg)
+function steam:action(msg, config, matches)
   local data = steam:get_steam_data(matches[1])
   if not data then utilities.send_reply(msg, config.errors.connection) return end
 
