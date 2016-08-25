@@ -10,7 +10,8 @@ function help:init(config)
     "^/hilfe (.+)",
 	"^/help (.+)",
 	"^/(hilfe)_(.+)",
-	"^/hilfe$"
+	"^/hilfe$",
+	"^/help$"
   }
   help.inline_triggers = {
     "^hilfe (.+)",
@@ -38,7 +39,7 @@ end
 function help:action(msg, config, matches)
   if matches[2] then
     input = matches[2]
-  elseif matches[1] ~= '/hilfe' then
+  elseif matches[1] ~= '/hilfe' and matches[1] ~= '/help' then
     input = matches[1]
   else
     input = nil
