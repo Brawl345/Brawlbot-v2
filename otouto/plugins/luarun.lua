@@ -23,7 +23,7 @@ function luarun:action(msg, config)
 
 	local input = utilities.input(msg.text)
 	if not input then
-		utilities.send_reply(self, msg, 'Bitte gebe einen Befehl ein.')
+		utilities.send_reply(msg, 'Bitte gebe einen Befehl ein.')
 		return
 	end
 
@@ -39,8 +39,8 @@ function luarun:action(msg, config)
 		local URL = require('socket.url')
 		local http = require('socket.http')
 		local https = require('ssl.https')
-		return function (self, msg, config) ]] .. input .. [[ end
-	]] )()(self, msg, config)
+		return function (msg, config) ]] .. input .. [[ end
+	]] )()(msg, config)
 	if output == nil then
 		output = 'Ausgeführt!'
 	else
@@ -52,7 +52,7 @@ function luarun:action(msg, config)
 		end
 		output = '```\n' .. tostring(output) .. '\n```'
 	end
-	utilities.send_message(self, msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
 
 end
 
