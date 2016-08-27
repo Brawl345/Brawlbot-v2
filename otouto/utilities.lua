@@ -450,6 +450,15 @@ function utilities.save_data(filename, data)
 	f:close()
 end
 
+-- Returns file size as Integer
+-- See: https://www.lua.org/pil/21.3.html
+function get_file_size(file)
+  local current = file:seek()      -- get current position
+  local size = file:seek("end")    -- get file size
+  file:seek("set", current)        -- restore position
+  return tonumber(size)
+end
+
  -- Gets coordinates for a location. Used by gMaps.lua, time.lua, weather.lua.
 function utilities.get_coords(input, config)
   local url = 'https://maps.googleapis.com/maps/api/geocode/json?address='..URL.escape(input)..'&language=de'
@@ -723,6 +732,10 @@ function is_service_msg(msg)
   return var
 end
 
+-- Make a POST request
+-- URL = obvious
+-- Arguments = Things, that go into the body. If sending a file, use 'io.open('path/to/file', "r")'
+-- Headers = Header table. If not set, we will set a few!
 function post_petition(url, arguments, headers)
    local url, h = string.gsub(url, "http://", "")
    local url, hs = string.gsub(url, "https://", "")
@@ -749,8 +762,13 @@ function post_petition(url, arguments, headers)
      request_constructor.headers["X-Accept"] = "application/json"
 	 request_constructor.headers["Accept"] = "application/json"
    end
-   request_constructor.headers["Content-Length"] = tostring(#source)
-   request_constructor.source = ltn12.source.string(source)
+   if type(arguments) == 'userdata' then
+     request_constructor.headers["Content-Length"] = get_file_size(source)
+     request_constructor.source = ltn12.source.file(source)
+   else 
+     request_constructor.headers["Content-Length"] = tostring(#source)
+     request_constructor.source = ltn12.source.string(source)
+  end
    
    if post_prot == "http" then
      ok, response_code, response_headers, response_status_line = http.request(request_constructor)
