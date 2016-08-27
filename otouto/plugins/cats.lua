@@ -59,7 +59,7 @@ function cats:inline_callback(inline_query, config, matches)
   utilities.answer_inline_query(inline_query, results, 30)
 end
 
-function cats:action(msg, config)
+function cats:action(msg, config, matches)
   if matches[1] == 'gif' then
     local url = 'http://thecatapi.com/api/images/get?type=gif&apikey='..apikey
 	local file = download_to_file(url, 'miau.gif')

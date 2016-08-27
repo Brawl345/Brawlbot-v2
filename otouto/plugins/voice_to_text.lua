@@ -46,7 +46,7 @@ function vtt:pre_process(msg, config)
   end
   
   if not data._text then
-    utilities.send_reply(msg, 'Keine Stimme zu hören!')
+    utilities.send_reply(msg, 'Keine Stimme zu hören oder Erkennung fehlgeschlagen.')
 	return
   end
 
