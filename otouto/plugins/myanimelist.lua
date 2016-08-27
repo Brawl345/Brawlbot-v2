@@ -28,7 +28,7 @@ end
 local user = cred_data.mal_user
 local password = cred_data.mal_pw
 
-local BASE_URL = 'http://'..user..':'..password..'@myanimelist.net/api'
+local BASE_URL = 'https://'..user..':'..password..'@myanimelist.net/api'
 
 function mal:delete_tags(str)
   str = string.gsub( str, '<br />', '')
@@ -50,7 +50,7 @@ function mal:get_mal_info(query, typ)
   elseif typ == 'manga' then
     url = BASE_URL..'/manga/search.xml?q='..query
   end
-  local res,code  = http.request(url)
+  local res,code  = https.request(url)
   if code ~= 200 then return "HTTP-Fehler" end
   local result = xml.load(res)
   return result
@@ -59,7 +59,7 @@ end
 function mal:send_anime_data(result, receiver)
   local title = xml.find(result, 'title')[1]
   local id = xml.find(result, 'id')[1]
-  local mal_url = 'http://myanimelist.net/anime/'..id
+  local mal_url = 'https://myanimelist.net/anime/'..id
   
   if xml.find(result, 'synonyms')[1] then
     alt_name = '\noder: '..unescape(mal:delete_tags(xml.find(result, 'synonyms')[1]))
@@ -121,7 +121,7 @@ end
 function mal:send_manga_data(result)
   local title = xml.find(result, 'title')[1]
   local id = xml.find(result, 'id')[1]
-  local mal_url = 'http://myanimelist.net/manga/'..id
+  local mal_url = 'https://myanimelist.net/manga/'..id
   
   if xml.find(result, 'type')[1] then
     typ = ' ('..xml.find(result, 'type')[1]..')'
