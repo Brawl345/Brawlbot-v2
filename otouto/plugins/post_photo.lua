@@ -17,7 +17,7 @@ function post_photo:pre_process(msg, config)
   local file_size = msg.document.file_size
   if file_size > 19922944 then
 	print('File is over 20 MB - can\'t download :(')
-	return
+	return msg
   end
   
   utilities.send_typing(msg.chat.id, 'upload_photo')

@@ -947,22 +947,28 @@ function get_cached_file(url, file_name, receiver, chat_action)
   local header, code = get_http_header(url)
 
   -- file size limit is 50 MB
-  if header["Content-Length"] then
-    if tonumber(header["Content-Length"]) > 52420000 then
-	  print('file is too large, won\'t send!')
-	  return nil
+  if header then
+
+    if header["Content-Length"] then
+	  if tonumber(header["Content-Length"]) > 52420000 then
+		print('file is too large, won\'t send!')
+		return nil
+	  end
+	elseif header["content-length"] then
+	  if tonumber(header["content-length"]) > 52420000 then
+		print('file is too large, won\'t send!')
+		return nil
+	  end
 	end
-  elseif header["content-length"] then
-	if tonumber(header["content-length"]) > 52420000 then
-	  print('file is too large, won\'t send!')
-	  return nil
-	end
-  end
   
-  if header["last-modified"] then
-    last_modified = header["last-modified"]
-  elseif header["Last-Modified"] then
-    last_modified = header["Last-Modified"]
+	if header["last-modified"] then
+	  last_modified = header["last-modified"]
+	elseif header["Last-Modified"] then
+	  last_modified = header["Last-Modified"]
+	end
+  
+  else
+    last_modified = nil
   end
   
   if not last_modified then
