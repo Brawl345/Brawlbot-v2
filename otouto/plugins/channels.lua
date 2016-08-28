@@ -11,18 +11,6 @@ function channels:init(config)
 ]]..config.cmd_pat..[[channel* _<enable>_/_<disable>_: Aktiviert/deaktiviert den Bot im Chat]]
 end
 
--- Checks if bot was disabled on specific chat
-function channels:is_channel_disabled(msg)
-  local hash = 'chat:'..msg.chat.id..':disabled'
-  local disabled = redis:get(hash)
-  
-	if not disabled or disabled == "false" then
-		return false
-	end
-
-  return disabled
-end
-
 function channels:enable_channel(msg)
   local hash = 'chat:'..msg.chat.id..':disabled'
   local disabled = redis:get(hash)
@@ -55,12 +43,7 @@ function channels:pre_process(msg, config)
 	end
   end
 
-  if channels:is_channel_disabled(msg) then
-    print('Channel wurde deaktiviert')
-	return
-  end
-
-	return msg
+  return msg
 end
 
 function channels:action(msg, config, matches)

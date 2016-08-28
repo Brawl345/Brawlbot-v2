@@ -82,6 +82,14 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	  msg.text = string.gsub(msg.text, config.cmd_pat..'([A-Za-z0-9-_-]+)@'..self.info.username, "/%1")
 	  msg.text_lower = msg.text:lower()
 	end
+
+	if is_channel_disabled(msg)then
+	  if not is_sudo(msg, config) or msg.text ~= "/channel enable" then
+		  print('Channel wurde deaktiviert')
+		  return
+	  end
+	end
+
 	msg = pre_process_msg(self, msg, config)
 	if not msg then return end -- deleted by banning
 	
@@ -243,10 +251,12 @@ end
 function pre_process_msg(self, msg, config)
   for n=1, #self.plugins do 
 	local plugin = self.plugins[n]
-    if plugin.pre_process and msg then
-	  -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
-	  new_msg = plugin:pre_process(msg, config)
-	  if not new_msg then return end -- Message was deleted
+	if plugin.pre_process and msg then
+	  if not is_plugin_disabled_on_chat(plugin.name, msg, true) then
+	    -- print('Preprocess '..plugin.name) -- remove comment to restore old behaviour
+	    new_msg = plugin:pre_process(msg, config)
+	    if not new_msg then return end -- Message was deleted
+      end
     end
   end
   return new_msg
@@ -297,13 +307,15 @@ function match_plugins(self, msg, config, plugin)
   end
 end
 
-function is_plugin_disabled_on_chat(plugin_name, msg)
+function is_plugin_disabled_on_chat(plugin_name, msg, silent)
   local hash = get_redis_hash(msg, 'disabled_plugins')
   local disabled = redis:hget(hash, plugin_name)
   
   -- Plugin is disabled
   if disabled == 'true' then
-    print('Plugin '..plugin_name..' ist in diesem Chat deaktiviert')
+    if not silent then
+      print('Plugin '..plugin_name..' ist in diesem Chat deaktiviert')
+	end
 	return true
   else
     return false

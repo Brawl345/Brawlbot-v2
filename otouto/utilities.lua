@@ -1085,4 +1085,16 @@ function table.contains(table, element)
   return false
 end
 
+-- Checks if bot was disabled on specific chat
+function is_channel_disabled(msg)
+  local hash = 'chat:'..msg.chat.id..':disabled'
+  local disabled = redis:get(hash)
+  
+  if not disabled or disabled == "false" then
+	return false
+  end
+
+  return disabled
+end
+
 return utilities
