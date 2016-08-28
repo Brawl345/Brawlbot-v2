@@ -85,7 +85,6 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 
 	if is_channel_disabled(msg)then
 	  if not is_sudo(msg, config) or msg.text ~= "/channel enable" then
-		  print('Channel wurde deaktiviert')
 		  return
 	  end
 	end
