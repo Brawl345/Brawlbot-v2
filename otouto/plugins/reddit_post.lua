@@ -15,9 +15,9 @@ function reddit_post:get_reddit_data(subreddit, reddit_code)
 end
 
 function reddit_post:send_reddit_data(data)
-  local title = utilities.md_escape(data[1].data.children[1].data.title)
-  local author = utilities.md_escape(data[1].data.children[1].data.author)
-  local subreddit = utilities.md_escape(data[1].data.children[1].data.subreddit)
+  local title = data[1].data.children[1].data.title
+  local author = data[1].data.children[1].data.author
+  local subreddit = data[1].data.children[1].data.subreddit
   if string.len(data[1].data.children[1].data.selftext) > 300 then
     selftext = string.sub(unescape(data[1].data.children[1].data.selftext:gsub("%b<>", "")), 1, 300) .. '...'
   else
@@ -30,7 +30,7 @@ function reddit_post:send_reddit_data(data)
   end
   local score = comma_value(data[1].data.children[1].data.score)
   local comments = comma_value(data[1].data.children[1].data.num_comments)
-  local text = '*'..author..'* in */r/'..subreddit..'* _('..score..' Upvotes - '..comments..' Kommentare)_:\n'..title..'\n'..selftext..url
+  local text = '<b>'..author..'</b> in <b>/r/'..subreddit..'</b> <i>('..score..' Upvotes - '..comments..' Kommentare)</i>:\n<b>'..title..'\n</b>'..selftext..url
   return text
 end
 
@@ -44,7 +44,7 @@ function reddit_post:action(msg, config, matches)
   local text = reddit_post:send_reddit_data(data)
   if not text then utilities.send_reply(msg, config.errors.connection) return end
   
-  utilities.send_reply(msg, text, true)
+  utilities.send_reply(msg, text, 'HTML')
 end
 
 return reddit_post
