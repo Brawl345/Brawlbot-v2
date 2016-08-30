@@ -10,6 +10,7 @@ function vtt:pre_process(msg, config)
   if not msg.voice then return msg end -- Ignore
   local mime_type = msg.voice.mime_type
   if mime_type ~= 'audio/ogg' then return msg end -- We only want to transcript voice messages
+  if msg.voice.duration > 90 then return msg end -- Only voice messages < 60 seconds
   local file_id = msg.voice.file_id
   local file_size = msg.voice.file_size
   if file_size > 19922944 then
