@@ -23,6 +23,7 @@ local bot = {}
 bot.version = '2.2.7'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
+    assert(config.bot_api_key, 'Dein Bot-Token ist nicht in der Config gesetzt!')
     bindings = require('otouto.bindings').init(config.bot_api_key)
 	utilities = require('otouto.utilities')
 	cred_data = load_cred()

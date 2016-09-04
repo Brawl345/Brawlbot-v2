@@ -184,4 +184,4 @@ Das ist die Datenbank-Struktur:
 
 `database.userdata` speichert Daten von verschiedenen Plugins, hierzu wird aber für Brawlbot-Plugins Redis verwendet.
 
-`database.version` speichert die Bot-Version.
+`database.version` speichert die Bot-Version
