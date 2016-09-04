@@ -4,6 +4,7 @@ function cleverbot:init(config)
 	cleverbot.triggers = {
 	"^/cbot (.+)$",
 	"^[Bb]rawlbot, (.+)$",
+	"^[Bb]ot, (.+)$"
 	}
 	cleverbot.url = config.chatter.cleverbot_api
 end
