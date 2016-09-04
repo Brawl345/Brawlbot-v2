@@ -156,7 +156,10 @@ function banhammer:pre_process(msg, config)
 		end
       else
 	    if not has_been_warned then
-		  utilities.send_reply(msg, "Dies ist ein privater Bot, der erst nach einer Freischaltung benutzt werden kann.\nThis is a private bot, which can only be after an approval.")
+		  utilities.send_reply(msg, config.banhammer_text or [[
+		  Dies ist ein privater Bot, der erst nach einer Freischaltung benutzt werden kann.
+	This is a private bot, which can only be used after an approval.
+		  ]])
 		  redis:hset('user:'..user_id, 'has_been_warned', true)
 		else
 		  print('User has already been warned!')

@@ -18,8 +18,15 @@ Dies ist die BETA-Version von Brawlbot v2.
 
 Sende /hilfe, um zu starten
 	]],
-	-- The symbol that starts a command. Usually noted as '/' in documentation.
+
+	-- DO NOT CHANGE THIS
 	cmd_pat = '/',
+	
+	-- Text for users, who are not approved
+	banhammer_text = [[
+	Dies ist ein privater Bot, der erst nach einer Freischaltung benutzt werden kann.
+	This is a private bot, which can only be used after an approval.
+	]],
 
 	-- false = only whitelisted users can use inline querys
 	-- NOTE that it doesn't matter, if the chat is whitelisted! The USER must be whitelisted!
