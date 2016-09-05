@@ -28,6 +28,7 @@ Ubuntu und Debian liefern Luarocks nur für Lua 5.1 aus. Um Luarocks für Lua 5.
 
 ### Setup
 Du benötigst **Lua 5.2+**, eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
+* luautf8
 * luasocket
 * luasec
 * multipart-post
@@ -184,4 +185,4 @@ Das ist die Datenbank-Struktur:
 
 `database.userdata` speichert Daten von verschiedenen Plugins, hierzu wird aber für Brawlbot-Plugins Redis verwendet.
 
-`database.version` speichert die Bot-Version
+`database.version` speichert die Bot-Version.

@@ -20,6 +20,7 @@
 
 local utilities = {}
 
+utf8 = require 'lua-utf8'
 ltn12 = require('ltn12')
 http = require('socket.http')
 https = require('ssl.https')
@@ -1095,6 +1096,12 @@ function is_channel_disabled(msg)
   end
 
   return disabled
+end
+
+ -- Converts a gross string back into proper UTF-8.
+ -- Useful for fixing improper encoding caused by bad JSON escaping.
+function utilities.fix_utf8(str)
+	return string.char(utf8.codepoint(str, 1, -1))
 end
 
 return utilities
