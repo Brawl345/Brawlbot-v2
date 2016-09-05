@@ -2,7 +2,9 @@ local leave_group = {}
 
 leave_group.triggers = {
   '^//tgservice group_chat_created$',
-  '^//tgservice supergroup_chat_created$'
+  '^//tgservice supergroup_chat_created$',
+  '^//tgservice new_chat_member$',
+  '^//tgservice (left_chat_member)$'
 }
 
 local report_to_admin = true -- set to false to not be notified, when Bot leaves groups without you
@@ -23,9 +25,17 @@ function leave_group:check_for_admin(msg, config)
   end
 end
 
-function leave_group:action(msg, config)
+function leave_group:action(msg, config, matches)
   if not is_service_msg(msg) then return end -- Bad attempt at trolling!
-  local admin_in_group = leave_group:check_for_admin(msg, config)
+  if matches[1] == 'left_chat_member' then
+    if msg.left_chat_member.id == config.admin then
+	  admin_in_group = false
+	else
+	  admin_in_group = leave_group:check_for_admin(msg, config)
+	end
+  else
+    admin_in_group = leave_group:check_for_admin(msg, config)
+  end
   if not admin_in_group then
 	print('Admin ist nicht in der Gruppe, verlasse sie deshalb...')
 	utilities.send_reply(msg, 'Dieser Bot wurde in eine fremde Gruppe hinzugefügt. Dies wird gemeldet!\nThis bot was added to foreign group. This incident will be reported!')
