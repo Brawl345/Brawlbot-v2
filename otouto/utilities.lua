@@ -20,6 +20,7 @@
 
 local utilities = {}
 
+utf8 = require('lua-utf8')
 ltn12 = require('ltn12')
 http = require('socket.http')
 https = require('ssl.https')
@@ -32,9 +33,6 @@ redis = (loadfile "./otouto/redis.lua")()
 mime = (loadfile "./otouto/mimetype.lua")()
 OAuth = require "OAuth"
 helpers = require "OAuth.helpers"
- -- Lua 5.2 compatibility.
- -- If no built-in utf8 is available, load the library.
-local utf8 = utf8 or require('lua-utf8')
 
 http.timeout = 5
 https.timeout = 5
