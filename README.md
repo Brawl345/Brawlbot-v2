@@ -24,11 +24,11 @@ Brawlbot v2 ist freie Software; du darfst ihn modifizieren und weiterverbreiten,
 # Für User
 ## Setup
 ### Ubuntu und Debian
-Ubuntu und Debian liefern Luarocks nur für Lua 5.1 aus. Um Luarocks für Lua 5.2 zu verwenden, folge bitte der [Anleitung auf StackOverflow](http://stackoverflow.com/a/20359102).
-
-### Setup
 Falls du Ubuntu oder Debian verwendest, kannst du einfach `./install dependencies.sh` ausführen, damit alles installiert wird. Ergänze dann noch den `bot_api_key` und die `admin`-ID (Bekommst du in Telegram mit `@Brawlbot id`) und kopiere die config.lua.example nach config.lua.
 
+Für eine manuelle Installation musst du LuaRocks für 5.2 [selbst kompilieren](http://stackoverflow.com/a/20359102).
+
+### Setup
 Du benötigst **Lua 5.2** (Lua 5.3 funktioniert NICHT!), eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
 * luautf8
 * luasocket
