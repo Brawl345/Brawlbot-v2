@@ -62,7 +62,6 @@ end
 function bot:on_msg_receive(msg, config) -- The fn run whenever a message is received.
 	-- remove comment to enable debugging
     -- vardump(msg)
-	-- Cache user info for those involved.
 	
 	if msg.date < os.time() - 5 then return end -- Do not process old messages.
 

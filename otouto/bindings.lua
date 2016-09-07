@@ -23,7 +23,7 @@
 local bindings = {}
 
 local https = require('ssl.https')
-https.timeout = 10
+https.TIMEOUT = 10
 local json = require('dkjson')
 local ltn12 = require('ltn12')
 local mp_encode = require('multipart-post').encode

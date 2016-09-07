@@ -34,8 +34,8 @@ mime = (loadfile "./otouto/mimetype.lua")()
 OAuth = require "OAuth"
 helpers = require "OAuth.helpers"
 
-http.timeout = 5
-https.timeout = 5
+http.TIMEOUT = 7
+https.TIMEOUT = 7
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -387,10 +387,8 @@ function run_command(str)
   return result
 end
 
-function convert_timestamp(timestamp, format)
-  local converted_date = run_command('date -d @'..timestamp..' +"'..format..'"')
-  local converted_date = string.gsub(converted_date, '%\n', '')
-  return converted_date
+function convert_timestamp(timestamp, date_format)
+  return os.date(date_format, timestamp)
 end
 
 function string.starts(String, Start)
