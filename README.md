@@ -23,6 +23,9 @@ Brawlbot v2 ist freie Software; du darfst ihn modifizieren und weiterverbreiten,
 * * *
 # Für User
 ## Setup
+### Uberspace
+Der Bot kann mit einem einfachen Installationsskript bei [Uberspace](https://uberspace.de) gehostet werden. Führe einfach `./install-on-uberspace.sh` aus!
+
 ### Ubuntu und Debian
 Falls du Ubuntu oder Debian verwendest, kannst du einfach `./install-dependencies.sh` ausführen, damit alles installiert wird. Ergänze dann noch den `bot_api_key` und die `admin`-ID (Bekommst du in Telegram mit `@Brawlbot id`) und kopiere die config.lua.example nach config.lua.
 
