@@ -1,15 +1,11 @@
-# Run Brawlbot in Lua 5.3, if available.
-# (Specifying lua5.3 because "lua" is not linked to it in Ubuntu 16.04.)
-# Otherwise, use any generic installed Lua.
+#!/bin/sh
+# Run Brawlbot.
 # If none, give an error and a friendly suggestion.
 # If Lua was found, restart Brawlbot five seconds after halting each time.
 
-#!/bin/sh
-
-# Ubuntu 16.04 seems to not link "lua" to lua5.3.
-if type lua5.3 >/dev/null 2>/dev/null; then
+if type lua5.2 >/dev/null 2>/dev/null; then
     while true; do
-        lua5.3 main.lua
+        lua5.2 main.lua
         echo "Brawlbot wurde angehalten. ^C zum Beenden."
         sleep 5s
     done
