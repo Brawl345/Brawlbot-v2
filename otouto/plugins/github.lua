@@ -23,9 +23,9 @@ end
 
 function github:send_github_data(data)
   if not data.owner then return nil end
-  local name = '*'..utilities.md_escape(data.name)..'*'
-  local description = '_'..utilities.md_escape(data.description)..'_'
-  local owner = utilities.md_escape(data.owner.login)
+  local name = '<b>'..data.name..'</b>'
+  local description = '<i>'..data.description..'</i>'
+  local owner = data.owner.login
   local clone_url = data.clone_url
   if data.language == nil or data.language == "" then
     language = ''
@@ -40,17 +40,17 @@ function github:send_github_data(data)
   if data.homepage == nil or data.homepage == "" then
     homepage = ''
   else
-    homepage = '\n[Homepage besuchen]('..data.homepage..')'
+    homepage = '\n<a href="'..data.homepage..'">Homepage besuchen</a>'
   end
-  local text = name..' von '..owner..'\n'..description..'\n`git clone '..clone_url..'`'..language..issues..homepage
+  local text = name..' von '..owner..'\n'..description..'\n<pre>git clone '..clone_url..'</pre>'..language..issues..homepage
   return text
 end
 
 function github:send_gh_commit_data(gh_code, gh_commit_sha, data)
-  if not data.committer then return nil end
-  local committer = data.committer.name
+  if not data.author then return nil end
+  local author = data.author.name
   local message = utilities.md_escape(data.message)
-  local text = '`'..gh_code..'@'..gh_commit_sha..'` von *'..committer..'*:\n'..message
+  local text = '<code>'..gh_code..'@'..gh_commit_sha..'</code> von <b>'..author..'</b>:\n'..message
   return text
 end
 
@@ -63,7 +63,7 @@ function github:action(msg, config, matches)
   else
     output = github:send_gh_commit_data(gh_code, gh_commit_sha, data)
   end
-  utilities.send_reply(msg, output, true)
+  utilities.send_reply(msg, output, 'HTML')
 end
 
 return github
