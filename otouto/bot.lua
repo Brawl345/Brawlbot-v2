@@ -189,6 +189,11 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
     inline_query.query = inline_query.query:gsub('"', '\\"')
   end
   
+  if string.len(inline_query.query) > 200 then
+    abort_inline_query(inline_query)
+	return
+  end
+  
   for n=1, #self.plugins do
     local plugin = self.plugins[n]
     match_inline_plugins(self, inline_query, config, plugin)
