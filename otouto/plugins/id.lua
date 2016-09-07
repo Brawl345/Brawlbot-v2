@@ -66,27 +66,27 @@ function id:action(msg, config, matches)
 	end
 
 	local chat_id = msg.chat.id
-	local user = 'Du bist @%s, auch bekannt als *%s* `[%s]`'
+	local user = 'Du bist @%s, auch bekannt als <b>%s</b> <code>[%s]</code>'
 	if msg.from.username then
-		user = user:format(utilities.markdown_escape(msg.from.username), msg.from.name, msg.from.id)
+		user = user:format(utilities.html_escape(msg.from.username), msg.from.name, msg.from.id)
 	else
-		user = 'Du bist *%s* `[%s]`,'
+		user = 'Du bist <b>%s</b> <code>[%s]</code>,'
 		user = user:format(msg.from.name, msg.from.id)
 	end
 
-	local group = '@%s, auch bekannt als *%s* `[%s]`.'
+	local group = '@%s, auch bekannt als <b>%s</b> <code>[%s]</code>.'
 	if msg.chat.type == 'private' then
-		group = group:format(utilities.markdown_escape(self.info.username), self.info.first_name, self.info.id)
+		group = group:format(utilities.html_escape(self.info.username), self.info.first_name, self.info.id)
 	elseif msg.chat.username then
-		group = group:format(utilities.markdown_escape(msg.chat.username), msg.chat.title, chat_id)
+		group = group:format(utilities.html_escape(msg.chat.username), msg.chat.title, chat_id)
 	else
-		group = '*%s* `[%s]`.'
+		group = '<b>%s</b> <code>[%s]</code>.'
 		group = group:format(msg.chat.title, chat_id)
 	end
 
 	local output = user .. ', und du bist in der Gruppe ' .. group
 
-	utilities.send_message(msg.chat.id, output, true, msg.message_id, true)
+	utilities.send_message(msg.chat.id, output, true, msg.message_id, 'HTML')
   elseif matches[1] == "chat" then
     if msg.chat.type ~= 'group' and msg.chat.type ~= 'supergroup' then
 	  utilities.send_reply(msg, 'Das hier ist keine Gruppe!')
@@ -118,21 +118,21 @@ function id:action(msg, config, matches)
 	local result = id:get_member_count(msg, chat_id)
 	local member_count = result.result
 	if member_count == 1 then
-	  member_count = 'ist *1 Mitglied'
+	  member_count = 'ist <b>1 Mitglied'
 	else
-	  member_count = 'sind *'..member_count..' Mitglieder'
+	  member_count = 'sind <b>'..member_count..' Mitglieder'
 	end
-    local text = 'IDs für *'..chat_name..'* `['..chat_id..']`\nHier '..member_count..':*\n---------\n'
+    local text = 'IDs für <b>'..chat_name..'</b> <code>['..chat_id..']</code>\nHier '..member_count..':</b>\n---------\n'
     for k,user in pairs(users_info) do
 	  if table.contains(admins, tostring(user.id)) then
-	    text = text..'*'..user.name..'* `['..user.id..']` _Administrator_\n'
+	    text = text..'<b>'..user.name..'</b> <code>['..user.id..']</code> <i>Administrator</i>\n'
 	  elseif tostring(creator_id) == user.id then
-	    text = text..'*'..user.name..'* `['..user.id..']` _Gründer_\n'
+	    text = text..'<b>'..user.name..'</b> <code>['..user.id..']</code> <i>Gründer</i>\n'
 	  else
-        text = text..'*'..user.name..'* `['..user.id..']`\n'
+        text = text..'<b>'..user.name..'</b> <code>['..user.id..']</code>\n'
 	  end
     end
-	utilities.send_reply(msg, text..'_(Bots sind nicht gelistet)_', true)
+	utilities.send_reply(msg, text..'<i>(Bots sind nicht gelistet)</i>', 'HTML')
   end
 end
 

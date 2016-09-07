@@ -64,7 +64,7 @@ function tagesschau_eil:action(msg, config)
 	local output = tagesschau_eil:deabonnieren(id)
 	utilities.send_reply(msg, output, true)
   elseif input:match('(sync)$') then
-    if msg.from.id ~= config.admin then
+	if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end

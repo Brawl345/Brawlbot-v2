@@ -21,10 +21,6 @@ end
 quotes.command = 'quote'
 
 function quotes:save_quote(msg)
-  if msg.text:sub(11):isempty() then
-    return "Benutzung: /addquote [Zitat]"
-  end
-  
   local quote = msg.text:sub(11)
   local hash = get_redis_hash(msg, 'quotes')
   print('Saving quote to redis set '..hash)
@@ -33,10 +29,6 @@ function quotes:save_quote(msg)
 end
 
 function quotes:delete_quote(msg)
-  if msg.text:sub(11):isempty() then
-    return "Benutzung: /delquote [Zitat]"
-  end
-  
   local quote = msg.text:sub(11)
   local hash = get_redis_hash(msg, 'quotes')
   print('Deleting quote from redis set '..hash)

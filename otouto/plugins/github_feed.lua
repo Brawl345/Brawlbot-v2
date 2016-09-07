@@ -180,7 +180,7 @@ function gh_feed:action(msg, config, matches)
   
   -- For channels
   if matches[1] == 'sub' and matches[2] and matches[3] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -194,7 +194,7 @@ function gh_feed:action(msg, config, matches)
 	utilities.send_reply(msg, output, true)
 	return
   elseif matches[1] == 'del' and matches[2] and matches[3] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -227,7 +227,7 @@ function gh_feed:action(msg, config, matches)
   end
 
   if matches[1] == 'sub' and matches[2] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -235,7 +235,7 @@ function gh_feed:action(msg, config, matches)
 	utilities.send_reply(msg, output, true)
 	return
   elseif matches[1] == 'del' and matches[2] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -247,7 +247,7 @@ function gh_feed:action(msg, config, matches)
 	utilities.send_reply(msg, list_subs, true, keyboard)
     return
   elseif matches[1] == 'sync' then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end

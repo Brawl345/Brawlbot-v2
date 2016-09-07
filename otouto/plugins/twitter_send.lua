@@ -248,7 +248,7 @@ end
 
 function twitter_send:action(msg, config, matches)
   if matches[1] == "twwhitelist add" then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     else
@@ -265,7 +265,7 @@ function twitter_send:action(msg, config, matches)
   end
 
   if matches[1] == "twwhitelist del" then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     else
@@ -288,7 +288,7 @@ function twitter_send:action(msg, config, matches)
   -- Thanks to the great doc at https://github.com/ignacio/LuaOAuth#a-more-involved-example
   if not oauth_token and not oauth_token_secret then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-	  if msg.from.id ~= config.admin then
+	  if not is_sudo(msg, config) then
         utilities.send_reply(msg, config.errors.sudo)
 	    return
       else
@@ -312,7 +312,7 @@ function twitter_send:action(msg, config, matches)
 
   if matches[1] == 'auth' and matches[2] then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-      if msg.from.id ~= config.admin then
+      if not is_sudo(msg, config) then
         utilities.send_reply(msg, config.errors.sudo)
 	    return
       end
@@ -327,7 +327,7 @@ function twitter_send:action(msg, config, matches)
   
   if matches[1] == 'unauth' then
     if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-      if msg.from.id ~= config.admin then
+      if not is_sudo(msg, config) then
         utilities.send_reply(msg, config.errors.sudo)
 	    return
       end

@@ -43,7 +43,7 @@ function app_store:send_appstore_data(data)
   else
     game_center = ''
   end
-  local category_count = tablelength(data.genres)
+  local category_count = #data.genres
   if category_count == 1 then
     category = '\nKategorie: '..data.genres[1]
   else

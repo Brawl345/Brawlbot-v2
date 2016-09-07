@@ -124,10 +124,10 @@ function bitly_create:action(msg, config, matches)
   end
 
   if matches[2] == nil then
-    long_url = url_encode(matches[1])
+    long_url = URL.encode(matches[1])
 	domain = 'bit.ly'
   else
-    long_url = url_encode(matches[2])
+    long_url = URL.encode(matches[2])
 	domain = matches[1]
   end
   utilities.send_reply(msg, bitly_create:create_bitlink(long_url, domain, bitly_access_token))

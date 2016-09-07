@@ -24,6 +24,18 @@ end
 
 plugin_manager.command = 'plugins <nur für Superuser>'
 
+-- Returns at table of lua files inside plugins
+function plugin_manager:plugins_names()
+  local files = {}
+  for k, v in pairs(scandir("otouto/plugins")) do
+    -- Ends with .lua
+    if (v:match(".lua$")) then
+	  files[#files+1] = v
+    end 
+  end
+  return files
+end
+
 -- Returns the key (index) in the config.enabled_plugins table
 function plugin_manager:plugin_enabled(name, chat)
   for k,v in pairs(enabled_plugins) do
@@ -37,7 +49,7 @@ end
 
 -- Returns true if file exists in plugins folder
 function plugin_manager:plugin_exists(name)
-  for k,v in pairs(plugins_names()) do
+  for k,v in pairs(plugin_manager:plugins_names()) do
     if name..'.lua' == v then
       return true
     end
@@ -47,7 +59,7 @@ end
 
 function plugin_manager:list_plugins()
   local text = ''
-  for k, v in pairs(plugins_names()) do
+  for k, v in pairs(plugin_manager:plugins_names()) do
     --  ✔ enabled, ❌ disabled
     local status = '❌'
     -- Check if is enabled
@@ -161,7 +173,7 @@ function plugin_manager:reenable_plugin_on_chat(msg, plugin)
 end
 
 function plugin_manager:action(msg, config, matches)
-  if msg.from.id ~= config.admin then
+  if not is_sudo(msg, config) then
     utilities.send_reply(msg, config.errors.sudo)
 	return
   end

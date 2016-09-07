@@ -16,7 +16,7 @@ lyrics.command = 'lyrics <Lied>'
 
 function lyrics:getLyrics(text)
   local apikey = cred_data.lyricsnmusic_apikey
-  local q = url_encode(text)
+  local q = URL.encode(text)
   local b = http.request("http://api.lyricsnmusic.com/songs?api_key="..apikey.."&q=" .. q)
   response = json.decode(b)
   local reply = ""

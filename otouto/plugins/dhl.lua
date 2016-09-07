@@ -16,9 +16,9 @@ function dhl:sendungsstatus(id)
   local res,code = https.request(url)
   if code ~= 200 then return "Fehler beim Abrufen von mobil.dhl.de" end
   local status = string.match(res, "<div id%=\"detailShortStatus\">(.-)</div>")
-  local status = all_trim(status)
+  local status = utilities.trim(status)
   local zeit = string.match(res, "<div id%=\"detailStatusDateTime\">(.-)</div>")
-  local zeit = all_trim(zeit)
+  local zeit = utilities.trim(zeit)
   if not zeit or zeit == '<br />' then
     return status
   end

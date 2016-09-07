@@ -79,7 +79,7 @@ function games:send_game_data(game_id, self, msg)
   
   if xml.find(result, 'Genres') then
     local genres = xml.find(result, 'Genres')
-    local genre_count = tablelength(genres)-1
+    local genre_count = #genres-1
     if genre_count == 1 then
       genre = '\nGenre: '..genres[1][1]
     else

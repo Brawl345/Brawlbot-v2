@@ -211,7 +211,7 @@ function rss:action(msg, config, matches)
   
   -- For channels
   if matches[1] == 'sub' and matches[2] and matches[3] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -225,7 +225,7 @@ function rss:action(msg, config, matches)
 	utilities.send_reply(msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] and matches[3] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -258,7 +258,7 @@ function rss:action(msg, config, matches)
   end
   
   if matches[1] == 'sub' and matches[2] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -266,7 +266,7 @@ function rss:action(msg, config, matches)
 	utilities.send_reply(msg, output, 'HTML')
 	return
   elseif matches[1] == 'del' and matches[2] then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end
@@ -278,7 +278,7 @@ function rss:action(msg, config, matches)
 	utilities.send_reply(msg, list_subs, 'HTML', keyboard)
     return
   elseif matches[1] == 'sync' then
-    if msg.from.id ~= config.admin then
+    if not is_sudo(msg, config) then
       utilities.send_reply(msg, config.errors.sudo)
 	  return
     end

@@ -8,7 +8,7 @@ function site_header:init(config)
 end
 
 function site_header:action(msg, config, matches)
-  if msg.from.id ~= config.admin then
+  if not is_sudo(msg, config) then
 	utilities.send_reply(msg, config.errors.sudo)
   end
   

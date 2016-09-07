@@ -342,38 +342,21 @@ function utilities.input_from_msg(msg)
 	return utilities.input(msg.text) or (msg.reply_to_message and #msg.reply_to_message.text > 0 and msg.reply_to_message.text) or false
 end
 
--- Calculates the length of the given string as UTF-8 characters
-function utilities.utf8_len(s)
-    local chars = 0
-    for i = 1, string.len(s) do
-        local b = string.byte(s, i)
-        if b < 128 or b >= 192 then
-            chars = chars + 1
-        end
-    end
-    return chars
-end
-
 -- Trims whitespace from a string.
 function utilities.trim(str)
 	local s = str:gsub('^%s*(.-)%s*$', '%1')
 	return s
 end
 
--- Returns true if the string is empty
+-- Returns true if the string is blank/empty
 function string:isempty()
-  return self == nil or self == ''
-end
-
--- Returns true if the string is blank
-function string:isblank()
   self = self:trim()
-  return self:isempty()
+  return self == nil or self == ''
 end
 
 function get_name(msg)
    local name = msg.from.first_name
-   if name == nil then
+   if not name then
       name = msg.from.id
    end
    return name
@@ -389,10 +372,6 @@ end
 
 function convert_timestamp(timestamp, date_format)
   return os.date(date_format, timestamp)
-end
-
-function string.starts(String, Start)
-   return Start == string.sub(String,1,string.len(Start))
 end
 
 -- Saves file to $HOME/tmp/. If file_name isn't provided,
@@ -497,19 +476,6 @@ function utilities.build_name(first, last)
 	end
 end
 
-function utilities:resolve_username(input)
-	input = input:gsub('^@', '')
-	for _, user in pairs(self.database.users) do
-		if user.username and user.username:lower() == input:lower() then
-			local t = {}
-			for key, val in pairs(user) do
-				t[key] = val
-			end
-			return t
-		end
-	end
-end
-
 function utilities:handle_exception(err, message, log_chat)
     local output = string.format(
         '[%s]\n%s: %s\n%s\n',
@@ -527,18 +493,11 @@ function utilities:handle_exception(err, message, log_chat)
 
 end
 
--- MOVED TO DOWNLOAD_TO_FILE
-function utilities.download_file(url, filename)
-  return download_to_file(url, filename)
-end
-
 function utilities.md_escape(text)
 	return text:gsub('_', '\\_')
 			:gsub('%[', '\\['):gsub('%]', '\\]')
 			:gsub('%*', '\\*'):gsub('`', '\\`')
 end
-
-utilities.markdown_escape = utilities.md_escape
 
 function utilities.html_escape(text)
 	return text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
@@ -565,13 +524,6 @@ function utilities.triggers(username, cmd_pat, trigger_table)
 	return self
 end
 
-function utilities.with_http_timeout(timeout, fun)
-	local original = http.TIMEOUT
-	http.TIMEOUT = timeout
-	fun()
-	http.TIMEOUT = original
-end
-
 function utilities.enrich_user(user)
 	user.id_str = tostring(user.id)
 	user.name = utilities.build_name(user.first_name, user.last_name)
@@ -594,11 +546,11 @@ function utilities.enrich_message(msg)
 	if msg.forward_from then
 		msg.forward_from = utilities.enrich_user(msg.forward_from)
 	end
-	if msg.new_chat_participant then
-		msg.new_chat_participant = utilities.enrich_user(msg.new_chat_participant)
+	if msg.new_chat_member then
+		msg.new_chat_member = utilities.enrich_user(msg.new_chat_member)
 	end
-	if msg.left_chat_participant then
-		msg.left_chat_participant = utilities.enrich_user(msg.left_chat_participant)
+	if msg.left_chat_member then
+		msg.left_chat_member = utilities.enrich_user(msg.left_chat_member)
 	end
 	return msg
 end
@@ -630,29 +582,6 @@ function scandir(directory)
     t[i] = filename
   end
   return t
-end
-
--- Returns at table of lua files inside plugins
-function plugins_names()
-  local files = {}
-  for k, v in pairs(scandir("otouto/plugins")) do
-    -- Ends with .lua
-    if (v:match(".lua$")) then
-	  files[#files+1] = v
-    end 
-  end
-  return files
-end
-
--- Function name explains what it does.
-function file_exists(name)
-  local f = io.open(name,"r")
-  if f ~= nil then 
-    io.close(f) 
-    return true 
-  else 
-    return false 
-  end
 end
 
 -- Returns a table with matches or nil
@@ -793,17 +722,6 @@ function get_redis_hash(msg, var)
   end
 end
 
--- remove whitespace
-function all_trim(s)
-  return s:match( "^%s*(.-)%s*$" )
-end
-
-function tablelength(T)
-  local count = 0
-  for _ in pairs(T) do count = count + 1 end
-  return count
-end
-
 function round(num, idp)
   if idp and idp>0 then
     local mult = 10^idp
@@ -823,6 +741,9 @@ function comma_value(amount)
   return formatted
 end
 
+function string.starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
 
 function string.ends(str, fin)
   return fin=='' or string.sub(str,-string.len(fin)) == fin
@@ -1034,19 +955,6 @@ function makeHumanTime(totalseconds)
   end
 end
 
-function is_blacklisted(msg)
-  _blacklist = redis:smembers("telegram:img_blacklist")
-  local var = false
-  for v,word in pairs(_blacklist) do
-    if string.find(string.lower(msg), string.lower(word)) then
-      print("Wort steht auf der Blacklist!")
-      var = true
-      break
-    end
-  end
-  return var
-end
-
 function unescape(str)
   str = string.gsub( str, '&lt;', '<' )
   str = string.gsub( str, '&gt;', '>' )
@@ -1062,16 +970,6 @@ function unescape(str)
   str = string.gsub( str, '&#(%d+);', function(n) return string.char(n) end )
   str = string.gsub( str, '&#x(%d+);', function(n) return string.char(tonumber(n,16)) end )
   str = string.gsub( str, '&amp;', '&' ) -- Be sure to do this after all others
-  return str
-end
-
-function url_encode(str)
-  if (str) then
-    str = string.gsub (str, "\n", "\r\n")
-    str = string.gsub (str, "([^%w %-%_%.%~])",
-        function (c) return string.format ("%%%02X", string.byte(c)) end)
-    str = string.gsub (str, " ", "+")
-  end
   return str
 end
 

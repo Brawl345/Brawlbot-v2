@@ -23,6 +23,19 @@ end
 
 gImages.command = 'img <Suchbegriff>'
 
+function gImages:is_blacklisted(msg)
+  _blacklist = redis:smembers("telegram:img_blacklist")
+  local var = false
+  for v,word in pairs(_blacklist) do
+    if string.find(string.lower(msg), string.lower(word)) then
+      print("Wort steht auf der Blacklist!")
+      var = true
+      break
+    end
+  end
+  return var
+end
+
 -- Yes, the callback is copied from below, but I can't think of another method :\
 function gImages:callback(callback, msg, self, config, input)
   if not msg then return end
@@ -150,7 +163,7 @@ function gImages:action(msg, config, matches)
   end
   
   print ('Checking if search contains blacklisted word: '..input)
-  if is_blacklisted(input) then
+  if gImages:is_blacklisted(input) then
     utilities.send_reply(msg, 'Vergiss es! ._.')
 	return
   end

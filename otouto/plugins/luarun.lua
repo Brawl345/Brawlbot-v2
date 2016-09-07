@@ -27,7 +27,7 @@ end
 
 function luarun:action(msg, config)
 
-    if msg.from.id ~= config.admin then
+	if not is_sudo(msg, config) then
         return true
     end
 

@@ -89,7 +89,7 @@ end
 
 function creds_manager:action(msg, config, matches)
   local receiver = msg.from.id
-  if receiver ~= config.admin then
+  if not is_sudo(msg, config) then
     utilities.send_reply(msg, config.errors.sudo)
 	return
   end

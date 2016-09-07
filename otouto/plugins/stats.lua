@@ -136,7 +136,7 @@ function stats:action(msg, config, matches)
     end
 
     if matches[2] == "chat" then
-	  if msg.from.id ~= config.admin then
+	  if not is_sudo(msg, config) then
         utilities.send_reply(msg, config.errors.sudo)
 	    return
       else
