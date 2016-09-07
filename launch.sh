@@ -10,16 +10,16 @@
 if type lua5.3 >/dev/null 2>/dev/null; then
     while true; do
         lua5.3 main.lua
-        echo "Brawlbot has stopped. ^C to exit."
+        echo "Brawlbot wurde angehalten. ^C zum Beenden."
         sleep 5s
     done
 elif type lua >/dev/null 2>/dev/null; then
     while true; do
         lua main.lua
-        echo "Brawlbot has stopped. ^C to exit."
+        echo "Brawlbot wurde angehalten. ^C zum Beenden."
         sleep 5s
     done
 else
-    echo "Lua not found."
-    echo "If you're on Ubuntu, try running ./install-dependencies.sh."
+    echo "Lua nicht gefunden."
+	echo "Falls du Ubuntu verwendest, führe vorher ./install-dependencies.sh aus."
 fi
