@@ -22,6 +22,8 @@ function banhammer:init(config)
 	"^/(block) (delete)$",
     "^/(kick) (%d+)$",
 	"^/(kick)$",
+	"^/(leave) (%-?%d+)",
+	"^/(leave) (@[A-Za-z0-9-_-]+)",
 	"^/(leave)$"
 	}
 	banhammer.doc = [[*
@@ -184,12 +186,20 @@ function banhammer:action(msg, config, matches)
   end
   
   if matches[1] == 'leave' then
-    if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-	  bindings.request('leaveChat', {
-	    chat_id = msg.chat.id
-	  } )
-	  return
+    if matches[2] then
+	  chat_id = matches[2]
+	else
+	  chat_id = msg.chat.id
 	end
+	local result = bindings.request('leaveChat', {
+	  chat_id = chat_id
+	} )
+	if matches[2] and result then
+	  utilities.send_reply(msg, 'Chat verlassen!')
+	elseif matches[2] and not result then
+	  utilities.send_reply(msg, 'Chat konnte nicht verlassen werden, ist die ID/der Name korrekt?')
+	end
+	return
   end
   
   if matches[1] == 'ban' then
