@@ -349,7 +349,7 @@ end
 
 -- Returns true if the string is blank/empty
 function string:isempty()
-  self = self:trim()
+  self = utilities.trim(self)
   return self == nil or self == ''
 end
 

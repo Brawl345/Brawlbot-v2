@@ -16,10 +16,10 @@ end
 
 function tagesschau:get_tagesschau_article(article)
   local url = BASE_URL..'/'..article..'.json'
-  local res,code  = https.request(url)
-  local data = json.decode(res)
+  local res, code  = https.request(url)
   if code == 404 then return "Artikel nicht gefunden!" end
   if code ~= 200 then return "HTTP-Fehler" end
+  local data = json.decode(res)
   if not data then return "HTTP-Fehler" end
   if data.type ~= "story" then
     print('Typ "'..data.type..'" wird nicht unterstützt')
