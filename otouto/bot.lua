@@ -229,7 +229,6 @@ function bot:run(config)
 		-- Run cron jobs every minute.
 		if self.last_cron ~= os.date('%M') then
 			self.last_cron = os.date('%M')
-			utilities.save_data(self.info.username..'.db', self.database) -- Save the database.
 		    for n=1, #self.plugins do 
 			    local v = self.plugins[n]
 				if v.cron then -- Call each plugin's cron function, if it has one.

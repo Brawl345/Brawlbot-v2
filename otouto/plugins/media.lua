@@ -1,5 +1,7 @@
 local media = {}
 
+local mime = (loadfile "./otouto/mimetype.lua")()
+
 media.triggers = {
     	"(https?://[%w-_%.%?%.:,/%+=&%[%]]+%.(gif))$",
     	"^(https?://[%w-_%.%?%.:,/%+=&%[%]]+%.(mp4))$",
