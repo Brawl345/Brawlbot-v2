@@ -132,7 +132,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   
   -- Check if whitelist is enabled and user/chat is whitelisted
   local whitelist = redis:get('whitelist:enabled')
-  if whitelist and not is_sudo(msg, config) then
+  if whitelist and not is_sudo(callback, config) then
 	local hash = 'whitelist:user#id'..user_id
 	local allowed = redis:get(hash) or false
 	if not allowed then
@@ -160,10 +160,12 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   for n=1, #self.plugins do
     local plugin = self.plugins[n]
 	if plugin.name == called_plugin then
-	  if is_plugin_disabled_on_chat(plugin.name, msg) then return end
+	  if is_plugin_disabled_on_chat(plugin.name, msg) then utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.') return end
 	  plugin:callback(callback, msg, self, config, param)
 	end
   end
+  
+   utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Plugin gefunden.')
 end
 
 -- NOTE: To enable InlineQuerys, send /setinline to @BotFather

@@ -74,6 +74,7 @@ function pocket:add_pocket_item(access_token, url)
   local code = result.item.response_code
   
   local text = title..' ('..given_url..') hinzugefügt!'
+  if not code then return text end
   if code ~= "200" and code ~= "0" then text = text..'\nAber die Seite liefert Fehler '..code..' zurück.' end
   return text
 end
