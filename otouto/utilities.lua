@@ -33,8 +33,8 @@ redis = (loadfile "./otouto/redis.lua")()
 OAuth = require "OAuth"
 helpers = require "OAuth.helpers"
 
-http.TIMEOUT = 7
-https.TIMEOUT = 7
+http.TIMEOUT = 10
+https.TIMEOUT = 10
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
