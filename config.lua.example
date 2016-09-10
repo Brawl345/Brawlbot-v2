@@ -4,14 +4,9 @@ return {
 	bot_api_key = '',
 	-- Your Telegram ID.
 	admin = 1337,
-	-- Two-letter language code.
-	lang = 'de',
 	-- The channel, group, or user to send error reports to.
 	-- If this is not set, errors will be printed to the console.
 	log_chat = nil,
-	-- The port used to communicate with tg for administration.lua.
-	-- If you change this, make sure you also modify launch-tg.sh.
-	cli_port = 4567,
 	-- The block of text returned by /start.
 	about_text = [[
 Dies ist die BETA-Version von Brawlbot v2.
@@ -68,8 +63,8 @@ Sende /hilfe, um zu starten
 
     chatter = {
         cleverbot_api = 'https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text=',
-        connection = 'I don\'t feel like talking right now.',
-        response = 'I don\'t know what to say to that.'
+        connection = 'Ich möchte jetzt nicht reden.',
+        response = 'Ich weiß nicht, wie ich darauf reagieren soll.'
     }
 
 }

@@ -10,7 +10,7 @@ echo "Es werden auch Root-Rechte benötigt, um LuaRocks in /usr/local/"
 echo "mit den folgenden Rocks zu installieren:"
 echo $rocklist
 echo "Drücke ENTER, um fortzufahren, oder Strg-C zum Beenden."
-read
+read smth
 
 sudo apt-get update
 sudo apt-get install -y lua5.2 liblua5.2-dev git libssl-dev fortune-mod fortunes redis-server unzip make
