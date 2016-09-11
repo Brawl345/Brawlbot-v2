@@ -577,8 +577,10 @@ utilities.char = {
 function scandir(directory)
   local i, t, popen = 0, {}, io.popen
   for filename in popen('ls -a "'..directory..'"'):lines() do
-    i = i + 1
-    t[i] = filename
+    if filename ~= "." and filename ~= ".." then
+      i = i + 1
+      t[i] = filename
+    end
   end
   return t
 end
