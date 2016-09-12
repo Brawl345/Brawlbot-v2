@@ -11,9 +11,7 @@ function ap:get_article(article)
   
   local headline = res:match('<span class%=\"headline entry%-title\">(.-)</span>')
   if not headline then return end
-  
-  -- TODO: How to match all occurences? AP uses the same class for all paragraphs
-  -- but string.match only returns the first one oO
+
   local article = unescape(utilities.trim(res:match('<p class%=\"ap%-story%-p\">(.-)</p>')))
   
   local pic_url = res:match('<img src%=\"(/photos/.-)" alt%=\"AP Photo\"')
