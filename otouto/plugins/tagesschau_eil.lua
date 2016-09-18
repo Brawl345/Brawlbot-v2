@@ -84,7 +84,7 @@ function tagesschau_eil:cron()
   if data.breakingnews[1] then
     if data.breakingnews[1].date ~= last_eil then
       local title = '#EIL: <b>'..data.breakingnews[1].headline..'</b>'
-      local news = data.breakingnews[1].shorttext
+      local news = data.breakingnews[1].shorttext or ''
       local posted_at = makeOurDate(data.breakingnews[1].date)..' Uhr'
 	  local post_url = string.gsub(data.breakingnews[1].details, '/api/', '/')
 	  local post_url = string.gsub(post_url, '.json', '.html')
