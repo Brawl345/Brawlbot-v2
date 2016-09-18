@@ -35,7 +35,6 @@ else
 fi
 
 cd $HOME
-INSTALLED_DIR="$HOME/lua5.2" # REMOVE THIS!!!!!
 
 # LuaRocks
 if [ -n "$2" ]; then
