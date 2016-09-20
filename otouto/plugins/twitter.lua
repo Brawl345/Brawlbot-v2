@@ -60,7 +60,6 @@ function twitter:action(msg, config, matches)
     verified = ''
   end
   local header = '<b>Tweet von '..full_name..'</b> (<a href="https://twitter.com/'..user_name..'">@' ..user_name..'</a>'..verified..'):'
-  
   local text = response.text
   
   -- favorites & retweets
@@ -100,18 +99,18 @@ function twitter:action(msg, config, matches)
   if response.entities.media and response.extended_entities.media then
     for k, v in pairs(response.extended_entities.media) do
         local url = v.url
-        local pic = v.media_url_https
 		if v.video_info then
-		  if not v.video_info.variants[3] then
-		    local vid = v.video_info.variants[1].url
+		  if v.video_info.variants[#v.video_info.variants].bitrate == 2176000 then
+		    local vid = v.video_info.variants[#v.video_info.variants].url
 			videos[#videos+1] = vid
 		  else
-		    local vid = v.video_info.variants[3].url
+		    local vid = v.video_info.variants[1].url
 			videos[#videos+1] = vid
 		  end
-		end
-        text = text:gsub(url, "")
-		images[#images+1] = pic
+		else
+           images[#images+1] = v.media_url_https
+        end
+        text = text:gsub(url, '')
     end
   end
   
@@ -130,8 +129,7 @@ function twitter:action(msg, config, matches)
   end
   
   -- send the parts 
-  utilities.send_reply(msg, header .. "\n" .. text.."\n"..footer, 'HTML')
-  if videos[1] then images = {} end
+  utilities.send_reply(msg, header .. "\n" .. utilities.trim(text).."\n"..footer, 'HTML')
   for k, v in pairs(images) do
     local file = download_to_file(v)
 	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
