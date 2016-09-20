@@ -29,7 +29,7 @@ end
 
 weather.command = 'w [Ort]'
 
-local BASE_URL = "https://api.forecast.io/forecast"
+local BASE_URL = "https://api.darksky.net/forecast"
 local apikey = cred_data.forecastio_apikey
 local google_apikey = cred_data.google_apikey
 
