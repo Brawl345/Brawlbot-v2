@@ -983,18 +983,6 @@ function table.contains(table, element)
   return false
 end
 
--- Checks if bot was disabled on specific chat
-function is_channel_disabled(msg)
-  local hash = 'chat:'..msg.chat.id..':disabled'
-  local disabled = redis:get(hash)
-  
-  if not disabled or disabled == "false" then
-	return false
-  end
-
-  return disabled
-end
-
  -- Converts a gross string back into proper UTF-8.
  -- Useful for fixing improper encoding caused by bad JSON escaping.
 function utilities.fix_utf8(str)

@@ -83,12 +83,6 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	  msg.text_lower = msg.text:lower()
 	end
 
-	if is_channel_disabled(msg)then
-	  if not is_sudo(msg, config) or msg.text ~= "/channel enable" then
-		  return
-	  end
-	end
-
 	msg = pre_process_msg(self, msg, config)
 	if not msg then return end -- deleted by banning
 	
@@ -349,7 +343,6 @@ function create_plugin_set()
     'echo',
 	'currency',
     'banhammer',
-    'channels',
 	'plugins',
 	'settings',
     'help'
