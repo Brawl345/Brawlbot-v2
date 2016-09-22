@@ -100,12 +100,13 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   -- vardump(msg)
   -- vardump(callback)
 
-  if msg.date < os.time() - 1800 then -- Do not process old messages.
-    utilities.answer_callback_query(callback, 'Nachricht älter als eine halbe Stunde, bitte sende den Befehl selbst noch einmal.', true)
+  if msg.date < os.time() - 3600 then -- Do not process old messages.
+    utilities.answer_callback_query(callback, 'Nachricht älter als eine Stunde, bitte sende den Befehl selbst noch einmal.', true)
     return
   end
-
-  if not callback.data:find(':') or not callback.data:find('@'..self.info.username..' ') then
+  
+  if not callback.data:find(':') then
+    utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Parameter.')
 	return
   end
 
@@ -142,8 +143,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
 	  end
 	end
   end
-  
-  callback.data = string.gsub(callback.data, '@'..self.info.username..' ', "")
+
   local called_plugin = callback.data:match('(.*):.*')
   local param = callback.data:sub(callback.data:find(':')+1)
 
@@ -155,7 +155,13 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
     local plugin = self.plugins[n]
 	if plugin.name == called_plugin then
 	  if is_plugin_disabled_on_chat(plugin.name, msg) then utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.') return end
-	  plugin:callback(callback, msg, self, config, param)
+      if plugin.callback then
+	    plugin:callback(callback, msg, self, config, param)
+        return
+      else
+        utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Plugin unterstützt keine Callbacks.')
+        return
+      end
 	end
   end
   
@@ -181,9 +187,7 @@ function bot:process_inline_query(inline_query, config) -- When an inline query 
     if not is_whitelisted then abort_inline_query(inline_query) return end
   end
 
-  if inline_query.query:match('"') then
-    inline_query.query = inline_query.query:gsub('"', '\\"')
-  end
+  inline_query.query = inline_query.query:gsub('"', '\\"')
   
   if string.len(inline_query.query) > 200 then
     abort_inline_query(inline_query)
@@ -211,7 +215,7 @@ function bot:run(config)
 			    local v = res.result[n]
 				self.last_update = v.update_id
 				if v.inline_query then
-				    bot.process_inline_query(self, v.inline_query, config)
+                    bot.process_inline_query(self, v.inline_query, config)
 				elseif v.callback_query then
 				    bot.on_callback_receive(self, v.callback_query, v.callback_query.message, config)
 				elseif v.message then

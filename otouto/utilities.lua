@@ -989,5 +989,4 @@ function utilities.fix_utf8(str)
     return string.char(utf8.codepoint(str, 1, -1))
 end
 
-
 return utilities
