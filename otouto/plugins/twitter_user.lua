@@ -38,29 +38,11 @@ local client = OAuth.new(consumer_key, consumer_secret, {
     OAuthTokenSecret = access_token_secret
 })
 
-function twitter_user:resolve_url(url)
-  local response_body = {}
-  local request_constructor = {
-    url = url,
-    method = "HEAD",
-    sink = ltn12.sink.table(response_body),
-    headers = {},
-    redirect = false
-  }
-
-  local ok, response_code, response_headers, response_status_line = http.request(request_constructor)
-  if ok and response_headers.location then
-    return response_headers.location
-  else
-    return url
-  end
-end
-
 function twitter_user:action(msg, config, matches)
   local twitter_url = "https://api.twitter.com/1.1/users/show/"..matches[1]..".json"
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
-  local response = json.decode(response_body)
   if response_code ~= 200 then return end
+  local response = json.decode(response_body)
   
   local full_name = response.name
   local user_name = response.screen_name
@@ -79,11 +61,21 @@ function twitter_user:action(msg, config, matches)
     location = ''
   end
   if response.url and response.location ~= '' then
-    url = ' | '..twitter_user:resolve_url(response.url)..'\n'
+    url = ' | '..response.url..'\n'
   elseif response.url and response.location == '' then
-    url = twitter_user:resolve_url(response.url)..'\n'
+    url = response.url..'\n'
   else
     url = '\n'
+  end
+
+  -- replace short url
+  if response.entities.url then
+    for k, v in pairs(response.entities.url.urls) do 
+        local short = v.url
+        local long = v.expanded_url
+		local long = long:gsub('%%', '%%%%')
+        url = url:gsub(short, long)
+    end
   end
   
   local body = description..'\n'..location..url
