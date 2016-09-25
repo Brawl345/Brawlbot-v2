@@ -49,7 +49,8 @@ function twitter:action(msg, config, matches)
   end
 
   local twitter_url = "https://api.twitter.com/1.1/statuses/show/" .. id.. ".json"
-  local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url)
+  local get_params = {tweet_mode = 'extended'}
+  local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url, get_params)
   local response = json.decode(response_body)
   
   local full_name = response.user.name
@@ -60,7 +61,7 @@ function twitter:action(msg, config, matches)
     verified = ''
   end
   local header = '<b>Tweet von '..full_name..'</b> (<a href="https://twitter.com/'..user_name..'">@' ..user_name..'</a>'..verified..'):'
-  local text = response.text
+  local text = response.full_text
   
   -- favorites & retweets
   if response.retweet_count == 0 then
@@ -116,7 +117,7 @@ function twitter:action(msg, config, matches)
   
     -- quoted tweet
   if response.quoted_status then
-    local quoted_text = response.quoted_status.text
+    local quoted_text = response.quoted_status.full_text
 	local quoted_name = response.quoted_status.user.name
 	local quoted_screen_name = response.quoted_status.user.screen_name
 	if response.quoted_status.user.verified then
@@ -124,6 +125,27 @@ function twitter:action(msg, config, matches)
     else
 	  quoted_verified = ''
 	end
+
+    -- replace short URLs for quoted tweets
+    if response.quoted_status.entities.urls then
+      for k, v in pairs(response.quoted_status.entities.urls) do 
+        local short = v.url
+        local long = v.expanded_url
+        local long = long:gsub('%%', '%%%%')
+        quoted_text = quoted_text:gsub(short, long)
+      end
+    end
+    
+    -- same for media
+    if response.quoted_status.entities.media then
+      for k, v in pairs(response.quoted_status.entities.media) do
+        local short = v.url
+        local long = v.media_url_https
+        local long = long:gsub('%%', '%%%%')
+        quoted_text = quoted_text:gsub(short, long)
+      end
+    end
+    
 	quote = '<b>Als Antwort auf '..quoted_name..'</b> (<a href="https://twitter.com/'..quoted_screen_name..'">@' ..quoted_screen_name..'</a>'..quoted_verified..'):\n'..quoted_text
 	text = text..'\n\n'..quote..'\n'
   end
