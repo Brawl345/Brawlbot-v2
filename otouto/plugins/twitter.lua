@@ -41,7 +41,6 @@ local client = OAuth.new(consumer_key, consumer_secret, {
 })
 
 function twitter:action(msg, config, matches)
-  
   if not matches[2] then
     id = matches[1]
   else
