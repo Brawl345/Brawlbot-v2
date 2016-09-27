@@ -63,7 +63,7 @@ function quotes:callback(callback, msg, self, config)
 	local text = ""
 
     for num,quote in pairs(quotes_table) do
-      text = text..num..") "..quote..'\n'
+      text = text..'<b>'..num..")</b> "..quote..'\n'
     end
 
 	if not text or text == "" then
@@ -75,7 +75,7 @@ function quotes:callback(callback, msg, self, config)
       while text_len > 4096 do
         to_send_text = string.sub(text, 1, 4096)
         text = string.sub(text, 4096, text_len)
-        local res = utilities.send_message(callback.from.id, to_send_text)
+        local res = utilities.send_message(callback.from.id, to_send_text, true, nil, 'HTML')
 
         if not res then
           utilities.answer_callback_query(callback, 'Bitte starte den Bot zuerst privat!', true)
@@ -84,7 +84,7 @@ function quotes:callback(callback, msg, self, config)
         text_len = string.len(text)
       end
       
-      local res = utilities.send_message(callback.from.id, text)
+      local res = utilities.send_message(callback.from.id, to_send_text, true, nil, 'HTML')
       if not res then
         utilities.answer_callback_query(callback, 'Bitte starte den Bot zuerst privat!', true)
         return

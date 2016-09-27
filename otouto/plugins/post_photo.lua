@@ -9,6 +9,7 @@ post_photo.triggers = {
 
 function post_photo:pre_process(msg, config)
   if not msg.document then return msg end -- Ignore
+  if msg.caption:match("#ignore") then return msg end -- Ignore, when Caption contains "#ignore"
   local mime_type = msg.document.mime_type
   local valid_mimetypes = {['image/jpeg'] = true, ['image/png'] = true, ['image/bmp'] = true}
   if not valid_mimetypes[mime_type] then return msg end
