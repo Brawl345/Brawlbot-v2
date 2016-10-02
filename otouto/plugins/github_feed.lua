@@ -47,11 +47,11 @@ end
 
 function gh_feed_check_modified(repo, cur_etag, last_date)
   local url = BASE_URL..'/'..repo
-  local response_body = {}
   local request_constructor = {
       url = url,
       method = "HEAD",
 	  redirect = false,
+      sink = ltn12.sink.null(),
       headers = {
 	    Authorization = 'token '..token,
 		["If-None-Match"] = cur_etag

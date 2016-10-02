@@ -31,16 +31,14 @@ function expand:inline_callback(inline_query, config, matches)
 end
 
 function expand:url(long_url)
-   local response_body = {}
    local request_constructor = {
       url = long_url,
       method = "HEAD",
-      sink = ltn12.sink.table(response_body),
-      headers = {},
+      sink = ltn12.sink.null(),
       redirect = false
    }
 
-   local ok, response_code, response_headers, response_status_line = http.request(request_constructor)
+   local ok, response_code, response_headers = http.request(request_constructor)
    return ok, response_headers
 end
 
