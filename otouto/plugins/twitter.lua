@@ -40,18 +40,7 @@ local client = OAuth.new(consumer_key, consumer_secret, {
     OAuthTokenSecret = access_token_secret
 })
 
-function twitter:action(msg, config, matches)
-  if not matches[2] then
-    id = matches[1]
-  else
-    id = matches[2]
-  end
-
-  local twitter_url = "https://api.twitter.com/1.1/statuses/show/" .. id.. ".json"
-  local get_params = {tweet_mode = 'extended'}
-  local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url, get_params)
-  local response = json.decode(response_body)
-  
+function get_tweet(response)
   local full_name = response.user.name
   local user_name = response.user.screen_name
   if response.user.verified then
@@ -149,8 +138,30 @@ function twitter:action(msg, config, matches)
 	text = text..'\n\n'..quote..'\n'
   end
   
+  return header.."\n"..utilities.trim(text).."\n"..footer, images, videos
+end
+
+function twitter:action(msg, config, matches)
+  utilities.send_typing(msg.chat.id, 'typing')
+  if not matches[2] then
+    id = matches[1]
+  else
+    id = matches[2]
+  end
+
+  local twitter_url = "https://api.twitter.com/1.1/statuses/show/" .. id.. ".json"
+  local get_params = {tweet_mode = 'extended'}
+  local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url, get_params)
+  if response_code ~= 200 then
+    utilities.send_repl(msg, 'Twitter nicht erreichbar, Tweet existiert nicht oder User ist privat.')
+    return
+  end
+  local response = json.decode(response_body)
+  
+  local text, images, videos = get_tweet(response)
+  
   -- send the parts 
-  utilities.send_reply(msg, header .. "\n" .. utilities.trim(text).."\n"..footer, 'HTML')
+  utilities.send_reply(msg, text, 'HTML')
   for k, v in pairs(images) do
     local file = download_to_file(v)
 	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
