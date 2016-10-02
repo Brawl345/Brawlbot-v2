@@ -74,7 +74,7 @@ function notify:action(msg, config, matches)
     redis:hset(hash, 'notify', false)
     print('Removing '..username..' from redis set notify:ls')
     redis:srem('notify:ls', username)
-	utilities.send_reply(msg, 'Du erhälst jetzt keine Benachrichtigungen mehr, wenn du angesprochen wirst.')
+	utilities.send_reply(msg, 'Du erhältst jetzt keine Benachrichtigungen mehr, wenn du angesprochen wirst.')
 	return
   else
     if redis:sismember('notify:ls', username) then
@@ -87,11 +87,11 @@ function notify:action(msg, config, matches)
     redis:hset(hash, 'id', msg.from.id)
     print('Adding '..username..' to redis set notify:ls')
     redis:sadd('notify:ls', username)
-	local res = utilities.send_message(msg.from.id, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true, nil, true)
+	local res = utilities.send_message(msg.from.id, 'Du erhältst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true, nil, true)
 	if not res then
 	  utilities.send_reply(msg, 'Bitte schreibe mir [privat](http://telegram.me/' .. self.info.username .. '?start=notify), um den Vorgang abzuschließen.', true)
 	elseif msg.chat.type ~= 'private' then
-	  utilities.send_reply(msg, 'Du erhälst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true)
+	  utilities.send_reply(msg, 'Du erhältst jetzt Benachrichtigungen, wenn du angesprochen wirst, nutze `/notify del` zum Deaktivieren.', true)
 	end
   end
 end
