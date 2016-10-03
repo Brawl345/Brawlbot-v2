@@ -36,85 +36,6 @@ function gImages:is_blacklisted(msg)
   return var
 end
 
--- Yes, the callback is copied from below, but I can't think of another method :\
-function gImages:callback(callback, msg, self, config, input)
-  if not msg then return end
-  utilities.answer_callback_query(callback, 'Suche nochmal nach "'..URL.unescape(input)..'"')
-  utilities.send_typing(msg.chat.id, 'upload_photo')
-  local hash = 'telegram:cache:gImages'
-  local results = redis:smembers(hash..':'..string.lower(URL.unescape(input)))
-  
-  if not results[1] then
-    print('doing web request')
-    results = gImages:get_image(input)
-	if results == 403 then
-	  utilities.send_reply(msg, config.errors.quotaexceeded, true)
-	  return
-    elseif not results then
-      utilities.send_reply(msg, config.errors.results, true)
-	  return
-    end
-    gImages:cache_result(results, input)
-  end
-
-  -- Random image from table
-  local i = math.random(#results)
-  
-  -- Thanks to Amedeo for this!
-  local failed = true
-  local nofTries = 0
-  
-  while failed and nofTries < #results do
-    if results[i].image then
-      img_url = results[i].link
-      mimetype = results[i].mime
-      context = results[i].image.contextLink
-    else -- from cache
-      img_url = results[i]
-	  mimetype = redis:hget(hash..':'..img_url, 'mime')
-	  context = redis:hget(hash..':'..img_url, 'contextLink')
-    end
-
-    -- It's important to save the image with the right ending!
-    if mimetype == 'image/gif' then
-      file = download_to_file(img_url, 'img.gif')
-    elseif mimetype == 'image/png' then
-     file = download_to_file(img_url, 'img.png')
-    elseif mimetype == 'image/jpeg' then
-      file = download_to_file(img_url, 'img.jpg')
-    else
-      file = nil
-    end
-	
-	if not file then
-	  nofTries = nofTries + 1
-	  i = i+1
-	  if i > #results then
-	    i = 1
-	  end
-	else
-	  failed = false
-	end
-
-  end
-  
-  if failed then
-    utilities.send_reply(msg, 'Fehler beim Herunterladen eines Bildes.', true)
-	return
-  end
-  
-  if mimetype == 'image/gif' then
-    result = utilities.send_document(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
-  else
-    result = utilities.send_photo(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..input..'"}]]}')
-  end
-
-  if not result then
-    utilities.send_reply(msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..input..'"}]]}')
-	return
-  end
-end
-
 function gImages:get_image(input)
   local apikey = cred_data.google_apikey -- 100 requests is RIDICULOUS, Google!
   local cseid = cred_data.google_cse_id
@@ -151,23 +72,7 @@ function gImages:cache_result(results, text)
   cache_data('gImages', string.lower(text), cache, 1209600, 'set')
 end
 
-function gImages:action(msg, config, matches)
-  local input = utilities.input(msg.text)
-  if not input then
-    if msg.reply_to_message and msg.reply_to_message.text then
-      input = msg.reply_to_message.text
-    else
-	  utilities.send_message(msg.chat.id, gImages.doc, true, msg.message_id, true)
-	  return
-	end
-  end
-  
-  print ('Checking if search contains blacklisted word: '..input)
-  if gImages:is_blacklisted(input) then
-    utilities.send_reply(msg, 'Vergiss es! ._.')
-	return
-  end
-
+function gImages:send_image(msg, input)
   utilities.send_typing(msg.chat.id, 'upload_photo')
 
   local hash = 'telegram:cache:gImages'
@@ -204,18 +109,15 @@ function gImages:action(msg, config, matches)
 	  context = redis:hget(hash..':'..img_url, 'contextLink')
     end
 
-    -- It's important to save the image with the right ending!
     if mimetype == 'image/gif' then
-      file = download_to_file(img_url, 'img.gif')
-    elseif mimetype == 'image/png' then
-     file = download_to_file(img_url, 'img.png')
-    elseif mimetype == 'image/jpeg' then
-      file = download_to_file(img_url, 'img.jpg')
+      res = utilities.send_document(msg.chat.id, img_url, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+    elseif mimetype == 'image/png' or mimetype == 'image/jpeg' then
+      res = utilities.send_photo(msg.chat.id, img_url, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
     else
-      file = nil
+      res = nil
     end
 	
-	if not file then
+	if not res then
 	  nofTries = nofTries + 1
 	  i = i+1
 	  if i > #results then
@@ -231,17 +133,38 @@ function gImages:action(msg, config, matches)
     utilities.send_reply(msg, 'Fehler beim Herunterladen eines Bildes.', true)
 	return
   end
-  
-  if mimetype == 'image/gif' then
-    result = utilities.send_document(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  else
-    result = utilities.send_photo(msg.chat.id, file, nil, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..context..'"},{"text":"Bild aufrufen","url":"'..img_url..'"},{"text":"Nochmal suchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
-  end
+end
 
-  if not result then
-    utilities.send_reply(msg, config.errors.connection, true, '{"inline_keyboard":[[{"text":"Nochmal versuchen","callback_data":"gImages:'..URL.escape(input)..'"}]]}')
+function gImages:callback(callback, msg, self, config, input)
+  if not msg then return end
+  local input = URL.unescape(input)
+  if gImages:is_blacklisted(input) then
+    utilities.answer_callback_query(callback, 'Wort steht auf der Blacklist!', true)
+	return
+  else
+    utilities.answer_callback_query(callback, 'Suche nochmal nach "'..input..'"')
+  end
+  gImages:send_image(msg, input)
+end
+
+function gImages:action(msg, config, matches)
+  local input = utilities.input(msg.text)
+  if not input then
+    if msg.reply_to_message and msg.reply_to_message.text then
+      input = msg.reply_to_message.text
+    else
+	  utilities.send_message(msg.chat.id, gImages.doc, true, msg.message_id, true)
+	  return
+	end
+  end
+  
+  print ('Checking if search contains blacklisted word: '..input)
+  if gImages:is_blacklisted(input) then
+    utilities.send_reply(msg, 'Vergiss es! ._.')
 	return
   end
+  
+  gImages:send_image(msg, input)
 end
 
 return gImages

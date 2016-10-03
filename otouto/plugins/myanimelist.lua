@@ -197,8 +197,7 @@ function mal:action(msg, config, matches)
       local text, image_url = mal:send_anime_data(anime_info)
 	  if image_url then
 	    utilities.send_typing(msg.chat.id, 'upload_photo')
-	    local file = download_to_file(image_url)
-		utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+		utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
 	  end
 	  utilities.send_reply(msg, text, true)  
 	  return
@@ -212,8 +211,7 @@ function mal:action(msg, config, matches)
       local text, image_url = mal:send_manga_data(manga_info)
 	  if image_url then
 	    utilities.send_typing(msg.chat.id, 'upload_photo')
-	    local file = download_to_file(image_url)
-		utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+		utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
 	  end
 	  utilities.send_reply(msg, text, true)
 	  return

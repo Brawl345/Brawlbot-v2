@@ -53,8 +53,7 @@ function ninegag:action(msg, config)
 	return
   end
 
-  local file = download_to_file(url)
-  utilities.send_photo(msg.chat.id, file, title, msg.message_id, '{"inline_keyboard":[[{"text":"Post aufrufen","url":"'..post_url..'"}]]}')
+  utilities.send_photo(msg.chat.id, url, title, msg.message_id, '{"inline_keyboard":[[{"text":"Post aufrufen","url":"'..post_url..'"}]]}')
 end
 
 return ninegag

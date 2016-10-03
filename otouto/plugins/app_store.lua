@@ -103,8 +103,7 @@ function app_store:action(msg, config, matches)
     utilities.send_reply(msg, output, 'HTML')
 	if image_url then
 	  utilities.send_typing(msg.chat.id, 'upload_photo')
-	  local file = download_to_file(image_url)
-	  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	  utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
 	end
   end
 end

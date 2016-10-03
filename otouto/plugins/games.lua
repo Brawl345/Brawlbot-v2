@@ -51,8 +51,7 @@ function games:send_game_photo(result, self, msg)
   local i = 0
   for k, v in pairs(images) do
     i = i+1
-    local file = download_to_file(v, 'game'..i..'.jpg')
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, v, nil, msg.message_id)
   end
 end
 

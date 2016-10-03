@@ -30,8 +30,7 @@ function ap:action(msg, config, matches)
   
   if pic then
     local pic = pic:gsub('-small', '-big')
-    local photo = download_to_file('http://hosted.ap.org'..pic)
-    utilities.send_photo(msg.chat.id, photo, nil, msg.message_id)
+    utilities.send_photo(msg.chat.id, 'http://hosted.ap.org'..pic, nil, msg.message_id)
   end
   utilities.send_reply(msg, article, 'HTML')
 end
