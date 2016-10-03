@@ -34,8 +34,7 @@ function heise:action(msg, config, matches)
   if not text then return end
   if image_url then
     utilities.send_typing(msg.chat.id, 'upload_photo')
-    local file = download_to_file(image_url, 'heise_teaser.jpg')
-    utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+    utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
   end
   utilities.send_reply(msg, text, true)
 end

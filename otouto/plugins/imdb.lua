@@ -90,12 +90,10 @@ function imdb:action(msg, config)
   output = output..string.gsub(jdat.imdbRating, '%.', ',')..'/10 | '..jdat.Runtime..' | '.. jdat.Genre..'\n'
   output = output..'<i>' .. jdat.Plot .. '</i>'
 
-  utilities.send_reply(msg, output, 'HTML', '{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'.. jdat.imdbID..'"}]]}')
-	
   if jdat.Poster ~= "N/A" then
-    local file = download_to_file(jdat.Poster)
-    utilities.send_photo(msg.chat.id, file)
+    utilities.send_photo(msg.chat.id, jdat.Poster)
   end
+  utilities.send_reply(msg, output, 'HTML', '{"inline_keyboard":[[{"text":"IMDb-Seite aufrufen","url":"http://imdb.com/title/'.. jdat.imdbID..'"}]]}')
 end
 
 return imdb

@@ -69,8 +69,7 @@ function tv:send_tv_data(result, msg)
   if xml.find(result, 'banner') then
     local image_url = 'http://www.thetvdb.com/banners/'..xml.find(result, 'banner')[1]
 	utilities.send_typing(msg.chat.id, 'upload_photo')
-    local file = download_to_file(image_url)
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
   end
   utilities.send_reply(msg, text, true)
 end

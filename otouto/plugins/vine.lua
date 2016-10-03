@@ -25,8 +25,7 @@ function vine:send_vine_data(data)
   if data.explicitContent == 1 then
     text = text..' (ðŸ”ž NSFW ðŸ”ž)'
   end
-  local file = download_to_file(video_url, data.shortId..'.mp4')
-  return text, file
+  return text, video_url
 end
 
 function vine:action(msg, config, matches)
@@ -34,8 +33,8 @@ function vine:action(msg, config, matches)
   if not data then utilities.send_reply(msg, config.errors.connection) return end
   
   utilities.send_typing(msg.chat.id, 'upload_video')
-  local text, file = vine:send_vine_data(data)
-  utilities.send_video(msg.chat.id, file, text, msg.message_id)
+  local text, video_url = vine:send_vine_data(data)
+  utilities.send_video(msg.chat.id, video_url, text, msg.message_id)
 end
 
 return vine

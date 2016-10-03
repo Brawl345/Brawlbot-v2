@@ -136,8 +136,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
 	if blocked then
       text = text..'\nACHTUNG, In Deutschland gesperrt!'
     end
-    local file = download_to_file(image_url)
-	utilities.send_photo(msg.chat.id, file, text, msg.message_id)
+	utilities.send_photo(msg.chat.id, image_url, text, msg.message_id)
   else
     utilities.send_reply(msg, text, 'HTML')
   end

@@ -45,8 +45,7 @@ function gps:action(msg, config, matches)
   for i in ipairs(zooms) do
     local zoom = zooms[i]
     local url = "https://maps.googleapis.com/maps/api/staticmap?zoom=" .. zoom .. "&size=600x300&maptype=hybrid&center=" .. lat .. "," .. lon .. "&markers=color:red%7Clabel:•%7C" .. lat .. "," .. lon
-    local file = download_to_file(url, 'zoom_'..i..'.png')
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, url, nil, msg.message_id)
   end
 
   utilities.send_location(msg.chat.id, lat, lon, msg.message_id)

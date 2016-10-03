@@ -13,14 +13,13 @@ function gfycat:send_gfycat_video(name, msg)
   if code ~= 200 then return "HTTP-FEHLER" end
   local data = json.decode(res).gfyItem
   utilities.send_typing(msg.chat.id, 'upload_video')
-  local file = download_to_file(data.webmUrl)
-  if file == nil then
-    send_reply(msg, 'Fehler beim Herunterladen von '..name)
-	return
+  local file = download_to_file(data.mp4Url)
+  if tonumber(data.mp4Size) > 20971520 then
+    file = download_to_file(data.mp4Url)
   else
-    utilities.send_video(msg.chat.id, file, nil, msg.message_id)
-	return
+    file = data.mp4Url
   end
+  utilities.send_video(msg.chat.id, file, nil, msg.message_id)
 end
 
 function gfycat:action(msg, config, matches)

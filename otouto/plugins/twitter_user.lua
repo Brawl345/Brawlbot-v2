@@ -88,15 +88,14 @@ function twitter_user:action(msg, config, matches)
   
   local pic_url = string.gsub(response.profile_image_url_https, "normal", "400x400")
   utilities.send_typing(msg.chat.id, 'upload_photo')
-  local file = download_to_file(pic_url)
   
   local text = header..body..footer
   if string.len(text) > 199 then -- can only send captions with < 200 characters
-    utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+    utilities.send_photo(msg.chat.id, pic_url, nil, msg.message_id)
 	utilities.send_reply(msg, text)
 	return
   else
-    utilities.send_photo(msg.chat.id, file, text, msg.message_id)
+    utilities.send_photo(msg.chat.id, pic_url, text, msg.message_id)
 	return
   end
 end

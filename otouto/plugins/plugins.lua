@@ -90,7 +90,7 @@ function plugin_manager:reload_plugins(self, config, plugin_name, status)
   if plugin_name then
     return 'Plugin '..plugin_name..' wurde '..status
   else
-    return 'Plugins neu geladen'
+    return 'Plugins neu geladen ✔️'
   end
 end
 
@@ -106,31 +106,31 @@ function plugin_manager:enable_plugin(self, config, plugin_name)
     redis:sadd('telegram:enabled_plugins', plugin_name)
 	print(plugin_name..' saved to redis set telegram:enabled_plugins')
     -- Reload the plugins
-    return plugin_manager:reload_plugins(self, config, plugin_name, 'aktiviert')
+    return plugin_manager:reload_plugins(self, config, plugin_name, 'aktiviert ✔️')
   else
-    return 'Plugin '..plugin_name..' existiert nicht'
+    return 'Plugin '..plugin_name..' existiert nicht ❌'
   end
 end
 
 function plugin_manager:disable_plugin(self, config, name, chat)
   -- Check if plugins exists
   if not plugin_manager:plugin_exists(name) then
-    return 'Plugin '..name..' existiert nicht'
+    return 'Plugin '..name..' existiert nicht ❌'
   end
   local k = plugin_manager:plugin_enabled(name)
   -- Check if plugin is enabled
   if not k then
-    return 'Plugin '..name..' ist nicht aktiviert'
+    return 'Plugin '..name..' ist nicht aktiviert ❌'
   end
   -- Disable and reload
     redis:srem('telegram:enabled_plugins', name)
 	print(name..' saved to redis set telegram:enabled_plugins')
-   return plugin_manager:reload_plugins(self, config, name, 'deaktiviert')    
+   return plugin_manager:reload_plugins(self, config, name, 'deaktiviert ✔️')    
 end
 
 function plugin_manager:disable_plugin_on_chat(msg, plugin)
   if not plugin_manager:plugin_exists(plugin) then
-    return "Plugin existiert nicht!"
+    return "Plugin existiert nicht! ❌"
   end
   
   if not msg.chat then
@@ -143,15 +143,15 @@ function plugin_manager:disable_plugin_on_chat(msg, plugin)
   if disabled ~= 'true' then
     print('Setting '..plugin..' in redis hash '..hash..' to true')
     redis:hset(hash, plugin, true)
-	return 'Plugin '..plugin..' für diesen Chat deaktiviert.'
+	return 'Plugin '..plugin..' für diesen Chat deaktiviert. ✔️'
   else
-    return 'Plugin '..plugin..' wurde für diesen Chat bereits deaktiviert.'
+    return 'Plugin '..plugin..' wurde für diesen Chat bereits deaktiviert. ✔️'
   end
 end
 
 function plugin_manager:reenable_plugin_on_chat(msg, plugin)
   if not plugin_manager:plugin_exists(plugin) then
-    return "Plugin existiert nicht!"
+    return "Plugin existiert nicht! ❌"
   end
   
   if not msg.chat then
@@ -161,14 +161,14 @@ function plugin_manager:reenable_plugin_on_chat(msg, plugin)
   end
   local disabled = redis:hget(hash, plugin)
   
-  if disabled == nil then return 'Es gibt keine deaktivierten Plugins für disen Chat.' end
+  if disabled == nil then return 'Es gibt keine deaktivierten Plugins für disen Chat. ❌' end
 
   if disabled == 'true' then
     print('Setting '..plugin..' in redis hash '..hash..' to false')
     redis:hset(hash, plugin, false)
-	return 'Plugin '..plugin..' wurde für diesen Chat reaktiviert.'
+	return 'Plugin '..plugin..' wurde für diesen Chat reaktiviert. ✔️'
   else
-    return 'Plugin '..plugin..' ist nicht deaktiviert.'
+    return 'Plugin '..plugin..' ist nicht deaktiviert. ✔️'
   end
 end
 

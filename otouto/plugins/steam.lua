@@ -51,7 +51,7 @@ function steam:action(msg, config, matches)
 
   local text, image_url = steam:send_steam_data(data, msg)
   utilities.send_typing(msg.chat.id, 'upload_photo')
-  utilities.send_photo(msg.chat.id, download_to_file(image_url, matches[1]..'.jpg'), nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
   utilities.send_reply(msg, text, true)
 end
 

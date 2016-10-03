@@ -15,8 +15,7 @@ function gMaps:get_staticmap(area, lat, lon)
   local base_api = "https://maps.googleapis.com/maps/api"
   local url = base_api .. "/staticmap?size=600x300&zoom=12&center="..URL.escape(area).."&markers=color:red"..URL.escape("|"..area)
 
-  local file = download_to_file(url)
-  return file
+  return url
 end
 
 function gMaps:inline_callback(inline_query, config, matches)

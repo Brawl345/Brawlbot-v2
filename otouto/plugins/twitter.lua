@@ -163,12 +163,10 @@ function twitter:action(msg, config, matches)
   -- send the parts 
   utilities.send_reply(msg, text, 'HTML')
   for k, v in pairs(images) do
-    local file = download_to_file(v)
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, v, nil, msg.message_id)
   end
   for k, v in pairs(videos) do
-    local file = download_to_file(v)
-	utilities.send_video(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_video(msg.chat.id, v, nil, msg.message_id)
   end
 end
 

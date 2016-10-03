@@ -147,9 +147,8 @@ function facebook:action(msg, config, matches)
     local text, image_url = facebook:send_facebook_photo(photo_id, receiver)
 	if not image_url then return end
 	utilities.send_typing(msg.chat.id, 'upload_photo')
-	local file = download_to_file(image_url, 'photo.jpg')
 	utilities.send_reply(msg, text, 'HTML')
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
 	return
   elseif matches[1] == 'video' or matches[2] == 'videos' then
     if not matches[3] then

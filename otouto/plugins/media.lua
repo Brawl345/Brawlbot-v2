@@ -42,9 +42,9 @@ function media:action(msg, config, matches)
   if ext == 'gif' then
     result = utilities.send_document(receiver, file, nil, msg.message_id)
   elseif ext == 'ogg' then
-	result = utilities.send_voice(receiver, file, msg.message_id)
+	result = utilities.send_voice(receiver, file, nil, msg.message_id)
   elseif mime_type == 'audio' then
-    result = utilities.send_audio(receiver, file, msg.message_id)
+    result = utilities.send_audio(receiver, file, nil, msg.message_id)
   elseif mime_type == 'video' then
 	result = utilities.send_video(receiver, file, nil, msg.message_id)
   else

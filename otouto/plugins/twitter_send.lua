@@ -169,11 +169,21 @@ function twitter_send:twitter_verify_credentials(oauth_token, oauth_token_secret
     location = ''
   end
   if response.url and response.location ~= '' then
-    url = ' | '..twitter_send:resolve_url(response.url)..'\n'
+    url = ' | '..response.url..'\n'
   elseif response.url and response.location == '' then
-    url = twitter_send:resolve_url(response.url)..'\n'
+    url = response.url..'\n'
   else
     url = '\n'
+  end
+
+  -- replace short url
+  if response.entities.url then
+    for k, v in pairs(response.entities.url.urls) do 
+        local short = v.url
+        local long = v.expanded_url
+		local long = long:gsub('%%', '%%%%')
+        url = url:gsub(short, long)
+    end
   end
   
   local body = description..'\n'..location..url
@@ -338,15 +348,14 @@ function twitter_send:action(msg, config, matches)
   
   if matches[1] == 'verify' then
     local text, pp_url = twitter_send:twitter_verify_credentials(oauth_token, oauth_token_secret)
-	local file = download_to_file(pp_url)
-	utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+	utilities.send_photo(msg.chat.id, pp_url, nil, msg.message_id)
 	utilities.send_reply(msg, text)
 	return
   end
   
   
   if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-    if not can_send_tweet(msg) then
+    if not can_send_tweet(msg) and not is_sudo(msg, config) then
 	  utilities.send_reply(msg, '*Du darfst keine Tweets senden.* Entweder wurdest du noch gar nicht freigeschaltet oder ausgeschlossen.', true)
 	  return 
 	else

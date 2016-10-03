@@ -127,12 +127,13 @@ function utilities.send_photo(chat_id, file, text, reply_to_message_id, reply_ma
 end
 
 -- https://core.telegram.org/bots/api#sendaudio
-function utilities.send_audio(chat_id, file, reply_to_message_id, duration, performer, title)
+function utilities.send_audio(chat_id, file, text, reply_to_message_id, duration, performer, title)
     if not file then return false end
 	local output = bindings.request(
 		'sendAudio',
 		{
 			chat_id = chat_id,
+            caption = text or nil,
 			duration = duration or nil,
 			performer = performer or nil,
 			title = title or nil,
@@ -197,12 +198,13 @@ end
 
 -- NOTE: Voice messages are .ogg files encoded with OPUS
 -- https://core.telegram.org/bots/api#sendvoice
-function utilities.send_voice(chat_id, file, reply_to_message_id, duration)
+function utilities.send_voice(chat_id, file, text, reply_to_message_id, duration)
 	if not file then return false end
 	local output = bindings.request(
 		'sendVoice',
 		{
 			chat_id = chat_id,
+            caption = text or nil,
 			duration = duration or nil,
 			reply_to_message_id = reply_to_message_id
 		},

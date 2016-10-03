@@ -109,8 +109,7 @@ function qr:action(msg, config, matches)
 
   local image_url = qr:qr(text, color, back)
   if not image_url then utilities.send_reply(msg, config.errors.connection) return end
-  local file = download_to_file(image_url, 'qr.png')
-  utilities.send_photo(msg.chat.id, file, nil, msg.message_id)
+  utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
 end
 
 return qr
