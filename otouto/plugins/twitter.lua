@@ -153,7 +153,7 @@ function twitter:action(msg, config, matches)
   local get_params = {tweet_mode = 'extended'}
   local response_code, response_headers, response_status_line, response_body = client:PerformRequest("GET", twitter_url, get_params)
   if response_code ~= 200 then
-    utilities.send_repl(msg, 'Twitter nicht erreichbar, Tweet existiert nicht oder User ist privat.')
+    utilities.send_reply(msg, 'Twitter nicht erreichbar, Tweet existiert nicht oder User ist privat.')
     return
   end
   local response = json.decode(response_body)
