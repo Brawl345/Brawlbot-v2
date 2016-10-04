@@ -162,7 +162,7 @@ function youtube_dl:action(msg, config, matches)
 	    else
 	      pretty_format = video.pretty_format..' ('..pretty_size..')'
 	    end
-	    local button = '{"text":"'..pretty_format..'","callback_data":"@'..self.info.username..' youtube_dl:'..id..'@'..format..'"}'
+	    local button = '{"text":"'..pretty_format..'","callback_data":"youtube_dl:'..id..'@'..format..'"}'
 	    callback_buttons[#callback_buttons+1] = button
 	  end
 	
