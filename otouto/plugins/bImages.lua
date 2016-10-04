@@ -42,7 +42,7 @@ function bImages:getImages(query)
     if images[n].encodingFormat == 'jpeg' then -- Inline-Querys MUST use JPEG photos!
       local photo_url = images[n].contentUrl
 	  local thumb_url = images[n].thumbnailUrl
-      results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..photo_url..'","thumb_url":"'..thumb_url..'","photo_width":'..images[n].width..',"photo_height":'..images[n].height..',"reply_markup":{"inline_keyboard":[[{"text":"Bing aufrufen","url":"'..images[n].webSearchUrl..'"},{"text":"Bild öffnen","url":"'..photo_url..'"}]]}},'
+      results = results..'{"type":"photo","id":"'..id..'","photo_url":"'..photo_url..'","thumb_url":"'..thumb_url..'","photo_width":'..images[n].width..',"photo_height":'..images[n].height..',"reply_markup":{"inline_keyboard":[[{"text":"Bing aufrufen","url":"'..images[n].webSearchUrl..'"},{"text":"Bild öffnen","url":"'..photo_url..'"},{"text":"Nochmal suchen","switch_inline_query_current_chat":"b '..query..'"}]]}},'
 	  id = id+1
 	end
   end
