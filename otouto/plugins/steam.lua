@@ -40,7 +40,7 @@ function steam:send_steam_data(data, msg)
   local title = data.name
   local price = steam:price_info(data.price_overview)
 
-  local text = '*'..title..'* _'..price..'_\n'..description
+  local text = '<b>'..title..'</b> <i>'..price..'</i>\n'..description
   local image_url = data.header_image
   return text, image_url
 end
@@ -52,7 +52,8 @@ function steam:action(msg, config, matches)
   local text, image_url = steam:send_steam_data(data, msg)
   utilities.send_typing(msg.chat.id, 'upload_photo')
   utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
-  utilities.send_reply(msg, text, true)
+  print(text)
+  utilities.send_reply(msg, text, 'HTML')
 end
 
 return steam
