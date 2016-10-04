@@ -1,17 +1,21 @@
 return {
 
 	-- Your authorization token from the botfather.
-	bot_api_key = '',
+	bot_api_key = '235106290:AAF2acnyBgnE4kS70Kj4QDjU6Wbc0iU7SOM',
 	-- Your Telegram ID.
-	admin = 1337,
+	admin = 36623702,
+	-- Two-letter language code.
+	lang = 'de',
 	-- The channel, group, or user to send error reports to.
 	-- If this is not set, errors will be printed to the console.
 	log_chat = nil,
+	-- The port used to communicate with tg for administration.lua.
+	-- If you change this, make sure you also modify launch-tg.sh.
+	cli_port = 4567,
 	-- The block of text returned by /start.
 	about_text = [[
-Dies ist die BETA-Version von Brawlbot v2.
-
-Sende /hilfe, um zu starten
+*Willkommen beim Brawlbot!*
+Sende /hilfe, um zu starten.
 	]],
 
 	-- DO NOT CHANGE THIS
@@ -26,23 +30,23 @@ Sende /hilfe, um zu starten
 	-- false = only whitelisted users can use inline querys
 	-- NOTE that it doesn't matter, if the chat is whitelisted! The USER must be whitelisted!
 	enable_inline_for_everyone = true,
-
+	
 	-- Path, where getFile.lua should store the files WITHOUT an ending slash!
 	-- Create the following folders in this folder: photo, document, video, voice
-	getfile_path = '/tmp/telegram_files',
+	--getfile_path = '/home/anditest/tmp/tg',
 	
 	-- Redis settings. Only edit if you know what you're doing.
 	redis = {
 		host = '127.0.0.1',
 		port = 6379,
-		use_socket = false, -- Set to true, if you need to connect over a socket
-		socket_path = 'unix:///home/path/to/your/redis/sock',
-		password = nil, -- Set, if you need a password to connect to redis
-		database = nil -- Set, if you want to select another database. Default is 0 (use no ""!)
+		use_socket = true,
+		socket_path = 'unix:///home/anditest/.redis/sock',
+		password = nil,
+		database = 1
 	},
 
 	errors = { -- Generic error messages used in various plugins.
-	    generic = 'An unexpected error occurred.',
+	    generic = 'Ein unbekannter Fehler ist aufgetreten, bitte  [melde diesen Bug](https://github.com/Brawl345/Brawlbot-v2/issues).',
 		connection = 'Verbindungsfehler.',
 		quotaexceeded = 'API-Quota aufgebraucht.',
 		results = 'Keine Ergebnisse gefunden.',
@@ -56,15 +60,15 @@ Sende /hilfe, um zu starten
     remind = {
         persist = true,
         max_length = 1000,
-        max_duration = 526000,
-        max_reminders_group = 10,
-        max_reminders_private = 50
+        max_duration = 1440,
+        max_reminders_group = 5,
+        max_reminders_private = 10
     },
 
     cleverbot = {
         cleverbot_api = 'https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text=',
-        connection = 'Ich möchte jetzt nicht reden.',
-        response = 'Ich weiß nicht, wie ich darauf reagieren soll.'
+        connection = 'Ich möchte jetzt nicht reden...',
+        response = 'Keine Ahnung, was ich dazu sagen soll...'
     }
 
 }

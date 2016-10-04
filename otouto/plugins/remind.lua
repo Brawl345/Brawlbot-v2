@@ -3,14 +3,19 @@ local remind = {}
 remind.command = 'remind <Länge> <Nachricht>'
 
 function remind:init(config)
-	self.database.reminders = self.database.reminders or {}
+	self.database.remind = self.database.remind or {}
 
 	remind.triggers = utilities.triggers(self.info.username, config.cmd_pat):t('remind', true).table
 	remind.doc = [[*
 ]]..config.cmd_pat..[[remind* _<Länge>_ _<Nachricht>_
 Erinnert dich in der angegeben Länge in Minuten an eine Nachricht.
 Die maximale Länge einer Erinnerung beträgt %s Buchstaben, die maximale Zeit beträgt %s Minuten, die maximale Anzahl an Erinnerung für eine Gruppe ist %s und für private Chats %s.]]
-	remind.doc = remind.doc:format(config.remind.max_length, config.remind.max_duration, config.remind.max_reminders_group, config.remind.max_reminders_private)
+	remind.doc = remind.doc:format(
+        config.remind.max_length,
+        config.remind.max_duration,
+        config.remind.max_reminders_group,
+        config.remind.max_reminders_private
+    )
 end
 
 function remind:action(msg, config)
@@ -49,10 +54,10 @@ function remind:action(msg, config)
  
   local chat_id_str = tostring(msg.chat.id)
   local output
-  self.database.reminders[chat_id_str] = self.database.reminders[chat_id_str] or {}
-  if msg.chat.type == 'private' and utilities.table_size(self.database.reminders[chat_id_str]) >= config.remind.max_reminders_private then
+  self.database.remind[chat_id_str] = self.database.remind[chat_id_str] or {}
+  if msg.chat.type == 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= config.remind.max_reminders_private then
 	output = 'Sorry, du kannst keine Erinnerungen mehr hinzufügen.'
-  elseif msg.chat.type ~= 'private' and utilities.table_size(self.database.reminders[chat_id_str]) >= config.remind.max_reminders_group then
+  elseif msg.chat.type ~= 'private' and utilities.table_size(self.database.remind[chat_id_str]) >= config.remind.max_reminders_group then
 	output = 'Sorry, diese Gruppe kann keine Erinnerungen mehr hinzufügen.'
   else
 	-- Put together the reminder with the expiration, message, and message to reply to.
@@ -61,7 +66,7 @@ function remind:action(msg, config)
 	  time = timestamp,
 	  message = message
 	}
-	table.insert(self.database.reminders[chat_id_str], reminder)
+	table.insert(self.database.remind[chat_id_str], reminder)
 	local human_readable_time = convert_timestamp(timestamp, '%H:%M:%S')
 	output = 'Ich werde dich um *'..human_readable_time..' Uhr* erinnern.'
   end
@@ -71,13 +76,13 @@ end
 function remind:cron(config)
 	local time = os.time()
 	-- Iterate over the group entries in the reminders database.
-	for chat_id, group in pairs(self.database.reminders) do
+	for chat_id, group in pairs(self.database.remind) do
 		-- Iterate over each reminder.
 		for k, reminder in pairs(group) do
 			-- If the reminder is past-due, send it and nullify it.
 			-- Otherwise, add it to the replacement table.
 			if time > reminder.time then
-				local output = '*ERINNERUNG:*\n"' .. utilities.md_escape(reminder.message) .. '"'
+				local output = '<b>ERINNERUNG:</b>\n"'..utilities.html_escape(reminder.message)..'"'
 				local res = utilities.send_message(chat_id, output, true, nil, true)
 				-- If the message fails to send, save it for later (if enabled in config).
 				if res or not config.remind.persist then

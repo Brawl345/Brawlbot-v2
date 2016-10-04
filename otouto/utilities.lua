@@ -4,21 +4,8 @@
 
     Copyright 2016 topkecleon <drew@otou.to>
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Affero General Public License version 3 as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    This code is licensed under the GNU AGPLv3. See /LICENSE for details.
 ]]--
-
-local utilities = {}
 
 utf8 = require('lua-utf8')
 ltn12 = require('ltn12')
@@ -35,6 +22,8 @@ helpers = require "OAuth.helpers"
 
 http.TIMEOUT = 10
 https.TIMEOUT = 10
+
+local utilities = {}
 
  -- For the sake of ease to new contributors and familiarity to old contributors,
  -- we'll provide a couple of aliases to real bindings here.
@@ -295,7 +284,7 @@ end
 -- https://core.telegram.org/bots/api#answerinlinequery
 function utilities.answer_inline_query(inline_query, results, cache_time, is_personal, next_offset, switch_pm_text, switch_pm_parameter)
 	return bindings.request(
-		'answerInlineQuery',
+		'answerlineQuery',
 		{
 			inline_query_id	 = inline_query.id,
 			results = results,
@@ -310,7 +299,7 @@ end
 
 function abort_inline_query(inline_query)
 	return bindings.request(
-		'answerInlineQuery',
+		'answerlineQuery',
 		{
 			inline_query_id	 = inline_query.id,
 			cache_time = 5,
@@ -461,7 +450,7 @@ end
  -- Get the number of values in a key/value table.
 function utilities.table_size(tab)
 	local i = 0
-	for _,_ in pairs(tab) do
+	for _ in pairs(tab) do
 		i = i + 1
 	end
 	return i

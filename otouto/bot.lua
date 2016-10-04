@@ -20,7 +20,7 @@
 
 local bot = {}
 
-bot.version = '2.2.7'
+bot.version = '2.3'
 
 function bot:init(config) -- The function run when the bot is started or reloaded.
     assert(config.bot_api_key, 'Dein Bot-Token ist nicht in der Config gesetzt!')
@@ -39,6 +39,16 @@ function bot:init(config) -- The function run when the bot is started or reloade
 	if not self.database then
 		self.database = utilities.load_data(self.info.username..'.db')
 	end
+    
+    -- Migration code 2.2.7 -> 2.3
+    -- "database.reminders" -> "database.remind"
+    if self.database.version ~= '2.3' then
+        self.database.remind = self.database.reminders
+        self.database.reminders = nil
+    end
+    -- End migration code.
+    
+    self.database.version = bot.version
 
 	self.plugins = {} -- Load plugins.
 	enabled_plugins = load_plugins()
@@ -72,7 +82,7 @@ function bot:on_msg_receive(msg, config) -- The fn run whenever a message is rec
 	end
 
 	-- Support deep linking.
-	if msg.text:match('^'..config.cmd_pat..'start .+') then
+	if msg.text:match('^/start .+') then
 		msg.text = config.cmd_pat .. utilities.input(msg.text)
 		msg.text_lower = msg.text:lower()
 	end
@@ -302,6 +312,7 @@ function match_plugins(self, msg, config, plugin)
 	end)
 	if not success then
 	  utilities.handle_exception(self, result, msg.from.id .. ': ' .. msg.text, config.log_chat)
+      msg = nil
 	  return
 	end
 	-- if one pattern matches, end

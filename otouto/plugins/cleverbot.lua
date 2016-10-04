@@ -6,7 +6,7 @@ function cleverbot:init(config)
 	"^[Bb]rawlbot, (.+)$",
 	"^[Bb]ot, (.+)$"
 	}
-	cleverbot.url = config.chatter.cleverbot_api
+	cleverbot.url = config.cleverbot.cleverbot_api
 end
 
 cleverbot.command = 'cbot <Text>'
@@ -16,13 +16,13 @@ function cleverbot:action(msg, config, matches)
   local text = matches[1]
   local query, code = https.request(cleverbot.url..URL.escape(text))
   if code ~= 200 then
-	utilities.send_reply(msg, 'Ich möchte jetzt nicht reden...')
+	utilities.send_reply(msg, config.cleverbot.connection)
 	return
   end
 
   local data = json.decode(query)
   if not data.clever then
-    utilities.send_reply(msg, 'Ich möchte jetzt nicht reden...')
+    utilities.send_reply(msg, config.cleverbot.response)
 	return
   end
 
