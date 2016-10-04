@@ -119,7 +119,7 @@ function utilities.send_photo(chat_id, file, text, reply_to_message_id, reply_ma
 			photo = file
 		}
 	)
-	if string.match(file, '/tmp/') then
+	if string.match(file, '^/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
 	end
@@ -143,7 +143,7 @@ function utilities.send_audio(chat_id, file, text, reply_to_message_id, duration
 			audio = file
 		}
 	)
-	if string.match(file, '/tmp/') then
+	if string.match(file, '^/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
 	end
@@ -165,7 +165,7 @@ function utilities.send_document(chat_id, file, text, reply_to_message_id, reply
 			document = file
 		}
 	)
-	if string.match(file, '/tmp/') then
+	if string.match(file, '^/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
 	end
@@ -189,7 +189,7 @@ function utilities.send_video(chat_id, file, text, reply_to_message_id, duration
 			video = file
 		}
 	)
-	if string.match(file, '/tmp/') then
+	if string.match(file, '^/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
 	end
@@ -212,7 +212,7 @@ function utilities.send_voice(chat_id, file, text, reply_to_message_id, duration
 			voice = file
 		}
 	)
-	if string.match(file, '/tmp/') then
+	if string.match(file, '^/tmp/') then
 	  os.remove(file)
 	  print("Deleted: "..file)
 	end
