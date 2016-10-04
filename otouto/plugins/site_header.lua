@@ -10,6 +10,7 @@ end
 function site_header:action(msg, config, matches)
   if not is_sudo(msg, config) then
 	utilities.send_reply(msg, config.errors.sudo)
+    return
   end
   
   local url = matches[2]
