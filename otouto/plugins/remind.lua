@@ -83,7 +83,7 @@ function remind:cron(config)
 			-- Otherwise, add it to the replacement table.
 			if time > reminder.time then
 				local output = '<b>ERINNERUNG:</b>\n"'..utilities.html_escape(reminder.message)..'"'
-				local res = utilities.send_message(chat_id, output, true, nil, true)
+				local res = utilities.send_message(chat_id, output, true, nil, 'HTML')
 				-- If the message fails to send, save it for later (if enabled in config).
 				if res or not config.remind.persist then
 					group[k] = nil
