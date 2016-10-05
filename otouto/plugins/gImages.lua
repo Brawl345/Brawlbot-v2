@@ -72,7 +72,7 @@ function gImages:cache_result(results, text)
   cache_data('gImages', string.lower(text), cache, 1209600, 'set')
 end
 
-function gImages:send_image(msg, input)
+function gImages:send_image(msg, input, config)
   utilities.send_typing(msg.chat.id, 'upload_photo')
 
   local hash = 'telegram:cache:gImages'
@@ -144,7 +144,7 @@ function gImages:callback(callback, msg, self, config, input)
   else
     utilities.answer_callback_query(callback, 'Suche nochmal nach "'..input..'"')
   end
-  gImages:send_image(msg, input)
+  gImages:send_image(msg, input, config)
 end
 
 function gImages:action(msg, config, matches)
@@ -164,7 +164,7 @@ function gImages:action(msg, config, matches)
 	return
   end
   
-  gImages:send_image(msg, input)
+  gImages:send_image(msg, input, config)
 end
 
 return gImages
