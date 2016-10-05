@@ -88,6 +88,7 @@ function creds_manager:rename_creds(var, newvar)
 end
 
 function creds_manager:callback(callback, msg, self, config)
+  utilities.answer_callback_query(callback)
   utilities.delete_message(msg.chat.id, msg.message_id)
 end
 
