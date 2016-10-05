@@ -111,7 +111,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   -- vardump(callback)
 
   if not callback.data:find(':') then
-    utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Parameter.')
+    utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Parameter.', true)
 	return
   end
 
@@ -165,7 +165,7 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
       -- Check if plugin is disabled on this chat
       if msg then
 	    if is_plugin_disabled_on_chat(plugin.name, msg) then
-          utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.')
+          utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.', true)
           return
         end
       end
@@ -174,13 +174,13 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
 	    plugin:callback(callback, msg, self, config, param)
         return
       else
-        utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Plugin unterstützt keine Callbacks.')
+        utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Plugin unterstützt keine Callbacks.', true)
         return
       end
 	end
   end
   
-   utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Plugin gefunden.')
+   utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Plugin gefunden.', true)
 end
 
 -- NOTE: To enable InlineQuerys, send /setinline to @BotFather
