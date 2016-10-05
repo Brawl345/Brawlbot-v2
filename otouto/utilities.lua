@@ -284,7 +284,7 @@ end
 -- https://core.telegram.org/bots/api#answerinlinequery
 function utilities.answer_inline_query(inline_query, results, cache_time, is_personal, next_offset, switch_pm_text, switch_pm_parameter)
 	return bindings.request(
-		'answerlineQuery',
+		'answerInlineQuery',
 		{
 			inline_query_id	 = inline_query.id,
 			results = results,
@@ -299,7 +299,7 @@ end
 
 function abort_inline_query(inline_query)
 	return bindings.request(
-		'answerlineQuery',
+		'answerInlineQuery',
 		{
 			inline_query_id	 = inline_query.id,
 			cache_time = 5,
