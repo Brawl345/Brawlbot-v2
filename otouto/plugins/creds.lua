@@ -87,6 +87,10 @@ function creds_manager:rename_creds(var, newvar)
   end
 end
 
+function creds_manager:callback(callback, msg, self, config)
+  utilities.delete_message(msg.chat.id, msg.message_id)
+end
+
 function creds_manager:action(msg, config, matches)
   local receiver = msg.from.id
   if not is_sudo(msg, config) then
@@ -100,7 +104,7 @@ function creds_manager:action(msg, config, matches)
   end
   
   if matches[1] == "/creds" then
-    utilities.send_reply(msg, creds_manager:list_creds())
+    utilities.send_reply(msg, creds_manager:list_creds(), false, '{"inline_keyboard":[[{"text":"Keys verbergen","callback_data":"creds:"}]]}')
     return
   elseif matches[1] == "/creds add" then
     local var = string.lower(string.sub(matches[2], 1, 50))
