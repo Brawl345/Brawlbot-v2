@@ -110,11 +110,6 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
   -- vardump(msg)
   -- vardump(callback)
 
-  if msg.date < os.time() - 3600 then -- Do not process old messages.
-    utilities.answer_callback_query(callback, 'Nachricht älter als eine Stunde, bitte sende den Befehl selbst noch einmal.', true)
-    return
-  end
-  
   if not callback.data:find(':') then
     utilities.answer_callback_query(callback, 'Ungültiger CallbackQuery: Kein Parameter.')
 	return
@@ -122,36 +117,40 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
 
   -- Check if user is blocked
   local user_id = callback.from.id
-  local chat_id = msg.chat.id
   if redis:get('blocked:'..user_id) then
     utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 	return
   end
  
-  -- Check if user is banned
-  local banned = redis:get('banned:'..chat_id..':'..user_id)
-  if banned then
-    utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
-	return
-  end
+  -- Check if user is banned, not working for Callbacks from InlineQuerys!
+  if msg then
+    local chat_id = msg.chat.id
+    local banned = redis:get('banned:'..chat_id..':'..user_id)
+    if banned then
+      utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
+	  return
+    end
   
-  -- Check if whitelist is enabled and user/chat is whitelisted
-  local whitelist = redis:get('whitelist:enabled')
-  if whitelist and not is_sudo(callback, config) then
-	local hash = 'whitelist:user#id'..user_id
-	local allowed = redis:get(hash) or false
-	if not allowed then
-      if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
-        local allowed = redis:get('whitelist:chat#id'.. chat_id)
-	    if not allowed then
+    -- Check if whitelist is enabled and user/chat is whitelisted
+    local whitelist = redis:get('whitelist:enabled')
+    if whitelist and not is_sudo(callback, config) then
+	  local hash = 'whitelist:user#id'..user_id
+	  local allowed = redis:get(hash) or false
+	  if not allowed then
+        if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
+          local allowed = redis:get('whitelist:chat#id'.. chat_id)
+	      if not allowed then
+	        utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
+		    return
+	      end
+	    else
 	      utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
 		  return
 	    end
-	  else
-	    utilities.answer_callback_query(callback, 'Du darfst den Bot nicht nutzen!', true)
-		return
 	  end
-	end
+    end
+
+    msg = utilities.enrich_message(msg)
   end
 
   local called_plugin = callback.data:match('(.*):.*')
@@ -159,12 +158,18 @@ function bot:on_callback_receive(callback, msg, config) -- whenever a new callba
 
   print('Callback Query "'..param..'" für Plugin "'..called_plugin..'" ausgelöst von '..callback.from.first_name..' ('..callback.from.id..')')
 
-  msg = utilities.enrich_message(msg)
-
   for n=1, #self.plugins do
     local plugin = self.plugins[n]
 	if plugin.name == called_plugin then
-	  if is_plugin_disabled_on_chat(plugin.name, msg) then utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.') return end
+      
+      -- Check if plugin is disabled on this chat
+      if msg then
+	    if is_plugin_disabled_on_chat(plugin.name, msg) then
+          utilities.answer_callback_query(callback, 'Plugin wurde in diesem Chat deaktiviert.')
+          return
+        end
+      end
+      
       if plugin.callback then
 	    plugin:callback(callback, msg, self, config, param)
         return
