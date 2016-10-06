@@ -83,7 +83,27 @@ function pixabay:get_pixabay(term)
   return image_url, full_url, page_url, user, tags
 end
 
+function pixabay:callback(callback, msg, self, config, input)
+  utilities.send_typing(msg.chat.id, 'upload_photo')
+  local input = URL.unescape(input)
+ 
+  local url, full_url, page_url, user, tags = pixabay:get_pixabay(input)
+
+  if not url then
+    utilities.answer_callback_query(callback, 'Verbindung mit Pixabay fehlgeschlagen :(', true)
+    return
+  elseif url == 'NOPIX' then
+    utilities.answer_callback_query(callback, 'Keine Ergebnisse gefunden!', true)
+	return
+  else
+	utilities.answer_callback_query(callback, 'Suche nochmal nach "'..input..'"')
+    local text = '"'..tags..'" von '..user
+    utilities.send_photo(msg.chat.id, url, text, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..page_url..'"},{"text":"Volles Bild (Login)","url":"'..full_url..'"},{"text":"Nochmal suchen","callback_data":"pixabay:'..URL.escape(input)..'"}]]}')
+  end
+end
+
 function pixabay:action(msg, config, matches)
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local term = matches[1]
   if matches[2] then
     if redis:exists("telegram:cache:pixabay:"..matches[2]) == true then -- if cached
@@ -96,17 +116,21 @@ function pixabay:action(msg, config, matches)
 	else
       url, full_url, page_url, user, tags = pixabay:get_pixabay_directlink(matches[2])
 	end
+    callback_button = ''
   else
     url, full_url, page_url, user, tags = pixabay:get_pixabay(term)
+    callback_button = ',{"text":"Nochmal suchen","callback_data":"pixabay:'..URL.escape(matches[1])..'"}'
   end
   
-  if url == 'NOPIX' then
+  if not url then
+    utilities.send_reply(msg, config.errors.connection)
+    return
+  elseif url == 'NOPIX' then
     utilities.send_reply(msg, config.errors.results)
 	return
   else
-    utilities.send_typing(msg.chat.id, 'upload_photo')
 	local text = '"'..tags..'" von '..user
-    utilities.send_photo(msg.chat.id, url, text, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..page_url..'"},{"text":"Volles Bild (Login notwendig)","url":"'..full_url..'"}]]}')
+    utilities.send_photo(msg.chat.id, url, text, msg.message_id, '{"inline_keyboard":[[{"text":"Seite aufrufen","url":"'..page_url..'"},{"text":"Volles Bild (Login)","url":"'..full_url..'"}'..callback_button..']]}')
     return
   end
 end
