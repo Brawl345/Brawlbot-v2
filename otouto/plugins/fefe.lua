@@ -5,7 +5,7 @@ fefe.triggers = {
 }
 
 function fefe:post(id)
-  local url = 'http://'..id
+  local url = 'https://'..id
   local results, code = https.request(url)
   if code ~= 200 then return "HTTP-Fehler" end
   if string.match(results, "No entries found.") then return "Eintrag nicht gefunden." end
@@ -16,17 +16,14 @@ function fefe:post(id)
   local text = text:gsub("<li><a href=\"%?ts=%w%w%w%w%w%w%w%w\">%[l]</a>", "")
   -- replace "<p>" with newline; "<b>" and "</b>" with "*"
   local text = text:gsub("<p>", "\n\n"):gsub("<p u>", "\n\n")
-  local text = text:gsub("<b>", "*"):gsub("</b>", "*")
-  local text = text:gsub("<i>", "_"):gsub("</i>", "_")
   -- format quotes and links markdown-like
-  local text = text:gsub("<a href=\"", "("):gsub("\">", ")["):gsub("</a>", "]")
   local text = text:gsub("<blockquote>", "\n\n> "):gsub("</blockquote>", "\n\n")
 
   return text
 end
 
 function fefe:action(msg, config, matches)
-  utilities.send_reply(msg, fefe:post(matches[1]))
+  utilities.send_reply(msg, fefe:post(matches[1]), 'HTML')
 end
 
 return fefe
