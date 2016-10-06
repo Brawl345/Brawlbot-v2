@@ -43,11 +43,12 @@ function flickr:send_flickr_photo_data(data)
 	  return text, image_url
 	end
   else
-    return '"'..title..'", aufgenommen '..taken..' von '..username..' ('..data.views..' Aufrufe)\nBild konnte nicht gedownloadet werden (Keine Berechtigung)'
+    return '<b>'..title..'</b>, aufgenommen '..taken..' von <b>'..username..'</b> <i>('..data.views..' Aufrufe)</i>\nBild konnte nicht gedownloadet werden (Keine Berechtigung)'
   end
 end
 
 function flickr:action(msg, config, matches)
+  utilities.send_typing(msg.chat.id, 'upload_photo')
   local data = flickr:get_flickr_photo_data(matches[2])
   if not data then utilities.send_reply(msg, config.errors.connection) return end
   local text, image_url, isgif = flickr:send_flickr_photo_data(data)
@@ -63,7 +64,7 @@ function flickr:action(msg, config, matches)
 	  return
 	end
   else
-    utilities.send_reply(msg, text)
+    utilities.send_reply(msg, text, 'HTML')
 	return
   end
 end
