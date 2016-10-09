@@ -89,13 +89,13 @@ function get_tweet(response)
     for k, v in pairs(response.extended_entities.media) do
         local url = v.url
 		if v.video_info then
-		  if v.video_info.variants[#v.video_info.variants].bitrate == 2176000 then
-		    local vid = v.video_info.variants[#v.video_info.variants].url
-			videos[#videos+1] = vid
-		  else
-		    local vid = v.video_info.variants[1].url
-			videos[#videos+1] = vid
-		  end
+		  for i in pairs(v.video_info.variants) do
+            if v.video_info.variants[i].content_type == 'video/mp4' then -- first mp4 is usually the highest res
+              local vid = v.video_info.variants[i].url
+              videos[#videos+1] = vid
+              break;
+            end
+          end
 		else
            images[#images+1] = v.media_url_https
         end
@@ -166,7 +166,8 @@ function twitter:action(msg, config, matches)
 	utilities.send_photo(msg.chat.id, v, nil, msg.message_id)
   end
   for k, v in pairs(videos) do
-	utilities.send_video(msg.chat.id, v, nil, msg.message_id)
+    local file = download_to_file(v)
+	utilities.send_video(msg.chat.id, file, nil, msg.message_id)
   end
 end
 
