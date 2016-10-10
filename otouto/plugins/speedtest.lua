@@ -2,7 +2,8 @@ local speedtest = {}
 
 speedtest.triggers = {
   "speedtest.net/my%-result/(%d+)",
-  "speedtest.net/my%-result/i/(%d+)"
+  "speedtest.net/my%-result/i/(%d+)",
+  "speedtest.net/my%-result/a/(%d+)"
 }
 
 function speedtest:action(msg, config, matches)
