@@ -24,7 +24,11 @@ end
 function github:send_github_data(data)
   if not data.owner then return nil end
   local name = '<b>'..data.name..'</b>'
-  local description = '<i>'..data.description..'</i>'
+  if data.description then
+    description = '\n<i>'..data.description..'</i>'
+  else
+    description = ''
+  end
   local owner = data.owner.login
   local clone_url = data.clone_url
   if data.language == nil or data.language == "" then
@@ -42,7 +46,7 @@ function github:send_github_data(data)
   else
     homepage = '\n<a href="'..data.homepage..'">Homepage besuchen</a>'
   end
-  local text = name..' von '..owner..'\n'..description..'\n<pre>git clone '..clone_url..'</pre>'..language..issues..homepage
+  local text = name..' von '..owner..description..'\n<pre>git clone '..clone_url..'</pre>'..language..issues..homepage
   return text
 end
 
