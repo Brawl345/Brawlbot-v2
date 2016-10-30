@@ -27,14 +27,14 @@ function send_wikia_article(wikia, article)
   local abstract = data.items[id].abstract
   local article_url = data.basepath..data.items[id].url
   
-  local text = '*'..title..'*:\n'..abstract..' [Weiterlesen]('..article_url..')'
+  local text = '<b>'..title..'</b>:\n'..abstract..' <a href="'..article_url..'">Weiterlesen</a>'
   return text
 end
 
 function wikia:action(msg, config, matches)
   local wikia = matches[1]
   local article = matches[2]
-  utilities.send_reply(msg, send_wikia_article(wikia, article), true)
+  utilities.send_reply(msg, send_wikia_article(wikia, article), 'HTML')
 end
 
 return wikia
