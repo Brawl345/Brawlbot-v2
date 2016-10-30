@@ -80,20 +80,11 @@ function afk:pre_process(msg)
     local duration = makeHumanTime(afk_time)
    
 	redis:hset(hash, 'afk', false)
-	local show_afk_keyboard = redis:hget(uhash, 'afk_keyboard')
     if afk_text then
 	  redis:hset(hash, 'afk_text', false)
-	  if show_afk_keyboard == 'true' then
-	    utilities.send_reply(msg, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', 'HTML', '{"hide_keyboard":true,"selective":true}')
-	 else
-	   utilities.send_message(chat_id, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', true, nil, 'HTML')
-	 end
+	  utilities.send_message(chat_id, user_name..' ist wieder da (war: <b>'..afk_text..'</b> für '..duration..')!', true, nil, 'HTML')
 	else
-	  if show_afk_keyboard == 'true' then
-	    utilities.send_reply(msg, user_name..' ist wieder da (war '..duration..' weg)!', nil, '{"hide_keyboard":true,"selective":true}')
-	  else
-	    utilities.send_message(chat_id, user_name..' ist wieder da (war '..duration..' weg)!')
-	  end
+	  utilities.send_message(chat_id, user_name..' ist wieder da (war '..duration..' weg)!')
 	end
   end
   
@@ -111,14 +102,8 @@ function afk:action(msg, config, matches)
   local user_name = get_name(msg)
   local timestamp = msg.date
   local uhash = 'user:'..msg.from.id
-  local show_afk_keyboard = redis:hget(uhash, 'afk_keyboard')
-  if show_afk_keyboard == 'true' then
-    keyboard = '{"keyboard":[[{"text":"Wieder da."}]], "one_time_keyboard":true, "selective":true, "resize_keyboard":true}'
-  else
-    keyboard = nil
-  end
   
-  utilities.send_reply(msg, afk:switch_afk(user_name, user_id, chat_id, timestamp, matches[2]), false, keyboard)
+  utilities.send_reply(msg, afk:switch_afk(user_name, user_id, chat_id, timestamp, matches[2]), false)
 end
 
 return afk

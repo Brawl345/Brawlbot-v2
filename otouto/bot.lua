@@ -364,7 +364,7 @@ function create_plugin_set()
 	'currency',
     'banhammer',
 	'plugins',
-	'settings',
+    'respond',
     'help'
   }
   print ('enabling a few plugins - saving to redis set telegram:enabled_plugins')
