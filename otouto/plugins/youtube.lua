@@ -98,7 +98,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
   local upload_date = makeOurDate(data.snippet.publishedAt)
   local viewCount = comma_value(data.statistics.viewCount)
   if data.statistics.likeCount then
-    likeCount = ' | 👍 '..comma_value(data.statistics.likeCount)..' | 👎'
+    likeCount = ' | 👍 '..comma_value(data.statistics.likeCount)..' | 👎 '
 	dislikeCount = comma_value(data.statistics.dislikeCount)
   else
     likeCount = ''
@@ -132,7 +132,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
   if sendpic then
     local image_url = get_yt_thumbnail(data)
 	-- need to change text, because Telegram captions can only be 200 characters long and don't support Markdown
-	local text = link..'\n'..title..'\n('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..')'
+    local text = link..'\n'..title..'\n🎥 '..uploader..', 📅 '..upload_date..'\n👁 '..viewCount..' | 🕒 '..duration..likeCount..dislikeCount..commentCount..'\n'
 	if blocked then
       text = text..'\nACHTUNG, In Deutschland gesperrt!'
     end
