@@ -98,15 +98,15 @@ function send_youtube_data(data, msg, self, link, sendpic)
   local upload_date = makeOurDate(data.snippet.publishedAt)
   local viewCount = comma_value(data.statistics.viewCount)
   if data.statistics.likeCount then
-    likeCount = ', '..comma_value(data.statistics.likeCount)..' Likes und '
-	dislikeCount = comma_value(data.statistics.dislikeCount)..' Dislikes'
+    likeCount = ' | 👍 '..comma_value(data.statistics.likeCount)..' | 👎'
+	dislikeCount = comma_value(data.statistics.dislikeCount)
   else
     likeCount = ''
 	dislikeCount = ''
   end
 
   if data.statistics.commentCount then
-    commentCount = ', '..comma_value(data.statistics.commentCount)..' Kommentare'
+    commentCount = ' | 🗣 '..comma_value(data.statistics.commentCount)
   else
     commentCount = ''
   end
@@ -120,7 +120,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
     blocked = false
   end
   
-  text = '<b>'..title..'</b>\n<i>('..uploader..' am '..upload_date..', '..viewCount..'x angesehen, Länge: '..duration..likeCount..dislikeCount..commentCount..')</i>\n'
+  text = '<b>'..title..'</b>\n🎥 <b>'..uploader..'</b>, 📅 '..upload_date..'\n👁 '..viewCount..' | 🕒 '..duration..likeCount..dislikeCount..commentCount..'\n'
   if link then
     text = link..'\n'..text
   end
