@@ -39,12 +39,13 @@ function notify:pre_process(msg)
 		  if redis:sismember('chat:'..chat_id..':users', id) then
 		    -- ignore message, if user is mentioning him/herself
 		    if id ~= tostring(msg.from.id) then
-			  local send_date = run_command('date -d @'..msg.date..' +"%d.%m.%Y um %H:%M:%S Uhr"')
+			  local send_date = run_command('date -d @'..msg.date..' +"<i>%d.%m.%Y</i> | 🕒 <i>%H:%M:%S Uhr</i>"')
 			  local send_date = string.gsub(send_date, "\n", "")
 			  local from = string.gsub(msg.from.name, "%_", " ")
 			  local chat_name = string.gsub(msg.chat.title, "%_", " ")
-			  local text = from..' am '..send_date..' in "'..chat_name..'":\n\n'..msg.text
-			  utilities.send_message(id, text, true)
+			  local text = '🔔 <b>'..utilities.html_escape(from)..'</b> hat dich erwähnt:'
+              local text = text..'\n👥 <b>'..utilities.html_escape(chat_name)..'</b> | 📅 '..send_date..'\n\n'..utilities.html_escape(msg.text)
+			  utilities.send_message(id, text, true, false, 'HTML')
 			end
 		  end
 	    end
