@@ -223,7 +223,7 @@ function bot:run(config)
 
 	while self.is_started do
 		-- Update loop
-		local res = bindings.getUpdates{ timeout = 120, offset = self.last_update+1, allowed_updates = ['message', 'inline_query', 'callback_query'] }
+		local res = bindings.getUpdates{ timeout = 120, offset = self.last_update+1, allowed_updates = {'message', 'inline_query', 'callback_query'} }
 		if res then
 			-- Iterate over every new message.
 		    for n=1, #res.result do
