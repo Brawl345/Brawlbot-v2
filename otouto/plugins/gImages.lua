@@ -43,19 +43,15 @@ function gImages:get_image(input)
   local url = BASE_URL..'/?searchType=image&alt=json&num=10&key='..apikey..'&cx='..cseid..'&safe=high'..'&q=' .. input .. '&fields=items(link,mime,image(contextLink))'
   local jstr, res = https.request(url)
   local jdat = json.decode(jstr).items
-  
+
+  if res == 403 then
+    return 403
+  end
+
   if not jdat then
 	return 'NORESULTS'
   end
 
-  if jdat.error then
-    if jdat.error.code == 403 then
-	  return 403
-    else
-	  return false
-	end
-  end
-  
   return jdat
 end
 

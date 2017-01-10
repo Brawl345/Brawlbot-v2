@@ -2,13 +2,14 @@ local respond = {}
 
 function respond:init(config)
     respond.triggers = {
-	"([Ff][Gg][Tt].? [Ss][Ww][Ii][Ff][Tt])",
+	"/[Ss][Hh][Rr][Uu][Gg]",
+    "([Ff][Gg][Tt].? [Ss][Ww][Ii][Ff][Tt])",
 	"([Ee][Ii][Nn][Zz][Ii][Gg][Ss][Tt][Ee][Ss])",
 	"([Ee][Ii][Nn][Zz][Ii][Gg][Ss][Tt][Ee][Rr])",
 	"([Ee][Ii][Nn][Zz][Ii][Gg][Ss][Tt][Ee])",
 	"^[Bb][Oo][Tt]%??$",
 	"^/([Ll][Oo][Dd])$",
-	"^/([Ll][Ff])$",
+	"/([Ll][Ff])",
 	"^/([Kk][Aa])$",
 	"^/([Ii][Dd][Kk])$",
 	"^/([Nn][Bb][Cc])$",
@@ -71,7 +72,7 @@ function respond:action(msg, config, matches)
   elseif string.match(msg.text, "[Ll][Ff]") then
     utilities.send_message(receiver,  '( ͡° ͜ʖ ͡°)')
     return
-  elseif string.match(msg.text, "[Nn][Bb][Cc]") or string.match(msg.text, "[Ii][Dd][Cc]") or string.match(msg.text, "[Kk][Aa]") or string.match(msg.text, "[Ii][Dd][Kk]")  then
+  elseif string.match(msg.text, "[Nn][Bb][Cc]") or string.match(msg.text, "[Ii][Dd][Cc]") or string.match(msg.text, "[Kk][Aa]") or string.match(msg.text, "[Ii][Dd][Kk]") or string.match(msg.text, "/[Ss][Hh][Rr][Uu][Gg]") then
     utilities.send_message(receiver,  [[¯\_(ツ)_/¯]])
 	return
   elseif string.match(msg.text, "[Ff][Rr][Oo][Ss][Cc][Hh]") then
