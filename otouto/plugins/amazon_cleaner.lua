@@ -19,7 +19,12 @@ function cln_amzn:action(msg, config, matches)
 
    local ok, response_code, response_headers = http.request(request_constructor)
    local long_url = response_headers.location
-   local domain, product_id = long_url:match('amazon.(%w+)/gp/product/(.+)/(.+)')
+   if not long_url then return end
+   local domain, product_id = long_url:match('amazon.(%w+)/gp/product/(.+)/.+')
+   if not product_id then
+     domain, product_id = long_url:match('amazon.(%w+)/.+/dp/(.+)/')
+   end
+   if not product_id then return end
    utilities.send_reply(msg, 'Ohne Ref: https://amazon.'..domain..'/dp/'..product_id)
    return
   end
