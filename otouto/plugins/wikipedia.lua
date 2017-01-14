@@ -8,6 +8,7 @@ function wikipedia:init(config)
       "^/[Ww]iki (search) ?(.*)$",
       "^/[Ww]iki(%w+) (.+)$",
       "^/[Ww]iki ?(.*)$",
+      "(%w+).m.wikipedia.org/wiki/(.+)",
   	  "(%w+).wikipedia.org/wiki/(.+)"
 	}
 	wikipedia.inline_triggers = {
