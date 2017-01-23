@@ -3,62 +3,25 @@
 
 Der multifunktionale Telegram-Bot.
 
-[Offizielle Webseite](https://brawlbot.tk) | [Entwickler auf Telegram](http://telegram.me/Brawl) **KEIN SUPPORT!** | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
+[Offizielle Webseite](https://brawlbot.tk) | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
 
 Brawlbot ist ein auf Plugins basierender Bot, der die [offizielle Telegram Bot API](http://core.telegram.org/bots/api) benutzt. Ursprünglich wurde er im Dezember 2014 auf Basis von Yagops [Telegram Bot](https://github.com/yagop/telegram-bot/) entwickelt, da aber die Entwicklung von tg-cli [zum Stillstand](https://brawlbot.tk/posts/ein-neuanfang) gekommen ist, wurden alle Plugins des bisher proprietären Brawlbots im Juni 2016 auf die Bot-API portiert und open-sourced.  
 **Brawlbot v2 basiert auf [otouto](https://github.com/topkecleon/otouto) von topkecleon.**
 
-**HINWEIS::** Ich gebe KEINEN Support für das Aufsetzen des Bots!
+**HINWEIS::** Es gibt KEINEN Support für das Aufsetzen des Bots!
 
-Brawlbot v2 ist freie Software; du darfst ihn modifizieren und weiterverbreiten, allerdings musst du dich an die GNU Affero General Public License v3 halten, siehe **LICENSE** für Details.
+Brawlbot v2 ist freie Software; du darfst ihn modifizieren und weiterverbreiten, allerdings musst du dich an die GNU Affero General Public License v3 halten, siehe **LICENSE** für Details. **Das heißt, du musst den Quellcode veröffentlichen, wenn du den Bot selbst nutzt!**
 
 ##Anleitung
 
 | Für User                                     | Für Entwickler|
-|:----------------------------------------------|:------------------------------|
-| [Setup](#setup)                               | [Plugins](#plugins)           |
-| [Bot steuern](#bot-steuern)           | [Bindings](#bindings)         |
+|:---------------------------------------------|:------------------------------|
+| [Bot steuern](#bot-steuern)                   | [Plugins](#plugins)           |
+|                                               | [Bindings](#bindings)         |
 |												| [Datenbank](#datenbank)
 
 * * *
 # Für User
-## Setup
-### Uberspace
-Der Bot kann mit einem einfachen Installationsskript bei [Uberspace](https://uberspace.de) gehostet werden. Führe einfach `./install-on-uberspace.sh` aus!
-
-### Ubuntu und Debian
-Falls du Ubuntu oder Debian verwendest, kannst du einfach `./install-dependencies.sh` ausführen, damit alles installiert wird. Ergänze dann noch den `bot_api_key` und die `admin`-ID (Bekommst du in Telegram mit `@Brawlbot id`) und kopiere die config.lua.example nach config.lua.
-
-Für eine manuelle Installation musst du LuaRocks für 5.2 [selbst kompilieren](http://stackoverflow.com/a/20359102).
-
-### Setup
-Du benötigst **Lua 5.2** (Lua 5.3 funktioniert NICHT!), eine aktive **Redis-Instanz** und die folgenden **LuaRocks-Module**:
-* luautf8
-* luasocket
-* luasec
-* multipart-post
-* dkjson
-* lpeg
-* redis-lua
-* fakeredis
-* oauth
-* xml
-* feedparser
-* serpent
-
-Klone danach diese Repo. kopiere die `config.lua.example` nach `config.lua` und trage folgendes ein:
-
- - `bot_api_key`: API-Token vom BotFather
- - `admin`: Deine Telegram-ID
-
-Starte danach den Bot mit `./launch.sh`. Um den Bot anzuhalten, führe erst `/halt` über Telegram aus.
-
-Beim Start werden einige Werte in die Redis-Datenbank unter `telegram:credentials` und `telegram:enabled_plugins` eingetragen. Mit `/plugins enable` kannst du Plugins aktivieren, es sind nicht alle von Haus aus aktiviert.
-
-Einige Plugins benötigen API-Keys, bitte gehe die einzelnen Plugins durch, bevor du sie aktivierst!
-
-* * *
-
 ## Bot steuern
 Ein Administrator kann den Bot über folgende Plugins steuern:
 
