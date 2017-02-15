@@ -6,34 +6,29 @@ function cleverbot:init(config)
 	"^[Bb]rawlbot, (.+)$",
 	"^[Bb]ot, (.+)$"
 	}
-	cleverbot.url = config.cleverbot.cleverbot_api
 end
 
 cleverbot.command = 'cbot <Text>'
 
+local BASE_URL = 'https://www.cleverbot.com/getreply'
+local apikey = cred_data.cleverbot_apikey -- get your key here: https://www.cleverbot.com/api/
+
 function cleverbot:action(msg, config, matches)
   utilities.send_typing(msg.chat.id, 'typing')
   local text = matches[1]
-  local query, code = https.request(cleverbot.url..URL.escape(text))
+  local query, code = https.request(BASE_URL..'?key='..apikey..'&input='..URL.escape(text))
   if code ~= 200 then
-	utilities.send_reply(msg, config.cleverbot.connection)
+	utilities.send_reply(msg, config.errors.connection)
 	return
   end
 
   local data = json.decode(query)
-  if not data.clever then
-    utilities.send_reply(msg, config.cleverbot.response)
+  if not data.output then
+    utilities.send_reply(msg, 'Ich möchte jetzt nicht reden...')
 	return
   end
 
-  local answer = string.gsub(data.clever, "&Auml;", "Ä")
-  local answer = string.gsub(answer, "&auml;", "ä")
-  local answer = string.gsub(answer, "&Ouml;", "Ö")
-  local answer = string.gsub(answer, "&ouml;", "ö")
-  local answer = string.gsub(answer, "&Uuml;", "Ü")
-  local answer = string.gsub(answer, "&uuml;", "ü")
-  local answer = string.gsub(answer, "&szlig;", "ß")
-  utilities.send_reply(msg, answer)
+  utilities.send_reply(msg, data.output)
 end
 
 return cleverbot
