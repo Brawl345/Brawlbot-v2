@@ -59,12 +59,5 @@ Sende /hilfe, um zu starten
         max_duration = 526000,
         max_reminders_group = 10,
         max_reminders_private = 50
-    },
-
-    cleverbot = {
-        cleverbot_api = 'https://brawlbot.tk/apis/chatter-bot-api/cleverbot.php?text=',
-        connection = 'Ich möchte jetzt nicht reden.',
-        response = 'Ich weiß nicht, wie ich darauf reagieren soll.'
     }
-
 }
