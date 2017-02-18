@@ -1,5 +1,4 @@
--- YOU NEED THE FOLLOWING FOLDERS: photo, document, video, voice
--- PLEASE ADJUST YOUR PATH BELOW
+-- YOU NEED THE FOLLOWING FOLDERS IN YOUR SAVE PATH: photo, document, video, voice
 
 local media_download = {}
 

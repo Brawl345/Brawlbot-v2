@@ -16,7 +16,16 @@ local apikey = cred_data.cleverbot_apikey -- get your key here: https://www.clev
 function cleverbot:action(msg, config, matches)
   utilities.send_typing(msg.chat.id, 'typing')
   local text = matches[1]
-  local query, code = https.request(BASE_URL..'?key='..apikey..'&input='..URL.escape(text))
+  local hash = get_redis_hash(msg, 'cleverbot')
+
+  local state = redis:get(hash)
+
+  if not state then
+    query, code = https.request(BASE_URL..'?key='..apikey..'&input='..URL.escape(text))
+  else
+    query, code = https.request(BASE_URL..'?key='..apikey..'&input='..URL.escape(text)..'&cs='..state)
+  end
+
   if code ~= 200 then
 	utilities.send_reply(msg, config.errors.connection)
 	return
@@ -28,6 +37,7 @@ function cleverbot:action(msg, config, matches)
 	return
   end
 
+  redis:set(hash, data.cs)
   utilities.send_reply(msg, data.output)
 end
 
