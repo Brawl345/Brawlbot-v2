@@ -141,7 +141,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
         dislikeCount = ''
     end
     if data.statistics.commentCount then
-        commentCount = ' | 🗣 '..comma_value(data.statistics.commentCount)
+        commentCount = ' | 💬 '..comma_value(data.statistics.commentCount)
     else
         commentCount = ''
     end
