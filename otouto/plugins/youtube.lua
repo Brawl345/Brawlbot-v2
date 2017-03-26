@@ -106,7 +106,7 @@ function send_youtube_data(data, msg, self, link, sendpic)
   end
 
   if data.statistics.commentCount then
-    commentCount = ' | 🗣 <i>'..comma_value(data.statistics.commentCount)..'</i>'
+    commentCount = ' | 💬 <i>'..comma_value(data.statistics.commentCount)..'</i>'
   else
     commentCount = ''
   end
