@@ -88,8 +88,11 @@ function tagesschau_eil:cron()
       local title = '#EIL: <b>'..data.breakingnews[1].headline..'</b>'
       local news = data.breakingnews[1].shorttext or ''
       local posted_at = makeOurDate(data.breakingnews[1].date)..' Uhr'
-	  local post_url = string.gsub(data.breakingnews[1].details, '/api/', '/')
-	  local post_url = string.gsub(post_url, '.json', '.html')
+      post_url = 'http://tagesschau.de'
+      if data.breakingnews[1].details ~= "" then
+	    post_url = string.gsub(data.breakingnews[1].details, '/api/', '/')
+	    post_url = string.gsub(post_url, '.json', '.html')
+      end
       local eil = title..'\n<i>'..posted_at..'</i>\n'..news
       redis:set(hash..':last_entry', data.breakingnews[1].date)
 	  for _,user in pairs(redis:smembers(hash..':subs')) do
