@@ -1,7 +1,7 @@
 local tagesschau = {}
 
 tagesschau.triggers = {
-  "tagesschau.de/([A-Za-z0-9-_-_-/]+).html"
+  "www.tagesschau.de/([A-Za-z0-9-_-_-/]+).html"
 }
 
 tagesschau.inline_triggers = tagesschau.triggers
