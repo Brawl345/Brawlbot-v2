@@ -190,7 +190,7 @@ function youtube_dl:action(msg, config, matches)
 	  utilities.edit_message(msg.chat.id, first_msg.result.message_id, '<b>Die MP3 überschreitet die Grenze von 50 MB!</b>', nil, 'HTML')
 	  return
 	end
-	utilities.send_audio(msg.chat.id, file, msg.message_id)
+	utilities.send_audio(msg.chat.id, file, nil, msg.message_id)
 	return
   end
 end
