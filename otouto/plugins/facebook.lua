@@ -68,13 +68,14 @@ function facebook:send_facebook_photo(photo_id, receiver)
   local data = json.decode(res)
   
   local from = '<b>'..data.from.name..'</b>'
-  if data.name then
-    text = from..' hat ein Bild gepostet:\n'..data.name
-  else
-    text = from..' hat ein Bild gepostet:'
-  end
   local image_url = data.images[1].source
-  return text, image_url
+  if data.name then
+    text = from..' hat <a href="'..image_url..'">ein Bild</a> gepostet:\n'..data.name
+  else
+    text = from..' hat <a href="'..image_url..'">ein Bild</a> gepostet:'
+  end
+  
+  return text
 end
 
 function facebook:send_facebook_video(video_id)
@@ -144,11 +145,10 @@ function facebook:action(msg, config, matches)
     else
       photo_id = matches[4]
     end
-    local text, image_url = facebook:send_facebook_photo(photo_id, receiver)
-	if not image_url then return end
+    local text = facebook:send_facebook_photo(photo_id, receiver)
+	if not text then return end
 	utilities.send_typing(msg.chat.id, 'upload_photo')
-	utilities.send_reply(msg, text, 'HTML')
-	utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
+	utilities.send_message(msg.chat.id, text, false, msg.message_id, 'HTML')
 	return
   elseif matches[1] == 'video' or matches[2] == 'videos' then
     if not matches[3] then
