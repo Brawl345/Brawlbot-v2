@@ -68,8 +68,15 @@ function utilities.edit_message(chat_id, message_id, text, disable_web_page_prev
 	)
 end
 
+-- https://core.telegram.org/bots/api#deletemessage
 function utilities.delete_message(chat_id, message_id)
-  return utilities.edit_message(chat_id, message_id, '<i>Gelöschte Nachricht</i>', true, 'HTML')
+    return bindings.request(
+        'deleteMessage',
+        {
+			chat_id = chat_id,
+            message_id = message_id
+        }
+    )
 end
 
 function utilities.send_reply(msg, text, use_markdown, reply_markup)

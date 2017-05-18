@@ -67,12 +67,6 @@ function app_store:send_appstore_data(data)
 	ratings = ""
   end
   
-  
-  local header = '<b>'..name..'</b> v'..version..' von <b>'..author..'</b> ('..price..'):'
-  local body = '\n'..description..'\n<i>Benötigt mind. iOS '..min_ios_ver..'</i>\nGröße: '..size..' MB\nErstveröffentlicht am '..release..game_center..category
-  local footer = '\n'..avg_rating..ratings
-  local text = header..body..footer
-  
   -- Picture
   if data.screenshotUrls[1] and data.ipadScreenshotUrls[1] then
     image_url = data.screenshotUrls[1]
@@ -84,7 +78,16 @@ function app_store:send_appstore_data(data)
     image_url = nil
   end
   
-  return text, image_url
+  if image_url then
+    header = '<b>'..name..'</b> v'..version..' (<a href="'..image_url..'">Screenshot</a>) von <b>'..author..'</b> ('..price..'):'
+  else
+    header = '<b>'..name..'</b> v'..version..' von <b>'..author..'</b> ('..price..'):'
+  end
+  local body = '\n'..description..'\n<i>Benötigt mind. iOS '..min_ios_ver..'</i>\nGröße: '..size..' MB\nErstveröffentlicht am '..release..game_center..category
+  local footer = '\n'..avg_rating..ratings
+  local text = header..body..footer
+  
+  return text
 end
 
 function app_store:action(msg, config, matches)
@@ -99,12 +102,8 @@ function app_store:action(msg, config, matches)
     utilities.send_reply(msg, '<b>App nicht gefunden!</b>', 'HTML')
     return
   else
-    local output, image_url = app_store:send_appstore_data(data)
-    utilities.send_reply(msg, output, 'HTML')
-	if image_url then
-	  utilities.send_typing(msg.chat.id, 'upload_photo')
-	  utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
-	end
+    local output = app_store:send_appstore_data(data)
+    utilities.send_message(msg.chat.id, output, false, msg.message_id, 'HTML')
   end
 end
 

@@ -131,25 +131,8 @@ function send_youtube_data(data, msg, self, link, sendpic)
   
   if sendpic then
     local image_url = get_yt_thumbnail(data)
-	-- need to change text, because Telegram captions can only be 200 characters long and don't support Markdown
-    -- hacky workaround
-    if data.statistics.likeCount then
-        likeCount = ' | 👍 '..comma_value(data.statistics.likeCount)..' |'
-        dislikeCount = ' 👎 '..comma_value(data.statistics.dislikeCount)
-    else
-        likeCount = ''
-        dislikeCount = ''
-    end
-    if data.statistics.commentCount then
-        commentCount = ' | 💬 '..comma_value(data.statistics.commentCount)
-    else
-        commentCount = ''
-    end
-    local text = link..'\n'..title..'\n🎥 '..uploader..', 📅 '..upload_date..'\n👁 '..viewCount..' | 🕒 '..duration..likeCount..dislikeCount..commentCount..'\n'
-	if blocked then
-      text = text..'\nACHTUNG, In Deutschland gesperrt!'
-    end
-	utilities.send_photo(msg.chat.id, image_url, text, msg.message_id)
+	local text = '<a href="'..image_url..'">'..utilities.char.zwnj..'</a>'..text
+    utilities.send_message(msg.chat.id, text, false, msg.message_id, 'HTML')
   else
     utilities.send_reply(msg, text, 'HTML')
   end

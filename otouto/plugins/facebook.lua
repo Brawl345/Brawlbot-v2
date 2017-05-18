@@ -70,9 +70,9 @@ function facebook:send_facebook_photo(photo_id, receiver)
   local from = '<b>'..data.from.name..'</b>'
   local image_url = data.images[1].source
   if data.name then
-    text = from..' hat <a href="'..image_url..'">ein Bild</a> gepostet:\n'..data.name
+    text = from..' hat <a href="'..image_url..'">'..utilities.char.zwnj..'</a>ein Bild gepostet:\n'..data.name
   else
-    text = from..' hat <a href="'..image_url..'">ein Bild</a> gepostet:'
+    text = from..' hat <a href="'..image_url..'">'..utilities.char.zwnj..'</a>ein Bild gepostet:'
   end
   
   return text
