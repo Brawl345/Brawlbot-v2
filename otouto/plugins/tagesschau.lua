@@ -29,19 +29,19 @@ function tagesschau:get_tagesschau_article(article)
   local title = data.topline..': '..data.headline
   local news = data.shorttext
   local posted_at = makeOurDate(data.date)..' Uhr'
-  
-  local text = '<b>'..title..'</b>\n<i>'..posted_at..'</i>\n'..news
+
+
   if data.banner[1] then
-    return text, data.banner[1].variants[1].modPremium, data.shortheadline, data.shorttext
+    return '<a href="'..data.banner[1].variants[1].modPremium..'">'..utilities.char.zwnj..'</a><b>'..title..'</b>\n<i>'..posted_at..'</i>\n'..news, data.shortheadline, data.shorttext
   else
-    return text, nil, data.shortheadline, data.shorttext
+    return '<b>'..title..'</b>\n<i>'..posted_at..'</i>\n'..news, data.shortheadline, data.shorttext
   end
 end
 
 function tagesschau:inline_callback(inline_query, config, matches)
   local article = matches[1]
   local full_url = 'http://www.tagesschau.de/'..article..'.html'
-  local text, img_url, headline, shorttext = tagesschau:get_tagesschau_article(article)
+  local text, headline, shorttext = tagesschau:get_tagesschau_article(article)
   if text == 'HTTP-Fehler' or text == 'Artikel nicht gefunden!' then abort_inline_query(inline_query) return end
 
   if text:match('"') then
@@ -56,17 +56,13 @@ function tagesschau:inline_callback(inline_query, config, matches)
   
   local text = text:gsub('\n', '\\n')
   local results = '[{"type":"article","id":"11","title":"'..headline..'","description":"'..shorttext..'","url":"'..full_url..'","thumb_url":"https://anditest.perseus.uberspace.de/inlineQuerys/tagesschau/tagesschau.jpg","thumb_width":150,"thumb_height":150,"hide_url":true,"reply_markup":{"inline_keyboard":[[{"text":"Artikel aufrufen","url":"'..full_url..'"}]]},"input_message_content":{"message_text":"'..text..'","parse_mode":"HTML"}}]'
-  utilities.answer_inline_query(inline_query, results, 7200)
+  utilities.answer_inline_query(inline_query, results, 3)
 end
 
 function tagesschau:action(msg, config, matches)
   local article = matches[1]
-  local text, image_url = tagesschau:get_tagesschau_article(article)
-  if image_url then
-    utilities.send_typing(msg.chat.id, 'upload_photo')
-    utilities.send_photo(msg.chat.id, image_url, nil, msg.message_id)
-  end
-  utilities.send_reply(msg, text, 'HTML')
+  local text = tagesschau:get_tagesschau_article(article)
+  utilities.send_message(msg.chat.id, text, false, msg.message_id, 'HTML')
 end
 
 return tagesschau
