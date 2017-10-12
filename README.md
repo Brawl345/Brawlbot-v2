@@ -5,6 +5,8 @@ Der multifunktionale Telegram-Bot.
 
 [Offizielle Webseite](https://brawlbot.tk) | [Offizieller Kanal](https://telegram.me/brawlbot_updates)
 
+**Hinweis**: Der Brawlbot v2 wird nicht mehr weiterenwickelt. Einige auf der Webseite und dem offiziellem Telegram-Kanal vorhandenen Informationen beziehen sich auf die neue, nicht öffentliche Version des Brawlbot v3.
+
 Brawlbot ist ein auf Plugins basierender Bot, der die [offizielle Telegram Bot API](http://core.telegram.org/bots/api) benutzt. Ursprünglich wurde er im Dezember 2014 auf Basis von Yagops [Telegram Bot](https://github.com/yagop/telegram-bot/) entwickelt, da aber die Entwicklung von tg-cli [zum Stillstand](https://brawlbot.tk/posts/ein-neuanfang) gekommen ist, wurden alle Plugins des bisher proprietären Brawlbots im Juni 2016 auf die Bot-API portiert und open-sourced.  
 **Brawlbot v2 basiert auf [otouto](https://github.com/topkecleon/otouto) von topkecleon.**
 
